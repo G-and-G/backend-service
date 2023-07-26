@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+model User{
+user_id String @id @default(uuid()) @unique
+order Order[]
+order_id String
+hotel Hotel? 
+
+}
+
+model Order{
+  order_id String @id @default(uuid()) @unique
+  customer User? @relation(fields:[customer_id], references:[user_id])
+  customer_id String
+  date DateTime 
+  deliveryAddress Address @relation(fields: [address_id],references: [address_id])
+  address_id String 
+  product CoffeeProduct? @relation(fields:[product_id], references:[coffee_id])
+  product_id String @unique
+  expectedDeliveryTime DateTime
+  price Float 
+  review String
+  rating Float
+}
+
+model CoffeeProduct{
+  coffee_id String @id @default(uuid()) @unique
+  hotel Hotel @relation(fields: [hotel_id],references: [hotel_id])
+  order Order?
+  order_id String @unique
+  hotel_id String 
+  name String
+  price Float
+  quantity_available Int
+  type String
+}
+
+model Hotel{
+  hotel_id String @id @default(uuid()) @unique
+  admin User @relation(fields:[admin_id],references: [user_id])
+  admin_id String @unique
+  name String
+  address Address?
+  products CoffeeProduct[]
+  rating Float
+  lastMonthOrders Int
+  ThisWeekOrders Int
+  startingWorkingTime DateTime
+  endingWorkingTime DateTime
+}
+
+model Address{
+address_id String @default(uuid()) @id
+hotel Hotel @relation(fields: [hotel_id],references: [hotel_id])
+order Order[]
+hotel_id String @unique @default(uuid())
+latitude Float
+longitude Float
+street String
+district String
+sector String
+cell String
+village String 
+}
