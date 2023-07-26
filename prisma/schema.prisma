@@ -52,6 +52,7 @@ model Hotel{
   address Address?
   products CoffeeProduct[]
   rating Float
+  menu Json
   lastMonthOrders Int
   ThisWeekOrders Int
   startingWorkingTime DateTime
@@ -70,4 +71,9 @@ district String
 sector String
 cell String
 village String 
+}
+
+model Menu{
+  hotel_id Int @default(autoincrement()) @id
+
 }

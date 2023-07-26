@@ -4,7 +4,12 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 @Injectable()
 export class OrderService {
-   async getOrders():Promise<Address[]>{
+   async getOrders():Promise<Address[]>{\
+        const hotel = await prisma.hotel.create({
+            data:{
+                
+            }
+        })
         const user = await prisma.address.create({
             data:{
                 village:"Rwampara",
