@@ -4,8 +4,8 @@ import { Hotel } from '@prisma/client';
 @Controller('menu')
 export class MenuController {
     @Get('/')
-    getMenu():{
-
+    getMenu(){
+       console.log("Hello")
     }
 
 }
