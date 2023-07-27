@@ -9,74 +9,105 @@ datasource db {
   provider = "postgresql"
   url      = env("DB_URL")
 }
-model User{
-user_id String @id @default(uuid()) @unique
-order Order[]
-order_id String
-hotel Hotel? 
 
+model User {
+  user_id  String  @id @unique @default(uuid())
+  order    Order[]
+  order_id String
+  hotel    Hotel?
 }
 
-model Order{
-  order_id String @id @default(uuid()) @unique
-  customer User? @relation(fields:[customer_id], references:[user_id])
-  customer_id String
-  date DateTime 
-  deliveryAddress Address @relation(fields: [address_id],references: [address_id])
-  address_id String 
-  product CoffeeProduct? @relation(fields:[product_id], references:[coffee_id])
-  product_id String @unique
+model Order {
+  order_id             String         @id @unique @default(uuid())
+  customer             User?          @relation(fields: [customer_id], references: [user_id])
+  customer_id          String
+  date                 DateTime
+  deliveryAddress      Address        @relation(fields: [address_id], references: [address_id])
+  address_id           String
+  product              CoffeeProduct? @relation(fields: [product_id], references: [coffee_id])
+  product_id           String         @unique
   expectedDeliveryTime DateTime
-  price Float 
-  review String
-  rating Float
+  price                Float
+  review               String
+  rating               Float
 }
 
-model CoffeeProduct{
-  coffee_id String @id @default(uuid()) @unique
-  hotel Hotel @relation(fields: [hotel_id],references: [hotel_id])
-  order Order?
-  order_id String @unique
-  hotel_id Int 
-  name String
-  price Float
+model CoffeeProduct {
+  coffee_id          String @id @unique @default(uuid())
+  hotel              Hotel  @relation(fields: [hotel_id], references: [hotel_id])
+  order              Order?
+  order_id           String @unique
+  hotel_id           Int
+  name               String
+  price              Float
   quantity_available Int
-  type String
+  type               String
 }
 
-model Hotel{
-  hotel_id Int @id @default(autoincrement()) @unique
-  admin User @relation(fields:[admin_id],references: [user_id])
-  admin_id String @unique
-  name String
-  menu Menu ? 
-  menu_id Int @unique
-  address Address?
-  products CoffeeProduct[]
-  rating Float
-  lastMonthOrders Int
-  ThisWeekOrders Int
+model Hotel {
+  hotel_id            Int             @id @unique @default(autoincrement())
+  admin               User            @relation(fields: [admin_id], references: [user_id])
+  admin_id            String          @unique
+  name                String
+  menu                Menu?
+  menu_id             Int             @unique
+  address             Address?
+  products            CoffeeProduct[]
+  rating              Float
+  lastMonthOrders     Int
+  ThisWeekOrders      Int
   startingWorkingTime DateTime
-  endingWorkingTime DateTime
+  endingWorkingTime   DateTime
 }
 
-model Address{
-address_id String @default(uuid()) @id
-hotel Hotel @relation(fields: [hotel_id],references: [hotel_id])
-order Order[]
-hotel_id Int @unique 
-latitude Float
-longitude Float
-street String
-district String
-sector String
-cell String
-village String 
+model Address {
+  address_id String  @id @default(uuid())
+  hotel      Hotel   @relation(fields: [hotel_id], references: [hotel_id])
+  order      Order[]
+  hotel_id   Int     @unique
+  latitude   Float
+  longitude  Float
+  street     String
+  district   String
+  sector     String
+  cell       String
+  village    String
 }
 
-model Menu{
-  menu_id Int @id @unique @default(autoincrement())
-  hotel Hotel? @relation(fields: [hotel_id],references: [hotel_id])
-  hotel_id Int @unique
-      
+model Menu {
+  menu_id      Int         @id @unique @default(autoincrement())
+  hotel        Hotel?      @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id     Int         @unique
+  items        MenuItem[]
+  categories Category[]
+}
+
+model MenuItem {
+  menuItem_id Int    @id @unique
+  name        String
+  type        String
+
+  Menu        Menu? @relation(fields: [menuMenu_id], references: [menu_id])
+  menuMenu_id Int?
+  price Int
+  category     Category
+  sub_category SubCategory
+}
+
+enum Category {
+  DRINK
+  FOOD 
+}
+
+enum SubCategory {
+  SANDWICH
+  WRAP
+  BURGER
+  SWEETS
+  SPECIALS
+  ESPRESSO
+  FRESH_JUICE
+  ICED
+  ALCOHOL
+  SMOOTHIES
 }
