@@ -7,10 +7,10 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "gen":"prisma generate",
+    "gen": "prisma generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "form":"prisma format",
+    "form": "prisma format",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -26,13 +26,10 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mongoose": "^10.0.1",
     "@nestjs/platform-express": "^10.0.0",
-<<<<<<< HEAD
-    "@nestjs/typeorm": "^10.0.0",
-    "pg": "^8.11.1",
-=======
     "@prisma/client": "^5.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "prisma": "^5.0.0",
->>>>>>> 1c622a887f2c4626928bbcf65191be1c53e7099b
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17"
