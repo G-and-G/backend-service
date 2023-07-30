@@ -7,11 +7,11 @@ CREATE TYPE "SubCategory" AS ENUM ('SANDWICH', 'WRAP', 'BURGER', 'SWEETS', 'SPEC
 -- CreateTable
 CREATE TABLE "User" (
     "user_id" TEXT NOT NULL,
-    "order_id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    
     "username" TEXT NOT NULL,
     "telephone" TEXT NOT NULL,
 
