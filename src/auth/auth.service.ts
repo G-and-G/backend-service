@@ -24,7 +24,7 @@ export class AuthService {
     });
     return { message: 'Signup was successful' };
   }
-  async signin(dto: SignInDTO) {
+  async signin(dto: SignInDTO,req: Request, res: Response) {
     const { email, password } = dto;
     const foundUser = await this.prisma.user.findUnique({ where: { email } });
     if (!foundUser) throw new Error('wrong credentials');
