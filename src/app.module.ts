@@ -10,7 +10,7 @@ import { CategoryModule } from './category/category.module';
 
 
 @Module({
-  imports: [ NotificationModule, MenuModule, AuthModule,PrismaModule,CategoryModule],
+  imports: [ NotificationModule, MenuModule, AuthModule,PrismaModule,UserModule,CategoryModule],
   controllers: [AppController],
   providers: [AppService],
 })
