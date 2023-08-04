@@ -1,9 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from '@nestjs/common';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
+import { CreateCategoryDto } from './dto/category.dto';
 const prisma = new PrismaClient();
 @Controller('category')
+@ApiTags('categories')
 export class CategoryController {
     @Get('/')
     async getCategories(@Req() req:Request, @Res() res:Response){
@@ -17,7 +20,12 @@ export class CategoryController {
     }
 
     @Post('/new')
-    async createCategory(@Req() req:Request, @Res() res:Response, @Body() body){
+    @ApiResponse({
+      status: 201,
+      description: 'The request was successful',     
+     // Replace with the actual DTO class for the response
+    })
+    async createCategory(@Req() req:Request, @Res() res:Response, @Body() body:CreateCategoryDto){
         try {
         let {description, name,subcategories,image } = body;
         if(!description || !name || !subcategories || !image){
@@ -31,7 +39,7 @@ export class CategoryController {
                 subcategories
             }
         })
-        return res.send(buildResponse("Category created!",Status.SUCCESS,newCategory))
+        return res.status(201).send(buildResponse("Category created!",Status.SUCCESS,newCategory))
         } catch (error) {
             console.log(error)
             return res.send(buildResponse("Category couldn't be created",Status.FAILED,null))
@@ -39,6 +47,7 @@ export class CategoryController {
     }
 
     @Put("/:id")
+    @ApiParam({name:'id',type:Number,description:"Id of the category to be updated",required:true})
     async updateCategory(@Param('id') id,@Res() res:Response, @Body() body:any){
       try {
         let category = await prisma.category.update({
@@ -59,6 +68,10 @@ export class CategoryController {
     }
 
     @Delete('/:id')
+    @ApiParam({name:'id',type:Number,description:"Id of the category to be deleted",required:true})
+    @ApiBody({
+      description:""
+    })
     async deleteUpdate(@Param("id") id, @Res() res:Response){
       try {
         const cat = await prisma.category.delete({
