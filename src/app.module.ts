@@ -7,10 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { MenuModule } from './menu/menu.module';
 import { CategoryModule } from './category/category.module';
+import { HotelModule } from './hotel/hote.module';
 
 
 @Module({
-  imports: [ NotificationModule, MenuModule, AuthModule,PrismaModule,UserModule,CategoryModule],
+  imports: [ NotificationModule,HotelModule, MenuModule, AuthModule,PrismaModule,UserModule,CategoryModule],
   controllers: [AppController],
   providers: [AppService],
 })
