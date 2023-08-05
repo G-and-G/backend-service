@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { MenuModule } from './menu/menu.module';
 import { CategoryModule } from './category/category.module';
-import { NotificationModule } from './notification/notification.module';
 import { ControllerModule } from './controller/controller.module';
 
 
