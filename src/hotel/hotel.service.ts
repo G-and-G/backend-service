@@ -14,7 +14,7 @@ export class HotelService{
 
     }
     async getAllHotels():Promise<Hotel[]>{
-        return this.prisma.hotel.findMany();
+        return this.prisma.hotel.findMany as unknown as Hotel[];
     }
     async createHotel(data:Hotel):Promise<Hotel>{
         const existingHotel = await this.prisma.hotel.findUnique({
@@ -25,12 +25,12 @@ export class HotelService{
         if(existingHotel){
             throw new ConflictException('Hotel already exists')
         }
-        return this.prisma.hotel.create({
+        return this.prisma.hotel.create as unknown as Hotel;({
             data,
-        });
+        })
     }
     async updateHotel(hotel_id:string,data:Hotel):Promise<Hotel>{
-        return this.prisma.hotel.update({
+        return this.prisma.hotel.update as unknown as Hotel;({
             where:{
                 hotel_id:Number(hotel_id)
             },
@@ -38,7 +38,7 @@ export class HotelService{
         })
     }
     async deleteHotel(hotel_id:string):Promise<Hotel>{
-        return return this.prisma.hotel.delete({
+        return  this.prisma.hotel.delete as unknown as Hotel;( {
             where:{hotel_id:Number(hotel_id)}
         })
     }
