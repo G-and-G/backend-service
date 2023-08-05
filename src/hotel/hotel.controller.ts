@@ -30,11 +30,11 @@ export class HotelController{
     async getHotel(@Param('hotel_id') hotel_id:number):Promise<Hotel|null>{
         return this.hotelService.getHotel(hotel_id);
     }
-    @Delete('/:hotel_id')
+    @Delete('/delete/:hotel_id')
     async deleteHotel(@Param('hotel_id') hotel_id:string):Promise<Hotel>{
         return this.hotelService.deleteHotel(hotel_id);
     }
-    @Put('/:hotel_id')
+    @Put('/update/:hotel_id')
     async updateHotel(@Param('hotel_id') hotel_id:string,@Body() postData:Hotel):Promise<Hotel>{
         return this.hotelService.updateHotel(hotel_id,postData);
     }
