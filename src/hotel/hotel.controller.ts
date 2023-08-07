@@ -22,7 +22,7 @@ export class HotelController{
             })
         }
     }
-    @Post()
+    @Post('/new')
     async postHotel(@Body() postData:Hotel):Promise<Hotel>{
         return this.hotelService.createHotel(postData);
     }

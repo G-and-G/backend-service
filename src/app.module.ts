@@ -8,11 +8,13 @@ import { PrismaModule } from 'prisma/prisma.module';
 import { MenuModule } from './menu/menu.module';
 import { CategoryModule } from './category/category.module';
 import { ControllerModule } from './controller/controller.module';
+import { HotelModule } from './hotel/hote.module';
+import { NotificationGateway } from './notification/notification.gateway';
 
 
 @Module({
-  imports: [ NotificationModule, MenuModule, AuthModule,PrismaModule,UserModule,CategoryModule, ControllerModule],
+  imports: [ NotificationModule, MenuModule,HotelModule,AuthModule,PrismaModule,UserModule,CategoryModule, ControllerModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, NotificationGateway],
 })
 export class AppModule {}
