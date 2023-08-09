@@ -40,17 +40,15 @@ model Order {
   rating               Float
 }
 
-// model CoffeeProduct {
-//   coffee_id          String @id @unique @default(uuid())
-//   hotel              Hotel  @relation(fields: [hotel_id], references: [hotel_id])
-//   order              Order?
-//   order_id           String @unique
-//   hotel_id           Int
-//   name               String
-//   price              Float
-//   quantity_available Int
-//   type               String
-// }
+model CoffeeProduct {
+  coffee_id          String @id @unique @default(uuid())
+  order_id           String @unique
+  hotel_id           Int
+  name               String
+  price              Float
+  quantity_available Int
+  type               String
+}
 
 model Hotel {
   hotel_id            Int      @id @unique @default(autoincrement())

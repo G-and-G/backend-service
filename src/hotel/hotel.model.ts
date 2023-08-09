@@ -1,8 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { IsString } from "class-validator";
 
-export class Hotel implements Prisma.HotelCreateInput{
-    
+export class Hotel{
     name: string;
     menu_id: number;
     rating: number;
@@ -13,7 +12,6 @@ export class Hotel implements Prisma.HotelCreateInput{
     admin: Prisma.UserCreateNestedOneWithoutHotelInput;
     menu?: Prisma.MenuCreateNestedOneWithoutHotelInput;
     address?: Prisma.AddressCreateNestedOneWithoutHotelInput;
-    products?: Prisma.CoffeeProductCreateNestedManyWithoutHotelInput;
+    products?: Prisma.CoffeeProductCreateInput;
     hotel_id: any;
-    
 }

@@ -53,7 +53,7 @@ export class HotelController{
             })
         }
     }
-    @Post()
+    @Post('/new')
     @ApiOperation({ summary: 'create new record'})
     @ApiBody({
         schema: {
