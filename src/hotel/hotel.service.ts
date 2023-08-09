@@ -17,30 +17,47 @@ export class HotelService{
         return this.prisma.hotel.findMany as unknown as Hotel[];
     }
     async createHotel(data:any):Promise<Hotel>{
-        const existingHotel = await this.prisma.hotel.findUnique({
-            where:{
-                hotel_id:data.hotel_id
+        try {
+            const existingHotel = await this.prisma.hotel.findUnique({
+                where:{
+                    hotel_id:data.hotel_id
+                }
+            })
+            if(existingHotel){
+                throw new ConflictException('Hotel already exists')
             }
-        })
-        if(existingHotel){
-            throw new ConflictException('Hotel already exists')
+            return this.prisma.hotel.create({
+                data,
+            }) as unknown as Hotel;
+        } catch (error) {
+            console.log(error);
+            
         }
-        return this.prisma.hotel.create({
-            data,
-        }) as unknown as Hotel;
+       
     }
     async updateHotel(hotel_id:string,data:any):Promise<Hotel>{
-        return this.prisma.hotel.update({
-            where:{
-                hotel_id:Number(hotel_id)
-            },
-            data
-        })as unknown as Hotel;
+         try {
+            return this.prisma.hotel.update({
+                where:{
+                    hotel_id:Number(hotel_id)
+                },
+                data
+            })as unknown as Hotel;
+         } catch (error) {
+            console.log(error);
+            
+         }
+     
     }
     async deleteHotel(hotel_id:string):Promise<Hotel>{
+      try {
         return  this.prisma.hotel.delete( {
             where:{hotel_id:Number(hotel_id)}
         })as unknown as Hotel;
+      } catch (error) {
+        console.log(error);
+        
+      }
     }
 
 }
