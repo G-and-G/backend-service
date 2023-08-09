@@ -9,7 +9,8 @@ import { ErrorHandlingMiddleware } from 'src/middlewares/ErrorHandling.middlewar
 @Module({
   imports:[JwtModule],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService],
+  
 })
 export class AuthModule  implements NestModule{
   configure(consumer: MiddlewareConsumer) {
