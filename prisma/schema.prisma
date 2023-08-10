@@ -13,8 +13,7 @@ datasource db {
 model User {
   user_id  String  @id @unique @default(uuid())
   order    Order[]
-  order_id String
-   hotel    Hotel?
+  hotel    Hotel?
   fullName String 
   gender   String 
   email String @unique

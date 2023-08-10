@@ -1,22 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateCategoryDto } from './dto/category.dto';
+import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 const prisma = new PrismaClient();
 @Controller('category')
 @ApiTags('categories')
+@UseInterceptors(ErrorInterceptor)
 export class CategoryController {
     @Get('/')
     async getCategories(@Req() req:Request, @Res() res:Response){
-      try {
         const categories = await prisma.category.findMany();
+        console.log(categories)
         return res.send(buildResponse("Categories",Status.SUCCESS,categories))
-      } catch (error) {
-        console.log(error)
-        return res.send(buildResponse("Something went wrong",Status.FAILED,null)) 
-      }
     }
 
     @Post('/new')
@@ -26,7 +24,6 @@ export class CategoryController {
      // Replace with the actual DTO class for the response
     })
     async createCategory(@Req() req:Request, @Res() res:Response, @Body() body:CreateCategoryDto){
-        try {
         let {description, name,subcategories,image } = body;
         if(!description || !name || !subcategories || !image){
           return res.send(buildResponse("Provide all the required details",Status.FAILED));
@@ -39,17 +36,12 @@ export class CategoryController {
                 subcategories
             }
         })
-        return res.status(201).send(buildResponse("Category created!",Status.SUCCESS,newCategory))
-        } catch (error) {
-            console.log(error)
-            return res.send(buildResponse("Category couldn't be created",Status.FAILED,null))
-        }
+        return res.status(201).send(buildResponse("Category created!",Status.SUCCESS,newCategory)) 
     }
 
     @Put("/:id")
     @ApiParam({name:'id',type:Number,description:"Id of the category to be updated",required:true})
     async updateCategory(@Param('id') id,@Res() res:Response, @Body() body:any){
-      try {
         let category = await prisma.category.update({
           data:{
             ...body,
@@ -61,10 +53,6 @@ export class CategoryController {
         if(category){
           return res.send(buildResponse("Category updated!",Status.SUCCESS,category))
         }
-      } catch (error) {
-        console.log(error)
-        return res.send(buildResponse("Category couldn't be updated",Status.FAILED,null))
-      }
     }
 
     @Delete('/:id')
@@ -73,7 +61,6 @@ export class CategoryController {
       description:""
     })
     async deleteUpdate(@Param("id") id, @Res() res:Response){
-      try {
         const cat = await prisma.category.delete({
           where:{
             category_id:parseInt(id)
@@ -81,10 +68,8 @@ export class CategoryController {
         })
         if(cat){
           return res.send(buildResponse("Category deleted!",Status.SUCCESS,cat))
+        }else{
+          throw new Error('Category not found!')
         }
-      } catch (error) {
-        console.log(error)
-        return res.send(buildResponse("Category couldn't be deleted",Status.FAILED,null))
-      }
     }
 }
