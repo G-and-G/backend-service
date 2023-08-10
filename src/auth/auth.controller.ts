@@ -8,14 +8,15 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup')
-  
   signup(@Body() dot:AuthDto){
     return  this.authService.signup(dot)
   }
+
   @Post('signin')
   signin(@Body() dot:SignInDTO,@Req() req,@Res() res){
     return  this.authService.signin(dot ,req,res)
   }
+  
   @Get('signout')
   signout(){
     return  this.authService.signout()
