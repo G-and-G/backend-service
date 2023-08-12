@@ -1,7 +1,7 @@
 // import { PrismaService } from "src/prisma.service";
 import { PrismaService } from "prisma/prisma.service";
-import { User } from "./User.model";
 import { ConflictException, Injectable } from "@nestjs/common";
+import { User } from "@prisma/client";
 
 
 @Injectable()
