@@ -18,10 +18,4 @@ import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware'
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer){
-    consumer
-     .apply(ErrorHandlingMiddleware)
-     .forRoutes('*')
-  }
-}
+export class AppModule  {}
