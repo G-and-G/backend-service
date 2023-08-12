@@ -12,9 +12,13 @@ const prisma = new PrismaClient();
 export class CategoryController {
     @Get('/')
     async getCategories(@Req() req:Request, @Res() res:Response){
+       try {
         const categories = await prisma.category.findMany();
         console.log(categories)
         return res.send(buildResponse("Categories",Status.SUCCESS,categories))
+       } catch (error) {
+        console.log(error)
+       }
     }
 
     @Post('/new')
