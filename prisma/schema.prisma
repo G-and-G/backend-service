@@ -13,19 +13,26 @@ datasource db {
 model User {
   user_id  String  @id @unique @default(uuid())
   order    Order[]
-  order_id String
   hotel    Hotel?
+  fullName String 
+  gender   String 
+  email String @unique
+  password String
+  username String
+  telephone String
+  
+
 }
 
 model Order {
-  order_id             String         @id @unique @default(uuid())
-  customer             User?          @relation(fields: [customer_id], references: [user_id])
+  order_id             String    @id @unique @default(uuid())
+  customer             User?     @relation(fields: [customer_id], references: [user_id])
   customer_id          String
   date                 DateTime
-  deliveryAddress      Address        @relation(fields: [address_id], references: [address_id])
+  deliveryAddress      Address   @relation(fields: [address_id], references: [address_id])
   address_id           String
-  product              CoffeeProduct? @relation(fields: [product_id], references: [coffee_id])
-  product_id           String         @unique
+  product              MenuItem? @relation(fields: [product_id], references: [menuItem_id])
+  product_id           Int       @unique
   expectedDeliveryTime DateTime
   price                Float
   review               String
@@ -34,8 +41,6 @@ model Order {
 
 model CoffeeProduct {
   coffee_id          String @id @unique @default(uuid())
-  hotel              Hotel  @relation(fields: [hotel_id], references: [hotel_id])
-  order              Order?
   order_id           String @unique
   hotel_id           Int
   name               String
@@ -45,19 +50,19 @@ model CoffeeProduct {
 }
 
 model Hotel {
-  hotel_id            Int             @id @unique @default(autoincrement())
-  admin               User            @relation(fields: [admin_id], references: [user_id])
-  admin_id            String          @unique
+  hotel_id            Int      @id @unique @default(autoincrement())
+  admin               User     @relation(fields: [admin_id], references: [user_id])
+  admin_id            String   @unique
   name                String
   menu                Menu?
-  menu_id             Int             @unique
+  menu_id             Int      @unique
   address             Address?
-  products            CoffeeProduct[]
   rating              Float
   lastMonthOrders     Int
   ThisWeekOrders      Int
   startingWorkingTime DateTime
   endingWorkingTime   DateTime
+  image               String
 }
 
 model Address {
@@ -75,39 +80,37 @@ model Address {
 }
 
 model Menu {
-  menu_id      Int         @id @unique @default(autoincrement())
-  hotel        Hotel?      @relation(fields: [hotel_id], references: [hotel_id])
-  hotel_id     Int         @unique
-  items        MenuItem[]
-  categories Category[]
+  menu_id        Int           @id @unique @default(autoincrement())
+  hotel          Hotel?        @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id       Int           @unique
+  items          MenuItem[]
+  categories     Category[]
 }
 
 model MenuItem {
-  menuItem_id Int    @id @unique
+  menuItem_id Int    @id @unique @default(autoincrement())
   name        String
   type        String
 
-  Menu        Menu? @relation(fields: [menuMenu_id], references: [menu_id])
-  menuMenu_id Int?
-  price Int
-  category     Category
-  sub_category SubCategory
+  Menu               Menu?       @relation(fields: [menu_id], references: [menu_id])
+  menu_id            Int?
+  price              Float
+  category           Category    @relation(fields: [category_id], references: [category_id])
+  category_id        Int
+  quantity_available Int
+  description        String
+  image              String?
+  Order              Order?
 }
 
-enum Category {
-  DRINK
-  FOOD 
+model Category {
+  category_id   Int           @id @unique @default(autoincrement())
+  subcategories String[]
+  menu          Menu[]
+  menuItem      MenuItem[]
+  description   String
+  image         String?
+  name String
 }
 
-enum SubCategory {
-  SANDWICH
-  WRAP
-  BURGER
-  SWEETS
-  SPECIALS
-  ESPRESSO
-  FRESH_JUICE
-  ICED
-  ALCOHOL
-  SMOOTHIES
-}
+
