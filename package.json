@@ -38,6 +38,8 @@
     "cookie-parser": "^1.4.6",
     "passport": "^0.6.0",
     "prisma": "^5.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "pg": "^8.11.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.2",
