@@ -27,7 +27,7 @@ export class HotelController{
                         example: 'Test'
                     }
                 }
-            }
+            }  
         }
     })
     @ApiResponse({
@@ -41,6 +41,7 @@ export class HotelController{
     async getAllHotels(@Req() request:Request,@Res() response:Response):Promise<any>{
         try {
             const result = await this.hotelService.getAllHotels();
+            console.log(result);
             return response.status(200).json({
                 status:'ok!',
                 message:'successfully fetch data',
@@ -80,7 +81,8 @@ export class HotelController{
         status: 403,
         description: 'Fobidden'
     })
-    async postHotel(@Body() postData:Hotel):Promise<Hotel>{
+    async postHotel(@Body() postData:any):Promise<Hotel>{
+        console.log('postData',postData);
         return this.hotelService.createHotel(postData);
     }
 

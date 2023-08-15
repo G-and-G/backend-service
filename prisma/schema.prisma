@@ -57,12 +57,12 @@ model Hotel {
   menu                Menu?
   menu_id             Int      @unique
   address             Address?
-  rating              Float
-  lastMonthOrders     Int
-  ThisWeekOrders      Int
-  startingWorkingTime DateTime
-  endingWorkingTime   DateTime
-  image               String
+  rating              Float  @default(0)
+  lastMonthOrders     Int ?   @default(0)
+  ThisWeekOrders      Int ?     @default(0)
+  startingWorkingTime DateTime @default(now())
+  endingWorkingTime   DateTime @default(now())
+  image               String   
 }
 
 model Address {
