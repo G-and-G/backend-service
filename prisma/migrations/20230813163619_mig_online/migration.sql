@@ -1,9 +1,3 @@
--- CreateEnum
-CREATE TYPE "Category" AS ENUM ('DRINK', 'FOOD');
-
--- CreateEnum
-CREATE TYPE "SubCategory" AS ENUM ('SANDWICH', 'WRAP', 'BURGER', 'SWEETS', 'SPECIALS', 'ESPRESSO', 'FRESH_JUICE', 'ICED', 'ALCOHOL', 'SMOOTHIES');
-
 -- CreateTable
 CREATE TABLE "User" (
     "user_id" TEXT NOT NULL,
@@ -11,7 +5,6 @@ CREATE TABLE "User" (
     "gender" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    
     "username" TEXT NOT NULL,
     "telephone" TEXT NOT NULL,
 
@@ -24,7 +17,7 @@ CREATE TABLE "Order" (
     "customer_id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "address_id" TEXT NOT NULL,
-    "product_id" TEXT NOT NULL,
+    "product_id" INTEGER NOT NULL,
     "expectedDeliveryTime" TIMESTAMP(3) NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "review" TEXT NOT NULL,
@@ -57,6 +50,7 @@ CREATE TABLE "Hotel" (
     "ThisWeekOrders" INTEGER NOT NULL,
     "startingWorkingTime" TIMESTAMP(3) NOT NULL,
     "endingWorkingTime" TIMESTAMP(3) NOT NULL,
+    "image" TEXT NOT NULL,
 
     CONSTRAINT "Hotel_pkey" PRIMARY KEY ("hotel_id")
 );
@@ -80,22 +74,40 @@ CREATE TABLE "Address" (
 CREATE TABLE "Menu" (
     "menu_id" SERIAL NOT NULL,
     "hotel_id" INTEGER NOT NULL,
-    "categories" "Category"[],
 
     CONSTRAINT "Menu_pkey" PRIMARY KEY ("menu_id")
 );
 
 -- CreateTable
 CREATE TABLE "MenuItem" (
-    "menuItem_id" INTEGER NOT NULL,
+    "menuItem_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "type" TEXT NOT NULL,
-    "menuMenu_id" INTEGER,
-    "price" INTEGER NOT NULL,
-    "category" "Category" NOT NULL,
-    "sub_category" "SubCategory" NOT NULL,
+    "menu_id" INTEGER,
+    "price" DOUBLE PRECISION NOT NULL,
+    "category_id" INTEGER NOT NULL,
+    "quantity_available" INTEGER NOT NULL,
+    "description" TEXT NOT NULL,
+    "image" TEXT,
 
     CONSTRAINT "MenuItem_pkey" PRIMARY KEY ("menuItem_id")
+);
+
+-- CreateTable
+CREATE TABLE "Category" (
+    "category_id" SERIAL NOT NULL,
+    "subcategories" TEXT[],
+    "description" TEXT NOT NULL,
+    "image" TEXT,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("category_id")
+);
+
+-- CreateTable
+CREATE TABLE "_CategoryToMenu" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
 );
 
 -- CreateIndex
@@ -137,6 +149,15 @@ CREATE UNIQUE INDEX "Menu_hotel_id_key" ON "Menu"("hotel_id");
 -- CreateIndex
 CREATE UNIQUE INDEX "MenuItem_menuItem_id_key" ON "MenuItem"("menuItem_id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Category_category_id_key" ON "Category"("category_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_CategoryToMenu_AB_unique" ON "_CategoryToMenu"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_CategoryToMenu_B_index" ON "_CategoryToMenu"("B");
+
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -144,10 +165,7 @@ ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("custom
 ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "CoffeeProduct"("coffee_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "CoffeeProduct" ADD CONSTRAINT "CoffeeProduct_hotel_id_fkey" FOREIGN KEY ("hotel_id") REFERENCES "Hotel"("hotel_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "MenuItem"("menuItem_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "User"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -159,4 +177,13 @@ ALTER TABLE "Address" ADD CONSTRAINT "Address_hotel_id_fkey" FOREIGN KEY ("hotel
 ALTER TABLE "Menu" ADD CONSTRAINT "Menu_hotel_id_fkey" FOREIGN KEY ("hotel_id") REFERENCES "Hotel"("hotel_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_menuMenu_id_fkey" FOREIGN KEY ("menuMenu_id") REFERENCES "Menu"("menu_id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_menu_id_fkey" FOREIGN KEY ("menu_id") REFERENCES "Menu"("menu_id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "Category"("category_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_CategoryToMenu" ADD CONSTRAINT "_CategoryToMenu_A_fkey" FOREIGN KEY ("A") REFERENCES "Category"("category_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_CategoryToMenu" ADD CONSTRAINT "_CategoryToMenu_B_fkey" FOREIGN KEY ("B") REFERENCES "Menu"("menu_id") ON DELETE CASCADE ON UPDATE CASCADE;
