@@ -17,6 +17,8 @@ import { Request, Response } from 'express';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateCategoryDto } from './dto/category.dto';
 import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
+// import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
+
 const prisma = new PrismaClient();
 @Controller('category')
 @ApiTags('categories')

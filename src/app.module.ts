@@ -7,13 +7,13 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { MenuModule } from './menu/menu.module';
 import { CategoryModule } from './category/category.module';
-import { HotelModule } from './hotel/hote.module';
+// import { HotelModule } from './hotel/hote.module';
 import { NotificationGateway } from './notification/notification.gateway';
-import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
+// import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 
 
 @Module({
-  imports: [ NotificationModule, MenuModule,HotelModule,AuthModule,PrismaModule,UserModule,CategoryModule],
+  imports: [ NotificationModule, MenuModule,AuthModule,PrismaModule,UserModule,CategoryModule],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
 })

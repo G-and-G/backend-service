@@ -1,19 +1,19 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import config from 'src/config';
 import { AuthController } from './auth.controller';
-import {JwtModule} from '@nestjs/jwt'
-import { RequestLoggingMiddleware } from 'src/middlewares/requestLogging.middleware';
+import { AuthService } from './auth.service';
+import { UserService } from 'src/user/user.service';
 
 @Module({
-  imports:[JwtModule],
-  controllers: [AuthController],
-  providers: [AuthService],
-  
+    imports: [
+        JwtModule.register({
+            global: true,
+            secret: config().jwt.secret,
+            signOptions: { expiresIn: config().jwt.expiresIn },
+        }),
+    ],
+    providers: [AuthService, UserService],
+    controllers: [AuthController]
 })
-export class AuthModule  implements NestModule{
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RequestLoggingMiddleware)
-      .forRoutes('*');
-  }
-}
+export class AuthModule { }
