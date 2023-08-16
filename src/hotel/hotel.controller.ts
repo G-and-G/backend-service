@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common'
 import { HotelService } from './hotel.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
-import { UpdateHotelDTO } from './dto/update-hotel.dto';
+// import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @ApiTags('hotels')
 @Controller('hotels')
