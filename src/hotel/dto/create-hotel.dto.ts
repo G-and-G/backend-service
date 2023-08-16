@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address } from '@prisma/client';
+import { Address, users } from '@prisma/client';
 import {
   IsNotEmpty,
   IsNumber,
@@ -20,6 +20,10 @@ export class CreateHotelDTO {
   @IsUrl()
   @ApiProperty()
   image?: string;
+  @ApiProperty()
+  address?: Address;
+  @ApiProperty()
+  admin:users;
  
 
 
