@@ -9,7 +9,7 @@ import {
 // import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
-import { UpdateHotelDTO } from './dto/update-hotel.dto';
+// import { CreateHotelDTO } from './dto/update-hotel.dto';
 import { Hotel } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
@@ -73,22 +73,52 @@ export class HotelService {
     return this.prisma.hotel.findMany();
   }
 
-  async updateHotel(
-    id: number,
-    updateHotelDTO: UpdateHotelDTO,
-  ): Promise<Hotel> {
+  async updateHotel(id: number, updateHotelDTO: CreateHotelDTO): Promise<Hotel> {
     const existingHotel = await this.prisma.hotel.findUnique({
       where: { hotel_id: id },
     });
+    
     if (!existingHotel) {
       throw new NotFoundException('Hotel not found');
     }
-    return this.prisma.hotel.update({
-      where: { hotel_id: id },
-      data: updateHotelDTO,
-    });
-  }
+  
+    try {
+      const adminUser = await this.prisma.users.findUnique({
+        where: { id: updateHotelDTO.admin.id },
+      });
+  
+      if (!adminUser) {
+        throw new NotFoundException('Admin user not found');
+      }
+  
+      const updatedHotel = await this.prisma.hotel.update({
+        where: { hotel_id: id },
+        data: {
+          name: updateHotelDTO.name,
+          image: updateHotelDTO.image,
+          address: {
+            update: {
+              latitude: updateHotelDTO.address.latitude,
+              longitude: updateHotelDTO.address.longitude,
+              street: updateHotelDTO.address.street,
+              district: updateHotelDTO.address.district,
+              sector: updateHotelDTO.address.sector,
+              cell: updateHotelDTO.address.cell,
+              village: updateHotelDTO.address.village,
+            },
+          },
+          admin: {
+            connect: { id: adminUser.id },
+          },
+          // ... other properties you want to update
+        },
+      });
+  
+      return updatedHotel;
+    }catch(error){
 
+    }
+  }
   async deleteHotel(id: number): Promise<void> {
     const existingHotel = await this.prisma.hotel.findUnique({
       where: { hotel_id: id },

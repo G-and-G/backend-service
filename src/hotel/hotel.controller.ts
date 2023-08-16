@@ -26,7 +26,7 @@ export class HotelController {
   }
 
   @Put('update_hotel/:id')
-  async update(@Param('id') id: number, @Body() updateHotelDTO: UpdateHotelDTO) {
+  async update(@Param('id') id: number, @Body() updateHotelDTO: CreateHotelDTO) {
     return this.hotelService.updateHotel(id, updateHotelDTO);
   }
 
