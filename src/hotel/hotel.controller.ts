@@ -6,7 +6,6 @@ import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @ApiTags('hotels')
 @Controller('hotels')
-
 export class HotelController {
   constructor(private readonly hotelService: HotelService) {}
 
