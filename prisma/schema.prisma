@@ -87,25 +87,25 @@ model CoffeeProduct {
   type               String
 }
 
-// model Hotel {
-//   hotel_id            Int      @id @unique @default(autoincrement())
-//   admin               User     @relation(fields: [admin_id], references: [id])
-//   admin_id            String   @unique
-//   name                String
-//   menu                Menu?
-//   menu_id             Int      @unique
-//   address             Address?
-//   rating              Float  @default(0)
-//   lastMonthOrders     Int ?   @default(0)
-//   ThisWeekOrders      Int ?     @default(0)
-//   startingWorkingTime DateTime @default(now())
-//   endingWorkingTime   DateTime @default(now())
-//   image               String   
-// }
+model Hotel {
+  hotel_id            Int      @id @unique @default(autoincrement())
+  // admin               users     @relation(fields: [admin_id], references: [id])
+  // admin_id            String   @unique
+  name                String
+  menu                Menu?
+  // menu_id             Int      @unique
+  address             Address?
+  rating              Float  @default(0)
+  lastMonthOrders     Int ?   @default(0)
+  ThisWeekOrders      Int ?     @default(0)
+  startingWorkingTime DateTime @default(now())
+  endingWorkingTime   DateTime @default(now())
+  image               String   
+}
 
 model Address {
   address_id String  @id @default(uuid())
-  // hotel      Hotel   @relation(fields: [hotel_id], references: [hotel_id])
+  hotel      Hotel   @relation(fields: [hotel_id], references: [hotel_id])
   order      Order[]
   hotel_id   Int     @unique
   latitude   Float
@@ -119,7 +119,7 @@ model Address {
 
 model Menu {
   menu_id        Int           @id @unique @default(autoincrement())
-  // hotel          Hotel?        @relation(fields: [hotel_id], references: [hotel_id])
+  hotel          Hotel?        @relation(fields: [hotel_id], references: [hotel_id])
   hotel_id       Int           @unique
   items          MenuItem[]
   categories     Category[]
