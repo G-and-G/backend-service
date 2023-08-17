@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -19,8 +20,11 @@ export class HotelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
-    console.log(createHotelDTO)
+    console.log('Received DTO:', createHotelDTO); 
     try {
+      if (!createHotelDTO || !createHotelDTO.address) {
+        throw new BadRequestException('Invalid input data');
+      }
       const adminUser = await this.prisma.users.findUnique({
         where: { id: createHotelDTO.admin_id},
       });
@@ -48,7 +52,7 @@ export class HotelService {
          admin_id:createHotelDTO.admin_id
         },
       });
-      console.log(hotel);
+      console.log("This is the hotel: ",hotel);
       
       return hotel;
     } catch (error) {
@@ -62,7 +66,7 @@ export class HotelService {
         );
       }
       console.log(error)
-      throw new InternalServerErrorException('Internal server error');
+      throw new InternalServerErrorException('Internal server error',error);
     }
   }
 
