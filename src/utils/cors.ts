@@ -1,5 +1,5 @@
 const whitelist = [
-    "http://localhost:3000",
+    "http://localhost:7878",
     "http://localhost:5000",
 ];
 const options = {

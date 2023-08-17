@@ -19,7 +19,7 @@ export class HotelController {
     return this.hotelService.getHotelById(id);
   }
 
-  @Get('all_hotels')
+  @Get()
   async findAll() {
     return this.hotelService.getAllHotels();
   }
