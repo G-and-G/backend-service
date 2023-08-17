@@ -15,6 +15,7 @@ export class AdminGuard implements CanActivate {
                 const decodedToken = this.jwtService.verify(tokenValue);
                 const user: users = await this.userService.getUserById(decodedToken.id);
                 if (user.role !== "ADMIN") {
+                    
                     return false
                 }
                 console.log("[APPLICATION LOG]: Admin check successful.")

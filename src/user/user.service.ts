@@ -56,4 +56,62 @@ export class UserService {
         return user;
     }
 
+    async getAllUsers() {
+        try {
+            const users = await this.prisma.users.findMany();
+            return users;
+        } catch (error) {
+            console.log("Error getting all users:", error);
+            throw error;
+        }
+    }
+
+    async searchUsers(query: string) {
+        try {
+            const users = await this.prisma.users.findMany({
+                where: {
+                    OR: [
+                        {
+                            first_name: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            last_name: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            email: {
+                                contains: query,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                },
+            });
+            return users;
+        } catch (error) {
+            console.log("Error searching users:", error);
+            throw error;
+        }
+    }
+
+    async deleteUserById(id: string) {
+        try {
+            const deletedUser = await this.prisma.users.delete({
+                where: {
+                    id,
+                },
+            });
+            return deletedUser;
+        } catch (error) {
+            console.log("Error deleting user:", error);
+            throw error;
+        }
+    }
+
+
 }
