@@ -13,6 +13,7 @@ import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { Hotel } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
+import { CreateMenuDTO } from './dto/create-menu.dto';
 @Injectable()
 export class HotelService {
   constructor(private readonly prisma: PrismaService) {}
@@ -130,5 +131,19 @@ export class HotelService {
       throw new NotFoundException('Hotel not found');
     }
     await this.prisma.hotel.delete({ where: { hotel_id: id } });
+  }
+
+  async addMenu(data:any,hotelId:number){
+    try {
+      const hotel = await this.prisma.hotel.findUnique({
+        where:{
+          hotel_id:Number(hotelId)
+        }
+      });
+      console.log(data)
+      console.log(hotel)
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

@@ -15,7 +15,6 @@ export class AuthService {
         const user = await this.userService.getUserByEmail(dto.email)
         if (user.role=="ADMIN"){
             console.log("adminnnnn");
-            
         }
         if (!user) return ApiResponse.error("Invalid email or password")
         const match = compareSync(dto.password, user.password)
