@@ -5,6 +5,8 @@ import ApiResponse from 'src/utils/ApiResponse';
 import { RegisterDTO } from './dto/create-user.dto';
 import { AdminGuard } from './guards/admin.guard';
 import { UserService } from './user.service';
+import { log } from 'console';
+import { request } from 'express';
 
 @Controller('user')
 @ApiTags('users')
@@ -25,32 +27,40 @@ export class UserController {
 
     }
 
-    @Get("all?page=:page&limit=:limit")
-    async all(@Query("page") page: number, @Query("limit") limit: number) {
-
+    @Get("all")
+    async all() {
+        const users = await this.userService.getAllUsers();
+        return ApiResponse.success('Users retrieved successfully', users);
     }
 
+   
     @Get(":id")
-    async get(@Param("id") id: String) {
-
+    async get(@Param("id") id: string) {
+        const user = await this.userService.getUserById(id);
+        return ApiResponse.success('User retrieved successfully', user);
     }
-
-
     @Get("search/:query")
-    async search(@Param("query") query: String) {
-
+    async search(@Param("query") query: string) {
+        const results = await this.userService.searchUsers(query);
+        return ApiResponse.success('Search results retrieved successfully', results);
     }
+
 
     @Delete("delete/:id")
     @UseGuards(AdminGuard)
-    async deleteUserByAdmin(@Param("id") userId: String) {
-
+    async deleteUserByAdmin(@Param("id") userId: string) {
+        const deletedUser = await this.userService.deleteUserById(userId);
+        return ApiResponse.success('User deleted by admin', deletedUser);
     }
-
     @Delete("delete")
     @UseGuards(AuthGuard)
-    async deleteUser() {
+    async deleteUser(@Param("id") id: string) {
+        const user = await this.userService.getUserById(id);
 
+        // Get the authenticated user's ID from the request context
+        const loggedInUserId = user.id; // Replace with actual method of getting user ID
+        const deletedUser = await this.userService.deleteUserById(loggedInUserId);
+        return ApiResponse.success('User deleted successfully', deletedUser);
     }
 
     @Get('me')

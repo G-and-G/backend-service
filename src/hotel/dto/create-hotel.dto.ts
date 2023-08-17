@@ -23,7 +23,8 @@ export class CreateHotelDTO {
   @ApiProperty()
   address?: Address;
   @ApiProperty()
-  admin:users;
+  @IsString()
+  admin_id:string;
  
 
 

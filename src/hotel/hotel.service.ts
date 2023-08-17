@@ -21,8 +21,10 @@ export class HotelService {
     console.log(createHotelDTO)
     try {
       const adminUser = await this.prisma.users.findUnique({
-        where: { id: createHotelDTO.admin.id },
+        where: { id: createHotelDTO.admin_id},
       });
+      // console.log(adminUser);
+      
 
       if (!adminUser) {
         throw new NotFoundException('Admin user not found');
@@ -42,13 +44,15 @@ export class HotelService {
               village: createHotelDTO.address.village,
             },
           },
-          admin: {
-            connect: { id: adminUser.id },
-          },
+         admin_id:createHotelDTO.admin_id
         },
       });
+      console.log(hotel);
+      
       return hotel;
     } catch (error) {
+      console.log(error);
+      
       // Handle specific errors, e.g., duplicate entries
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
@@ -86,7 +90,7 @@ export class HotelService {
   
     try {
       const adminUser = await this.prisma.users.findUnique({
-        where: { id: updateHotelDTO.admin.id },
+        where: { id: updateHotelDTO.admin_id},
       });
   
       if (!adminUser) {
@@ -109,10 +113,7 @@ export class HotelService {
               village: updateHotelDTO.address.village,
             },
           },
-          admin: {
-            connect: { id: adminUser.id },
-          },
-          // ... other properties you want to update
+         admin_id:updateHotelDTO.admin_id
         },
       });
   
