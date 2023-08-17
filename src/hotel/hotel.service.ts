@@ -14,6 +14,7 @@ import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { Hotel } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
+import { CreateMenuDTO } from './dto/create-menu.dto';
 @Injectable()
 export class HotelService {
   constructor(private readonly prisma: PrismaService) {}
@@ -134,5 +135,33 @@ export class HotelService {
       throw new NotFoundException('Hotel not found');
     }
     await this.prisma.hotel.delete({ where: { hotel_id: id } });
+  }
+
+  async addMenu(data:CreateMenuDTO,hotelId:number){
+    try {
+      const hotel = await this.prisma.hotel.findUnique({
+        where:{
+          hotel_id:Number(hotelId)
+        }
+      });
+      let newItem;
+      let newItems;
+      const {items,categories} = data;
+      for(var item of items){
+        const {category_id,...itemData} = item;
+         newItem = await this.prisma.menuItem.create({
+          data:{
+            ...itemData,
+            category: {connect:{category_id:category_id}}
+          },
+         });  
+         newItems.push(newItem);
+      }
+       
+
+    } catch (error) {
+      console.log(error);
+      throw new Error(error.message)
+    }
   }
 }

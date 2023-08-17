@@ -129,9 +129,7 @@ model Menu {
 model MenuItem {
   menuItem_id Int    @id @unique @default(autoincrement())
   name        String
-  type        String
-
-  Menu               Menu?    @relation(fields: [menu_id], references: [menu_id])
+  Menu               Menu?       @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int?
   price              Float
   category           Category @relation(fields: [category_id], references: [category_id])
