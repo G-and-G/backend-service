@@ -18,6 +18,7 @@ export class HotelService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    console.log(createHotelDTO)
     try {
       const adminUser = await this.prisma.users.findUnique({
         where: { id: createHotelDTO.admin.id },
@@ -55,6 +56,7 @@ export class HotelService {
           `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
         );
       }
+      console.log(error)
       throw new InternalServerErrorException('Internal server error');
     }
   }
