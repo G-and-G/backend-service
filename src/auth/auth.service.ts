@@ -1,57 +1,27 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
-import { AuthDto, SignInDTO } from './dto/auth.dto';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from '@nestjs/common';
+import { MailService } from 'src/mail/mail.service';
+import { UserService } from 'src/user/user.service';
+import { LoginDTO } from './dto/login.dto';
+import ApiResponse from 'src/utils/ApiResponse';
+import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { jwtSecret } from '../utils/constants';
+
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) {}
-  async signup(dto: AuthDto) {
-    const { email, password, telephone, gender, username, fullName } = dto;
-    const foundUser = await this.prisma.user.findUnique({ where: { email } });
-    if (foundUser) throw new Error('Email already exists');
-    const hashedPassword = await this.hashPassword(password);
-    await this.prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        telephone,
-        gender,
-        username,
-        fullName,
-      },
-    });
-    return { message: 'Signup was successful' };
-  }
 
-  async signin(dto: SignInDTO, req: Request, res: Response) {
-    const { email, password } = dto;
-    const foundUser = await this.prisma.user.findUnique({ where: { email } });
-    if (!foundUser) throw new Error('wrong credentials');
-    const isMatch = await this.comparePassword({
-      password,
-      hashedPassword: foundUser.password,
-    });
-    if (!isMatch) throw new BadRequestException('wrong credentials');
-    const token = await this.signToken({
-      id: foundUser.user_id,
-      email: foundUser.email,
-    });
+    constructor(private userService: UserService, private mailService: MailService, private jwtService: JwtService) { }
 
-    return { token };
-  }
-  
-  async signout() {}
-  async hashPassword(password: string) {
-    const salt = 10;
-    return await bcrypt.hash(password, salt);
-  }
-  async comparePassword(args: { password: string; hashedPassword: string }) {
-    return await bcrypt.compare(args.password, args.hashedPassword);
-  }
-  async signToken(args: { id: string; email: string }) {
-    const payload = args;
-    return this.jwt.signAsync(payload, { secret: jwtSecret });
-  }
+    async login(dto: LoginDTO) {
+        const user = await this.userService.getUserByEmail(dto.email)
+        if (user.role=="ADMIN"){
+            console.log("adminnnnn");
+            
+        }
+        if (!user) return ApiResponse.error("Invalid email or password")
+        const match = compareSync(dto.password, user.password)
+        if (!match) return ApiResponse.error("Invalid email or password")
+        const token = this.jwtService.sign({ id: user.id }, { expiresIn: '1d' })
+        return ApiResponse.success("Login successful", { token, user })
+    }
+
 }

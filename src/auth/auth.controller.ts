@@ -1,25 +1,39 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { LoginDTO } from './dto/login.dto';
+import { InitiateResetPasswordDTO } from './dto/initiate-reset-password.dto';
+import { ResetPasswordDTO } from './dto/reset-password.dto';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { dot } from 'node:test/reporters';
-import { AuthDto, SignInDTO } from './dto/auth.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-@ApiTags('Auth module')
+
 @Controller('auth')
+@ApiTags("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-  @Post('signup')
-  signup(@Body() dot:AuthDto){
-    return  this.authService.signup(dot)
-  }
 
-  @Post('signin')
-  signin(@Body() dot:SignInDTO,@Req() req,@Res() res){
-    return  this.authService.signin(dot ,req,res)
-  }
-  
-  @Get('signout')
-  signout(){
-    return  this.authService.signout()
-  }
+    constructor(private authService: AuthService) { }
 
+    @Post("login")
+    async login(@Body() dto: LoginDTO) {
+        const response = this.authService.login(dto);
+        return response;
+    }
+
+    @Post("initiate-reset-password")
+    async initiateResetPassword(@Body() dto: InitiateResetPasswordDTO) {
+
+    }
+
+    @Put("reset-password/:token")
+    async resetPassword(@Body() dto: ResetPasswordDTO, @Param("token") token: string) {
+
+    }
+
+    @Post("initiate-email-verification")
+    async initiateEmailVerification() {
+
+    }
+
+    @Put("verify-email/:token")
+    async verifyEmail(@Param("token") token: string) {
+
+    }
 }

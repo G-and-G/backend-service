@@ -1,63 +1,131 @@
-import { PrismaService } from "prisma/prisma.service";
-import { Hotel } from "./hotel.model";
-import { ConflictException, Injectable } from "@nestjs/common";
-
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+// import { PrismaService } from 'path-to-your-prisma-service';
+// Import your Prisma service or use your preferred data access method
+// import { CreateHotelDTO } from './dto/create-hotel.dto';
+import { PrismaService } from 'prisma/prisma.service';
+import { CreateHotelDTO } from './dto/create-hotel.dto';
+// import { CreateHotelDTO } from './dto/update-hotel.dto';
+import { Hotel } from '@prisma/client';
+// import { Hotel } from './hotel.entity';
+import ApiResponse from 'src/utils/ApiResponse';
 @Injectable()
-export class HotelService{
-    getHotel(id: number): Hotel | PromiseLike<Hotel> {
-        throw new Error("Method not implemented.");
-    }
-    getHotelById(id: number): Hotel | PromiseLike<Hotel> {
-        throw new Error("Method not implemented.");
-    }
-    constructor(private prisma: PrismaService) {
+export class HotelService {
+  constructor(private readonly prisma: PrismaService) {}
 
-    }
-    async getAllHotels():Promise<Hotel[]>{
-        return this.prisma.hotel.findMany as unknown as Hotel[];
-    }
-    async createHotel(data:any):Promise<Hotel>{
-        try {
-            const existingHotel = await this.prisma.hotel.findUnique({
-                where:{
-                    hotel_id:data.hotel_id
-                }
-            })
-            if(existingHotel){
-                throw new ConflictException('Hotel already exists')
-            }
-            return this.prisma.hotel.create({
-                data,
-            }) as unknown as Hotel;
-        } catch (error) {
-            console.log(error);
-            
-        }
-       
-    }
-    async updateHotel(hotel_id:string,data:any):Promise<Hotel>{
-         try {
-            return this.prisma.hotel.update({
-                where:{
-                    hotel_id:Number(hotel_id)
-                },
-                data
-            })as unknown as Hotel;
-         } catch (error) {
-            console.log(error);
-            
-         }
-     
-    }
-    async deleteHotel(hotel_id:string):Promise<Hotel>{
-      try {
-        return  this.prisma.hotel.delete( {
-            where:{hotel_id:Number(hotel_id)}
-        })as unknown as Hotel;
-      } catch (error) {
-        console.log(error);
-        
+  async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    try {
+      const adminUser = await this.prisma.users.findUnique({
+        where: { id: createHotelDTO.admin.id },
+      });
+
+      if (!adminUser) {
+        throw new NotFoundException('Admin user not found');
       }
+      const hotel = await this.prisma.hotel.create({
+        data: {
+          name: createHotelDTO.name,
+          image: createHotelDTO.image,
+          address: {
+            create: {
+              latitude: createHotelDTO.address.latitude,
+              longitude: createHotelDTO.address.longitude,
+              street: createHotelDTO.address.street,
+              district: createHotelDTO.address.district,
+              sector: createHotelDTO.address.sector,
+              cell: createHotelDTO.address.cell,
+              village: createHotelDTO.address.village,
+            },
+          },
+          admin: {
+            connect: { id: adminUser.id },
+          },
+        },
+      });
+      return hotel;
+    } catch (error) {
+      // Handle specific errors, e.g., duplicate entries
+      if (error.code === 'P2002') {
+        const key = error.meta.target[0];
+        throw new ConflictException(
+          `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
+        );
+      }
+      throw new InternalServerErrorException('Internal server error');
     }
+  }
 
+  async getHotelById(id: number): Promise<Hotel> {
+    const hotel = await this.prisma.hotel.findUnique({
+      where: { hotel_id: id },
+    });
+    if (!hotel) {
+      throw new NotFoundException('Hotel not found');
+    }
+    return hotel;
+  }
+
+  async getAllHotels(): Promise<Hotel[]> {
+    return this.prisma.hotel.findMany();
+  }
+
+  async updateHotel(id: number, updateHotelDTO: CreateHotelDTO): Promise<Hotel> {
+    const existingHotel = await this.prisma.hotel.findUnique({
+      where: { hotel_id: id },
+    });
+    
+    if (!existingHotel) {
+      throw new NotFoundException('Hotel not found');
+    }
+  
+    try {
+      const adminUser = await this.prisma.users.findUnique({
+        where: { id: updateHotelDTO.admin.id },
+      });
+  
+      if (!adminUser) {
+        throw new NotFoundException('Admin user not found');
+      }
+  
+      const updatedHotel = await this.prisma.hotel.update({
+        where: { hotel_id: id },
+        data: {
+          name: updateHotelDTO.name,
+          image: updateHotelDTO.image,
+          address: {
+            update: {
+              latitude: updateHotelDTO.address.latitude,
+              longitude: updateHotelDTO.address.longitude,
+              street: updateHotelDTO.address.street,
+              district: updateHotelDTO.address.district,
+              sector: updateHotelDTO.address.sector,
+              cell: updateHotelDTO.address.cell,
+              village: updateHotelDTO.address.village,
+            },
+          },
+          admin: {
+            connect: { id: adminUser.id },
+          },
+          // ... other properties you want to update
+        },
+      });
+  
+      return updatedHotel;
+    }catch(error){
+
+    }
+  }
+  async deleteHotel(id: number): Promise<void> {
+    const existingHotel = await this.prisma.hotel.findUnique({
+      where: { hotel_id: id },
+    });
+    if (!existingHotel) {
+      throw new NotFoundException('Hotel not found');
+    }
+    await this.prisma.hotel.delete({ where: { hotel_id: id } });
+  }
 }

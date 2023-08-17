@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
-import { Category, Hotel, MenuItem, PrismaClient } from '@prisma/client';
+import { Category, MenuItem, PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 const prisma = new PrismaClient();
