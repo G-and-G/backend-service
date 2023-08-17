@@ -27,7 +27,7 @@ export class HotelController {
   }
 
   @Post('/addMenu/:hotelId')
-  async addMenu(@Body() body:any, @Param('hotelId') hotelId:number){
+  async addMenu(@Body() body:CreateMenuDTO, @Param('hotelId') hotelId:number){
     console.log(hotelId)
     return this.hotelService.addMenu(body,hotelId);
   }
