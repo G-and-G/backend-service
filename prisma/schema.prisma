@@ -91,7 +91,7 @@ model CoffeeProduct {
 model Hotel {
   hotel_id            Int      @id @unique @default(autoincrement())
   admin               users     @relation(fields: [admin_id], references: [id])
-  admin_id            String   @unique
+  admin_id            String   @unique 
   name                String
   menu                Menu?
   menu_id             Int ?     @unique
@@ -129,8 +129,6 @@ model Menu {
 model MenuItem {
   menuItem_id Int    @id @unique @default(autoincrement())
   name        String
-  type        String
-
   Menu               Menu?       @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int?
   price              Float
