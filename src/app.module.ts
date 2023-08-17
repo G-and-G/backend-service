@@ -9,7 +9,6 @@ import { MenuModule } from './menu/menu.module';
 import { CategoryModule } from './category/category.module';
 import { HotelModule } from './hotel/hotel.module';
 import { NotificationGateway } from './notification/notification.gateway';
-import { ConfigModule } from '@nestjs/config';
 import options from './utils/cors';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 
