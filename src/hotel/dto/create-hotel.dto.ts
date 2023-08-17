@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address, users } from '@prisma/client';
+import {  users } from '@prisma/client';
+import { Address } from './address.dto';
 import {
   IsNotEmpty,
   IsNumber,
@@ -9,7 +10,9 @@ import {
   IsUrl,
   Min,
   Max,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateHotelDTO {
   @IsNotEmpty()
@@ -21,7 +24,10 @@ export class CreateHotelDTO {
   @ApiProperty()
   image?: string;
   @ApiProperty()
-  address?: Address;
+  @ValidateNested()
+ @Type(() => Address)
+  address: Address;
+
   @ApiProperty()
   @IsString()
   admin_id:string;
