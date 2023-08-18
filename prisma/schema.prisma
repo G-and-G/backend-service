@@ -120,8 +120,8 @@ model Address {
 
 model Menu {
   menu_id    Int        @id @unique @default(autoincrement())
-  hotel      Hotel?     @relation(fields: [hotel_id], references: [hotel_id])
-  hotel_id   Int        @unique
+  hotel      Hotel ?    @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id   Int  ?      @unique
   items      MenuItem[]
   categories Category[]
 }

@@ -114,7 +114,6 @@ CREATE TABLE "Menu" (
 CREATE TABLE "MenuItem" (
     "menuItem_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
     "menu_id" INTEGER,
     "price" DOUBLE PRECISION NOT NULL,
     "category_id" INTEGER NOT NULL,

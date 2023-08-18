@@ -1,16 +1,40 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { ApiParam } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get,Param, Post, Req, Res } from '@nestjs/common';
 import { Category, MenuItem, PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import ApiResponse from 'src/utils/ApiResponse';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 const prisma = new PrismaClient();
 @Controller('menu')
 export class MenuController {
     @Get('/')
-    getMenu(){
-       
+    async getMenu(){
+       try {
+        let menus = await prisma.menu.findMany({
+          include: {
+          categories: true, // Include categories
+          items: true,      // Include items
+        }});
+        // console.log(menus[0].items)
+        return ApiResponse.success('Menus here',menus,200);
+       } catch (error) {
+        console.log(error)
+        return ApiResponse.error(error.message,null,error.status)
+       }
     }
-
+    @Delete('/:id')
+    async deleteMenu(@Param('id') id:number){
+       try {
+        await prisma.menu.delete({
+          where:{
+            menu_id:Number(id)
+          }
+        });
+        return ApiResponse.success('Deleted successfully',null,200);
+       } catch (error) {
+        console.log(error)
+        return ApiResponse.error('Deleted Failure ' + error.message,null,error.status);
+       }
+    }
 //     @Post('/new')
 // async createMenu(@Req() req: Request, @Res() res: Response, @Body() body) {
 //   try {
@@ -64,23 +88,59 @@ export class MenuController {
 
 // }
 
-@Post('/menuItem/new')
-async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body){
+@Post('/menuItem/new/:menuId/:categoryId')
+async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body,@Param('menuId') menu_id:number,@Param('categoryId') category_id:number){
  try {
-    let {menu_id,category_id} = body;
     let category = await prisma.category.findFirst({
       where:{
-        category_id
+        category_id:Number(category_id)
       }
     });
-    if(!category){
+    let menu = await prisma.menu.findFirst({
+      where:{
+        menu_id: Number(menu_id)
+      },
+      include:{
+        items:true
+      }
+    })
+    if(!category ){
       throw new Error("Category doesn't exist")
     }
+    if(!menu ){
+      throw new Error("Menu doesn't exist")
+    }
+    
     const newItem = await prisma.menuItem.create({
         data:{
             ...body,
+            category:{
+              connect:{
+                category_id: Number(category_id)
+              }
+            },
+            Menu:{
+              connect:{
+                menu_id: Number(menu_id)
+              }
+            }
         }
-    })
+    });
+
+    await prisma.menu.update({
+      where:{
+        menu_id:menu.menu_id
+      },
+      data:{
+        ...menu,
+        items:{
+          connect: [
+            {menuItem_id:newItem.menuItem_id}
+          ]
+        }
+      }
+    });
+
     return res.send(buildResponse("MenuItem created",Status.SUCCESS,newItem))
  } catch (error){
     console.log(error.message)
