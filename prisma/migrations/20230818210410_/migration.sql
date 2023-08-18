@@ -14,6 +14,7 @@ CREATE TABLE "users" (
     "role" "Role" DEFAULT 'NORMAL',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
+    "resetToken" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

@@ -34,40 +34,79 @@ import { randomBytes } from 'crypto';
         
             return { status: 200, response: { message: "Login successful", token, user } };
         }
-        // async initiateResetPassword(email: string) {
-        //     const user = await this.userService.getUserByEmail(email);
+        async initiateResetPassword(email: string) {
+            const user = await this.userService.getUserByEmail(email);
     
-        //     if (!user) {
-        //         // User not found, do not give away whether the email exists in the system
-        //         return;
-        //     }
+            if (!user) {
+                
+                return;
+            }
     
-        //     // Generate a reset token
-        //     const resetToken = randomBytes(32).toString('hex');
+           
+            const resetToken = randomBytes(32).toString('hex');
+    
             
-        //     // Store the reset token and its expiration in the user's record in the database
-        //     await this.userService.updateResetToken(user.id, resetToken);
+            await this.userService.updateResetToken(user.id, resetToken);
     
-        //     // Send an email to the user with the reset token
-        //     await this.mailService.sendResetPasswordEmail(user.email, resetToken);
-        // }
+            
+            await this.mailService.sendResetPasswordEmail({
+                email: user.email,
+                token: resetToken,
+                names: `${user.first_name} ${user.last_name}`,
+            });
+        }
+        async resetPassword(token: string, newPassword: string) {
+            const user = await this.userService.getUserByResetToken(token);
     
-        // async resetPassword(token: string, newPassword: string) {
-        //     const user = await this.userService.getUserByResetToken(token);
+            if (!user) {
+                
+                return;
+            }
     
-        //     if (!user) {
-        //         // Token not found or expired
-        //         return;
-        //     }
+            
+            const hashedPassword = hashSync(newPassword, 10);
     
-        //     // Hash the new password
-        //     const hashedPassword = hashSync(newPassword, 10);
+            
+            await this.userService.updatePasswordAndClearToken(user.id, hashedPassword);
+        }
+        
+        async initiateEmailVerification(email: string) {
+            const user = await this.userService.getUserByEmail(email);
     
-        //     // Update the user's password and clear the reset token
-        //     await this.userService.updatePasswordAndClearToken(user.id, hashedPassword);
-        // }
+            if (!user) {
+                
+                return;
+            }
     
-        // Other methods...
+            
+            const verificationCode = randomBytes(6).toString('hex');
+    
+           
+            await this.mailService.sendInitiateEmailVerificationEmail({
+                email: user.email,
+                verificationCode,
+                names: `${user.first_name} ${user.last_name}`,
+            });
+    
+
+            return { message: 'Email verification initiated' };
+        }
+        
+        async verifyEmail(userId: string): Promise<boolean> {
+            try {
+                const user = await this.userService.verifyEmail(userId);
+                
+                if (user) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.log('Error verifying email:', error);
+                throw error;
+            }
+        }
+    
     }
         
     

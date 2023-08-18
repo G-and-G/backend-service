@@ -34,7 +34,7 @@ model users {
   orders         Order?
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
-
+ resetToken     String?
   @@map("users")
 }
 
