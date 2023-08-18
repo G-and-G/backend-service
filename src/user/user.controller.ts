@@ -68,5 +68,13 @@ export class UserController {
     async me() {
 
     }
+    @Put('make-admin/:id')
+    // @UseGuards(AdminGuard)
+    async makeUserAdmin(@Param('id') userId: string) {
+        const response = await this.userService.makeUserAdmin(userId);
+        // console.log("errorrr");
+        
+        return response;
+    }
 
 }

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
@@ -19,7 +19,7 @@ export class UserService {
             const hashedPassword = await hash(dto.password, 10)
             const user = await this.prisma.users.create({
                 data: {
-                    role:dto.role,
+                    // role:dto.role,
                     first_name: dto.firstName,
                     last_name: dto.lastName,
                     email: dto.email,
@@ -37,7 +37,23 @@ export class UserService {
             return ApiResponse.error("Internal server error", error);
         }
     }
+    async makeUserAdmin(userId: string) {
+        try {
+            const updatedUser = await this.prisma.users.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    role: 'ADMIN', // Set the role to 'admin'
+                },
+            });
 
+            return ApiResponse.success("User role updated to admin successfully", updatedUser);
+        } catch (error) {
+            console.log("Error updating user role:", error);
+            return ApiResponse.error("Error updating user role", error);
+        }
+    }
     async getUserById(id: string) {
         const user = this.prisma.users.findUnique({
             where: {
@@ -108,10 +124,27 @@ export class UserService {
             });
             return deletedUser;
         } catch (error) {
+
+            
             console.log("Error deleting user:", error);
             throw error;
         }
     }
+    // async   updateResetToken(userId: number, resetToken: string): Promise<void> {
+    //     try {
+    //         const updatedUser= await this.prisma.users.update({
+    //             where: { id: userId },
+    //             data: { resetToken   },
+    //         });
+
+    //         if (!updatedUser) {
+    //             throw new NotFoundException('User not found');
+    //         }
+    //     } catch (error) {
+    //         console.log("Error updating reset token:", error);
+    //         throw error;
+    //     }
+    // }
 
 
 }

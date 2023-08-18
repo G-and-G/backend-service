@@ -11,7 +11,7 @@ CREATE TABLE "users" (
     "last_name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
+    "role" "Role" DEFAULT 'NORMAL',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -114,7 +114,6 @@ CREATE TABLE "Menu" (
 CREATE TABLE "MenuItem" (
     "menuItem_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
     "menu_id" INTEGER,
     "price" DOUBLE PRECISION NOT NULL,
     "category_id" INTEGER NOT NULL,

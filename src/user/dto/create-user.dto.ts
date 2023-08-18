@@ -4,9 +4,7 @@ import { IsEmail, IsEnum, IsNotEmpty, IsString, Max, MaxLength, MinLength } from
 
 
 export class RegisterDTO {
-    @IsEnum(['ADMIN', 'NORMAL'])
-    @ApiProperty()
-    role :Role;
+   
     @IsString()
     @MaxLength(20)
     @MinLength(3)
