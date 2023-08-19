@@ -94,7 +94,6 @@ model Hotel {
   admin_id            String   @unique
   name                String
   menu                Menu?
-  menu_id             Int?
   address             Address?
   rating              Float    @default(0)
   lastMonthOrders     Int?     @default(0)
@@ -120,8 +119,8 @@ model Address {
 
 model Menu {
   menu_id    Int        @id @unique @default(autoincrement())
-  hotel      Hotel ?    @relation(fields: [hotel_id], references: [hotel_id])
-  hotel_id   Int  ?      @unique
+  hotel      Hotel     @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id   Int        @unique
   items      MenuItem[]
   categories Category[]
 }
@@ -129,7 +128,7 @@ model Menu {
 model MenuItem {
   menuItem_id Int    @id @unique @default(autoincrement())
   name        String
-  Menu               Menu?       @relation(fields: [menu_id], references: [menu_id])
+  Menu               Menu ?     @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int?
   price              Float
   category           Category @relation(fields: [category_id], references: [category_id])
