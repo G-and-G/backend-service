@@ -80,7 +80,11 @@ export class HotelService {
   }
 
   async getAllHotels(): Promise<Hotel[]> {
-    return this.prisma.hotel.findMany();
+    return this.prisma.hotel.findMany({
+      include:{
+        menu:true
+      }
+    });
   }
 
   async updateHotel(
@@ -134,6 +138,16 @@ export class HotelService {
     if (!existingHotel) {
       throw new NotFoundException('Hotel not found');
     }
+    await this.prisma.hotel.update({
+      where: {
+        hotel_id: Number(id),
+      },
+      data: {
+        address: {
+          disconnect: true,
+        },
+      },
+    });
     await this.prisma.hotel.delete({ where: { hotel_id: Number(id) } });
   }
 
@@ -187,23 +201,14 @@ export class HotelService {
           items: {
             connect: [...(itemsConnections as any[])],
           },
+          hotel: {
+            connect: {
+              hotel_id: hotel.hotel_id,
+            },
+          },
         },
       });
-      
-      await this.prisma.hotel.update({
-        where:{
-          hotel_id:hotel.hotel_id
-        },
-        data:{
-          menu:{
-            connect:{
-              menu_id:newMenu.menu_id
-            }
-          }
-        }
 
-      })
-      
       return ApiResponse.success('Menu created Successfully!', newMenu, 201);
     } catch (error) {
       console.log(error);
@@ -221,15 +226,17 @@ export class HotelService {
         where: {
           hotel_id: Number(hotelId),
         },
+        include: {
+          menu: true,
+        },
       });
-      console.log(hotel);
+      console.log(hotel.menu);
       if (!hotel) {
         throw new Error('Hotel not found!');
       }
-      if(!hotel.menu_id){
-        throw new Error("Hotel doesn't have a menu")
+      if (!hotel.menu.menu_id) {
+        throw new Error("Hotel doesn't have a menu");
       }
-      let menuId = hotel.menu_id;
       await this.prisma.hotel.update({
         where: {
           hotel_id: hotel.hotel_id,
@@ -240,10 +247,9 @@ export class HotelService {
           },
         },
       });
-      console.log('MenuId', menuId)
       await this.prisma.menu.delete({
         where: {
-          menu_id: menuId,
+          menu_id: hotel.menu.menu_id,
         },
       });
       return ApiResponse.success(
@@ -252,10 +258,19 @@ export class HotelService {
         200,
       );
     } catch (error) {
-      if(error.message.includes('Record to delete does not exist')){
-        return ApiResponse.error('Record to delete does not exist', null, error.status);
+      console.log(error)
+      if (error.message.includes('Record to delete does not exist')) {
+        return ApiResponse.error(
+          'Record to delete does not exist',
+          null,
+          error.status,
+        );
       }
-      return ApiResponse.error('Record to delete does not exist', null, error.status);
+      return ApiResponse.error(
+        'Record to delete does not exist',
+        null,
+        error.status,
+      );
     }
   }
 }

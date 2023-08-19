@@ -127,20 +127,6 @@ async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body,@P
         }
     });
 
-    await prisma.menu.update({
-      where:{
-        menu_id:menu.menu_id
-      },
-      data:{
-        ...menu,
-        items:{
-          connect: [
-            {menuItem_id:newItem.menuItem_id}
-          ]
-        }
-      }
-    });
-
     return res.send(buildResponse("MenuItem created",Status.SUCCESS,newItem))
  } catch (error){
     console.log(error.message)
