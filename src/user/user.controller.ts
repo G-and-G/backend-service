@@ -76,5 +76,9 @@ export class UserController {
         
         return response;
     }
-
+    @Put('updateadmin/:id')
+async  grantHotelAccessToAdmin(@Param('id') userId: string, @Query('hotelId') hotelId: number) {
+    const response = await this.userService.grantHotelAccessToAdmin(userId, hotelId);
+    return response;
+}
 }

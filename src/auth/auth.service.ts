@@ -16,10 +16,7 @@ import { randomBytes } from 'crypto';
         async login(dto: LoginDTO) {
             const user = await this.userService.getUserByEmail(dto.email);
             
-            if (user && user.role === "ADMIN") {
-                console.log("adminnnnn");
-            }
-            
+           
             if (!user) {
                 return { status: 400, response: { message: "Invalid email or password" } };
             }
@@ -91,6 +88,7 @@ import { randomBytes } from 'crypto';
 
             return { message: 'Email verification initiated' };
         }
+        
         
         async verifyEmail(userId: string): Promise<boolean> {
             try {
