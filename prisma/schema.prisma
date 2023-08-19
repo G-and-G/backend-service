@@ -28,13 +28,13 @@ model users {
   email          String         @unique
   password       String
   admin_hotels   Hotel[]
-  role           Role
+  role           Role?       @default(NORMAL)
   verification   Verification?
   password_reset PasswordReset?
   orders         Order?
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
-
+ resetToken     String?
   @@map("users")
 }
 

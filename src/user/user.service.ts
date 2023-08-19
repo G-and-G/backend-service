@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
@@ -19,7 +19,7 @@ export class UserService {
             const hashedPassword = await hash(dto.password, 10)
             const user = await this.prisma.users.create({
                 data: {
-                    role:dto.role,
+                    // role:dto.role,
                     first_name: dto.firstName,
                     last_name: dto.lastName,
                     email: dto.email,
@@ -37,7 +37,23 @@ export class UserService {
             return ApiResponse.error("Internal server error", error);
         }
     }
+    async makeUserAdmin(userId: string) {
+        try {
+            const updatedUser = await this.prisma.users.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    role: 'ADMIN', // Set the role to 'admin'
+                },
+            });
 
+            return ApiResponse.success("User role updated to admin successfully", updatedUser);
+        } catch (error) {
+            console.log("Error updating user role:", error);
+            return ApiResponse.error("Error updating user role", error);
+        }
+    }
     async getUserById(id: string) {
         const user = this.prisma.users.findUnique({
             where: {
@@ -108,10 +124,76 @@ export class UserService {
             });
             return deletedUser;
         } catch (error) {
+
+            
             console.log("Error deleting user:", error);
             throw error;
         }
     }
+    async updateResetToken(userId: string, resetToken: string): Promise<void> {
+        try {
+           const updatedUser= await this.prisma.users.updateMany({
+                where: { id: userId },
+                data: { resetToken },
+            });
+          console.log(updatedUser);
+          
+        } catch (error) {
+            console.log("Error updating reset token:", error);
+            throw error;
+        }
+    }
+    async getUserByResetToken(resetToken: string) {
+        try {
+            const user = await this.prisma.users.findFirst({
+                where: {
+                    resetToken,
+                },
+            });
+            return user;
+        } catch (error) {
+            console.log("Error getting user by reset token:", error);
+            throw error;
+        }
+    }
+    
+    async updatePasswordAndClearToken(userId: string, newPassword: string): Promise<void> {
+        try {
+            const hashedPassword = await hash(newPassword, 10);
 
-
+            await this.prisma.users.update({
+                where: { id: userId },
+                data: {
+                    password: hashedPassword,
+                    resetToken: null, // Clear the reset token
+                },
+            });
+        } catch (error) {
+            console.log("Error updating password and clearing token:", error);
+            throw error;
+        }
+    }
+    async verifyEmail(userId: string): Promise<boolean> {
+        try {
+            const user = await this.prisma.users.update({
+                where: { id: userId },
+                data: {
+                    verification: {
+                        update: {
+                            verification_status: 'VERIFIED'
+                        }
+                    }
+                }
+            });
+            
+            if (user) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            console.log('Error verifying email:', error);
+            throw error;
+        }
+    }
 }

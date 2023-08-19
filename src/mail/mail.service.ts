@@ -71,6 +71,15 @@ export class MailService {
         console.log("[APPLICATION LOG]: Sending email verification successful to " + email)
         await this.transporter.sendMail(mailOptions);
     }
-
+    async sendResetPasswordEmail({ email, token, names }: { email: string, token: string, names: string }) {
+        try {
+            // Send the initiate password reset email
+            await this.sendInitiatePasswordResetEmail({ email, token, names });
+            console.log("[APPLICATION LOG]: Password reset email sent successfully to " + email);
+        } catch (error) {
+            console.log("[APPLICATION LOG]: Error sending password reset email to " + email, error);
+            throw error;
+        }
+    }
 
 }
