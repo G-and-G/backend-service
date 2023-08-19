@@ -90,8 +90,8 @@ model CoffeeProduct {
 
 model Hotel {
   hotel_id            Int      @id @unique @default(autoincrement())
-  admin               users    @relation(fields: [admin_id], references: [id])
-  admin_id            String   @unique
+  admin               users ?   @relation(fields: [admin_id], references: [id])
+  admin_id            String?   @unique
   name                String
   menu                Menu?
   menu_id             Int?

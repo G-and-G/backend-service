@@ -54,6 +54,25 @@ export class UserService {
             return ApiResponse.error("Error updating user role", error);
         }
     }
+    
+    async grantHotelAccessToAdmin(adminId: string, hotelId: number) {
+        try {
+            const updatedAdmin = await this.prisma.users.update({
+                where: {
+                    id: adminId,
+                },
+                data: {
+                    admin_hotels: {
+                        connect: { hotel_id: hotelId }, // Connect the admin to the specific hotel
+                    },
+                },
+            });
+    
+            return ApiResponse.success("Admin granted access to hotel successfully", updatedAdmin);
+        } catch (error) {
+            console.log("Error granting hotel access to admin:", error);
+            return ApiResponse.error("Error granting hotel access to admin", error);
+        }}
     async getUserById(id: string) {
         const user = this.prisma.users.findUnique({
             where: {
