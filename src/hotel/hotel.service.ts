@@ -273,4 +273,16 @@ export class HotelService {
       );
     }
   }
+  async getHotelByAdminId(adminId: string): Promise<Hotel> {
+    const hotel = await this.prisma.hotel.findFirst({
+      where: { admin_id: adminId },
+    });
+    
+    if (!hotel) {
+      throw new NotFoundException('Hotel not found for the provided admin ID');
+    }
+
+    return hotel;
+  }
+
 }
