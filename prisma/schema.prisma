@@ -10,22 +10,68 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model User {
-  user_id  String  @id @unique @default(uuid())
-  order    Order[]
-  order_id String
-  hotel    Hotel?
+enum Role {
+  NORMAL
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+}
+
+model users {
+  id             String         @id @default(uuid())
+  first_name     String
+  last_name      String
+  email          String         @unique
+  password       String
+  admin_hotels   Hotel[]
+  role           Role?       @default(NORMAL)
+  verification   Verification?
+  password_reset PasswordReset?
+  orders         Order?
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+ resetToken     String?
+  @@map("users")
+}
+
+model Verification {
+  id                      String             @id @default(uuid())
+  user                    users              @relation(fields: [user_id], references: [id])
+  user_id                 String             @unique
+  verification_status     VerificationStatus @default(UNVERIFIED)
+  verificationToken       String
+  verificationTokenExpiry DateTime
+  created_at              DateTime           @default(now())
+  updated_at              DateTime           @updatedAt
+
+  @@map("user_verifications")
+}
+
+model PasswordReset {
+  id                  String   @id @default(uuid())
+  user                users    @relation(fields: [user_id], references: [id])
+  user_id             String   @unique
+  passwordResetToken  String
+  passwordResetExpiry DateTime
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("user_password_resets")
 }
 
 model Order {
-  order_id             String         @id @unique @default(uuid())
-  customer             User?          @relation(fields: [customer_id], references: [user_id])
-  customer_id          String
+  order_id             String    @id @unique @default(uuid())
+  customer             users?    @relation(fields: [customer_id], references: [id])
+  customer_id          String    @unique
   date                 DateTime
-  deliveryAddress      Address        @relation(fields: [address_id], references: [address_id])
+  deliveryAddress      Address   @relation(fields: [address_id], references: [address_id])
   address_id           String
-  product              CoffeeProduct? @relation(fields: [product_id], references: [coffee_id])
-  product_id           String         @unique
+  product              MenuItem? @relation(fields: [product_id], references: [menuItem_id])
+  product_id           Int       @unique
   expectedDeliveryTime DateTime
   price                Float
   review               String
@@ -34,8 +80,6 @@ model Order {
 
 model CoffeeProduct {
   coffee_id          String @id @unique @default(uuid())
-  hotel              Hotel  @relation(fields: [hotel_id], references: [hotel_id])
-  order              Order?
   order_id           String @unique
   hotel_id           Int
   name               String
@@ -45,19 +89,18 @@ model CoffeeProduct {
 }
 
 model Hotel {
-  hotel_id            Int             @id @unique @default(autoincrement())
-  admin               User            @relation(fields: [admin_id], references: [user_id])
-  admin_id            String          @unique
+  hotel_id            Int      @id @unique @default(autoincrement())
+  admin               users ?   @relation(fields: [admin_id], references: [id])
+  admin_id            String?   @unique
   name                String
   menu                Menu?
-  menu_id             Int             @unique
   address             Address?
-  products            CoffeeProduct[]
-  rating              Float
-  lastMonthOrders     Int
-  ThisWeekOrders      Int
-  startingWorkingTime DateTime
-  endingWorkingTime   DateTime
+  rating              Float    @default(0)
+  lastMonthOrders     Int?     @default(0)
+  ThisWeekOrders      Int?     @default(0)
+  startingWorkingTime DateTime @default(now())
+  endingWorkingTime   DateTime @default(now())
+  image               String
 }
 
 model Address {
@@ -75,39 +118,33 @@ model Address {
 }
 
 model Menu {
-  menu_id      Int         @id @unique @default(autoincrement())
-  hotel        Hotel?      @relation(fields: [hotel_id], references: [hotel_id])
-  hotel_id     Int         @unique
-  items        MenuItem[]
+  menu_id    Int        @id @unique @default(autoincrement())
+  hotel      Hotel     @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id   Int        @unique
+  items      MenuItem[]
   categories Category[]
 }
 
 model MenuItem {
-  menuItem_id Int    @id @unique
+  menuItem_id Int    @id @unique @default(autoincrement())
   name        String
-  type        String
-
-  Menu        Menu? @relation(fields: [menuMenu_id], references: [menu_id])
-  menuMenu_id Int?
-  price Int
-  category     Category
-  sub_category SubCategory
+  Menu               Menu ?     @relation(fields: [menu_id], references: [menu_id])
+  menu_id            Int?
+  price              Float
+  category           Category @relation(fields: [category_id], references: [category_id])
+  category_id        Int
+  quantity_available Int
+  description        String
+  image              String?
+  Order              Order?
 }
 
-enum Category {
-  DRINK
-  FOOD 
-}
-
-enum SubCategory {
-  SANDWICH
-  WRAP
-  BURGER
-  SWEETS
-  SPECIALS
-  ESPRESSO
-  FRESH_JUICE
-  ICED
-  ALCOHOL
-  SMOOTHIES
+model Category {
+  category_id   Int        @id @unique @default(autoincrement())
+  subcategories String[]
+  menu          Menu[]
+  menuItem      MenuItem[]
+  description   String
+  image         String?
+  name          String
 }
