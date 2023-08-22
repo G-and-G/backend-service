@@ -20,7 +20,14 @@ export class AuthController {
         return res.status(result.status).json(result.response);
     }
 
-   
+     
+    @Post("AdminLogin")
+    async adminLogin(@Body() dto: LoginDTO, @Res() res: Response) {
+        console.log(dto)
+        const result = await this.authService.adminAuth(dto);
+        return res.status(result.status).json(result.response);
+    }
+
     @Post('initiate-reset-password')
     async initiateResetPassword(@Body() dto: InitiateResetPasswordDTO) {
         await this.authService.initiateResetPassword(dto.email);
