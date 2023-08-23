@@ -28,7 +28,6 @@ export class HotelService {
       const adminUser = await this.prisma.users.findUnique({
         where: { id: createHotelDTO.admin_id },
       });
-      // console.log(adminUser);
 
       if (!adminUser) {
         throw new NotFoundException('Admin user not found');
