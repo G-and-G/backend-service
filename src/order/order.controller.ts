@@ -27,6 +27,7 @@ export class OrderController {
   async updateOrder(
     @Param('id') orderId: string,
     @Body() dataToUpdate: Partial<Order>
+    
   ): Promise<Order | null> {
     return this.orderService.updateOrder(orderId, dataToUpdate);
   }
