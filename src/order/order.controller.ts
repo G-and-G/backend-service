@@ -4,7 +4,7 @@ import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Order } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('orders')
-@Controller('order')
+@Controller('orders')
 export class OrderController {
     constructor(private readonly orderService:OrderService){}
      main():string{
@@ -15,7 +15,7 @@ export class OrderController {
         return this.orderService.getOrders();
     }
 
-    @Post("/")
+    @Post("/newOrder")
     createOrder(@Body() data:CreateOrderDTO){
         return this.orderService.createOrder(data);
     }
@@ -23,15 +23,16 @@ export class OrderController {
     async getOrderById(@Param('id') orderId: string): Promise<Order | null> {
       return this.orderService.getOrderById(orderId);
     }
-    @Put(':id')
+    @Put('update/:id')
   async updateOrder(
     @Param('id') orderId: string,
     @Body() dataToUpdate: Partial<Order>
+    
   ): Promise<Order | null> {
     return this.orderService.updateOrder(orderId, dataToUpdate);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   async deleteOrder(@Param('id') orderId: string): Promise<void> {
     return this.orderService.deleteOrder(orderId);
   }
