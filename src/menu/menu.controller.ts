@@ -3,6 +3,7 @@ import { Category, MenuItem, PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import ApiResponse from 'src/utils/ApiResponse';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
+import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
 const prisma = new PrismaClient();
 @Controller('menu')
 export class MenuController {
@@ -89,7 +90,7 @@ export class MenuController {
 // }
 
 @Post('/menuItem/new/:menuId/:categoryId')
-async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body,@Param('menuId') menu_id:number,@Param('categoryId') category_id:number){
+async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body:CreateMenuItemDTO,@Param('menuId') menu_id:number,@Param('categoryId') category_id:number){
  try {
     let category = await prisma.category.findFirst({
       where:{
