@@ -37,6 +37,7 @@ export class UserController {
     @Get(":id")
     async get(@Param("id") id: string) {
         const user = await this.userService.getUserById(id);
+        
         return ApiResponse.success('User retrieved successfully', user);
     }
     @Get("search/:query")
@@ -44,7 +45,7 @@ export class UserController {
         const results = await this.userService.searchUsers(query);
         return ApiResponse.success('Search results retrieved successfully', results);
     }
-
+  
 
     @Delete("delete/:id")
     @UseGuards(AdminGuard)
