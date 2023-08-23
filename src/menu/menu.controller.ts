@@ -93,7 +93,7 @@ async getMenuitem(@Param('id') menuItem_id){
   try {
     let menuItem = await prisma.menuItem.findUnique({
       where:{
-        menuItem_id
+        menuItem_id:Number(menuItem_id)
       }
   });
     if(!menuItem){
