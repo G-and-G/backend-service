@@ -154,6 +154,6 @@ model Reviews{
   description String
   product MenuItem @relation(fields:[product_id],references:[menuItem_id])
   product_id Int
-  createdAt Datetime
+  createdAt DateTime
   customer users @relation(fields:[customer_id],references:[id])
 }
