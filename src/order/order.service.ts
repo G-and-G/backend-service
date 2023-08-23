@@ -2,6 +2,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
+import ApiResponse from 'src/utils/ApiResponse';
 
 @Injectable()
 export class OrderService {
@@ -43,10 +44,10 @@ export class OrderService {
           },
         },
       });
-
-      
+      return ApiResponse.success("Order Placed!",newOrder,201);
     } catch (error) {
-      
+      console.log(error)
+      return ApiResponse.error("Order couldn't be placed!" + error.message,null,error.status);
     }
   }
 }
