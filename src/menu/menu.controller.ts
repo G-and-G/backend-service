@@ -91,7 +91,11 @@ export class MenuController {
 @Get('/menuItem/:id')
 async getMenuitem(@Param('id') menuItem_id){
   try {
-    let menuItem = await prisma.menuItem.findMany();
+    let menuItem = await prisma.menuItem.findUnique({
+      where:{
+        menuItem_id:Number(menuItem_id)
+      }
+  });
     if(!menuItem){
       throw new Error('Menu Item not found');
     }
