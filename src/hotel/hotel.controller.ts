@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseFilters, NotFoundException } from '@nestjs/common';
 import { HotelService } from './hotel.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
-import { Menu } from '@prisma/client';
+import { Hotel, Menu } from '@prisma/client';
 import { CreateMenuDTO } from './dto/create-menu.dto';
 import { AppExceptionFilter } from 'src/utils/filters/AppExceptionFilter';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
@@ -22,7 +22,15 @@ export class HotelController {
   async findById(@Param('id') id: number) {
     return this.hotelService.getHotelById(id);
   }
-
+  @Get('byAdminId/:adminId') 
+  async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
+    try {
+      const hotel = await this.hotelService.getHotelByAdminId(adminId);
+      return hotel;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
   @Get()
   async findAll() {
     return this.hotelService.getAllHotels();

@@ -5,27 +5,38 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
+
   getOrders() {
     throw new Error('Method not implemented.');
   }
-  async createOrder(dataobj: CreateOrderDTO) {
-    const {address_id,customer_id,...data} = dataobj;
+
+  async createOrder(data: CreateOrderDTO) {
     try {
       const newOrder = await this.prisma.order.create({
         data: {
-            ...data,
-            customer:{
-                connect:{
-                    id: dataobj.customer_id
-                }
+          price: data.price,
+          customer: {
+            connect: {
+              id: data.customer_id,
             },
-            deliveryAddress:{
-                connect:{
-                    address_id:dataobj.address_id
-                }
-            }
+          },
+          date: data.date,
+          deliveryAddress: {
+            connect: {
+              address_id: data.address_id,
+            },
+          },
+          products: {
+            connect: data.products.map(product => ({
+              menuItem_id: product.menuItem_id,
+            })),
+          },
         },
-      });   
-    } catch (error) {}
+      });
+
+      
+    } catch (error) {
+      
+    }
   }
 }
