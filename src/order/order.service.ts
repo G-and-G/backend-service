@@ -8,19 +8,20 @@ export class OrderService {
   getOrders() {
     throw new Error('Method not implemented.');
   }
-  async createOrder(data: CreateOrderDTO) {
+  async createOrder(dataobj: CreateOrderDTO) {
+    const {address_id,customer_id,...data} = dataobj;
     try {
       const newOrder = await this.prisma.order.create({
         data: {
             ...data,
             customer:{
                 connect:{
-                    id: data.customer_id
+                    id: dataobj.customer_id
                 }
             },
             deliveryAddress:{
                 connect:{
-                    address_id:data.address_id
+                    address_id:dataobj.address_id
                 }
             }
         },
