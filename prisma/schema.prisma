@@ -147,3 +147,13 @@ model Category {
   image         String?
   name          String
 }
+
+
+model Reviews{
+  id String @id @unique @default(uuid())
+  description String
+  product MenuItem @relation(fields:[product_id],references:[menuItem_id])
+  product_id Int
+  createdAt Datetime
+  customer users @relation(fields:[customer_id],references:[id])
+}
