@@ -31,7 +31,7 @@ model users {
   role           Role?       @default(NORMAL)
   verification   Verification?
   password_reset PasswordReset?
-  orders         Order?
+  orders         Order[]
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
  resetToken     String?
@@ -65,17 +65,15 @@ model PasswordReset {
 
 model Order {
   order_id             String    @id @unique @default(uuid())
-  customer             users?    @relation(fields: [customer_id], references: [id])
-  customer_id          String    @unique
+  customer             users     @relation(fields: [customer_id], references: [id])
+  customer_id          String    
   date                 DateTime
   deliveryAddress      Address   @relation(fields: [address_id], references: [address_id])
-  address_id           String
-  product              MenuItem? @relation(fields: [product_id], references: [menuItem_id])
-  product_id           Int       @unique
-  expectedDeliveryTime DateTime
+  address_id           String 
+  products             MenuItem[] 
   price                Float
-  review               String
-  rating               Float
+  review               String?
+  rating               Float?
 }
 
 model CoffeeProduct {
@@ -136,7 +134,8 @@ model MenuItem {
   quantity_available Int
   description        String
   image              String?
-  Order              Order?
+  Order              Order? @relation(fields:[order_id],references:[order_id])
+  order_id String? @unique
 }
 
 model Category {
