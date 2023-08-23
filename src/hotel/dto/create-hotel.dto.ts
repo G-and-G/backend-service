@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {  users } from '@prisma/client';
+import { users } from '@prisma/client';
 import { Address } from './address.dto';
 import {
   IsNotEmpty,
@@ -23,19 +23,22 @@ export class CreateHotelDTO {
   @IsUrl()
   @ApiProperty()
   image?: string;
-  @ApiProperty()
+  @ApiProperty({
+    example: {
+      latitude: 12.3,
+      longitude:-20.2,
+      street:"KN 45 ST",
+      district: "Nyarugenge",
+      sector: "Nyamirambo",
+      cell: "Nyarufunzo",
+      village: "Rwarutabura ",
+    },
+  })
   @ValidateNested()
- @Type(() => Address)
+  @Type(() => Address)
   address: Address;
 
   @ApiProperty()
   @IsString()
-  admin_id:string;
- 
-
-
-
-
-
-
+  admin_id: string;
 }
