@@ -28,13 +28,15 @@ model users {
   email          String         @unique
   password       String
   admin_hotels   Hotel[]
-  role           Role?       @default(NORMAL)
+  role           Role?          @default(NORMAL)
   verification   Verification?
   password_reset PasswordReset?
   orders         Order[]
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
- resetToken     String?
+  resetToken     String?
+  Review         Review[]
+
   @@map("users")
 }
 
@@ -64,16 +66,16 @@ model PasswordReset {
 }
 
 model Order {
-  order_id             String    @id @unique @default(uuid())
-  customer             users     @relation(fields: [customer_id], references: [id])
-  customer_id          String    
-  date                 DateTime
-  deliveryAddress      Address   @relation(fields: [address_id], references: [address_id])
-  address_id           String 
-  products             MenuItem[] 
-  price                Float
-  review               String?
-  rating               Float?
+  order_id        String     @id @unique @default(uuid())
+  customer        users      @relation(fields: [customer_id], references: [id])
+  customer_id     String
+  date            DateTime
+  deliveryAddress Address    @relation(fields: [address_id], references: [address_id])
+  address_id      String
+  products        MenuItem[]
+  price           Float
+  review          String?
+  rating          Float?
 }
 
 model CoffeeProduct {
@@ -88,8 +90,8 @@ model CoffeeProduct {
 
 model Hotel {
   hotel_id            Int      @id @unique @default(autoincrement())
-  admin               users ?   @relation(fields: [admin_id], references: [id])
-  admin_id            String?   @unique
+  admin               users?   @relation(fields: [admin_id], references: [id])
+  admin_id            String?  @unique
   name                String
   menu                Menu?
   address             Address?
@@ -117,16 +119,16 @@ model Address {
 
 model Menu {
   menu_id    Int        @id @unique @default(autoincrement())
-  hotel      Hotel     @relation(fields: [hotel_id], references: [hotel_id])
+  hotel      Hotel      @relation(fields: [hotel_id], references: [hotel_id])
   hotel_id   Int        @unique
   items      MenuItem[]
   categories Category[]
 }
 
 model MenuItem {
-  menuItem_id Int    @id @unique @default(autoincrement())
-  name        String
-  Menu               Menu ?     @relation(fields: [menu_id], references: [menu_id])
+  menuItem_id        Int      @id @unique @default(autoincrement())
+  name               String
+  Menu               Menu?    @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int?
   price              Float
   category           Category @relation(fields: [category_id], references: [category_id])
@@ -134,8 +136,9 @@ model MenuItem {
   quantity_available Int
   description        String
   image              String?
-  Order              Order? @relation(fields:[order_id],references:[order_id])
-  order_id String? @unique
+  Order              Order?   @relation(fields: [order_id], references: [order_id])
+  order_id           String?  @unique
+  Review             Review[]
 }
 
 model Category {
@@ -148,12 +151,13 @@ model Category {
   name          String
 }
 
-
-model Reviews{
-  id String @id @unique @default(uuid())
+model Review {
+  review_id   String   @id @unique @default(uuid())
+  user        users    @relation(fields: [user_id], references: [id])
+  user_id     String
+  product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
+  product_id  Int
   description String
-  product MenuItem @relation(fields:[product_id],references:[menuItem_id])
-  product_id Int
-  createdAt Datetime
-  customer users @relation(fields:[customer_id],references:[id])
+  date        DateTime
+  rating      Float?
 }

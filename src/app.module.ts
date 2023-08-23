@@ -11,11 +11,12 @@ import { HotelModule } from './hotel/hotel.module';
 import { NotificationGateway } from './notification/notification.gateway';
 import options from './utils/cors';
 import { OrderModule } from './order/order.module';
+import { ReviewModule } from './reviews/reviews.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 
 
 @Module({
-  imports: [ NotificationModule, MenuModule,AuthModule,PrismaModule,UserModule,CategoryModule,HotelModule,OrderModule],
+  imports: [ NotificationModule, MenuModule,AuthModule,PrismaModule,UserModule,CategoryModule,HotelModule,OrderModule,ReviewModule],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
 })
