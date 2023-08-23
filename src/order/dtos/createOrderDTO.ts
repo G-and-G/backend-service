@@ -1,22 +1,29 @@
-import { IsArray, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsDate, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
 
-export class CreateOrderDTO{
+class ProductDTO {
     @IsNumber()
     @IsNotEmpty()
-    price:number;
+    menuItem_id: number; // Assuming menuItem_id is of number type
+}
+
+export class CreateOrderDTO {
+    @IsNumber()
+    @IsNotEmpty()
+    price: number;
 
     @IsString()
     @IsNotEmpty()
-    customer_id:string;
+    customer_id: string;
 
     @IsDate()
     @IsNotEmpty()
-    date:Date;
+    date: Date;
 
     @IsString()
     @IsNotEmpty()
-    address_id:string;
+    address_id: string;
 
     @IsArray()
-    products:any[];
+    @ValidateNested({ each: true }) // Validate each product object
+    products: ProductDTO[]; // Array of ProductDTO objects
 }
