@@ -50,4 +50,42 @@ export class OrderService {
       return ApiResponse.error("Order couldn't be placed!" + error.message,null,error.status);
     }
   }
+  async updateOrder(orderId: string, dataToUpdate: Partial<Order>): Promise<Order | null> {
+    try {
+      const updatedOrder = await this.prisma.order.update({
+        where: { order_id: orderId },
+        data: dataToUpdate,
+      });
+
+      return updatedOrder;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to update order');
+    }
+  }
+  async getOrderById(orderId: string): Promise<Order | null> {
+    try {
+      const order = await this.prisma.order.findUnique({
+        where: { order_id: orderId },
+        // Include any related data if needed
+      });
+
+      return order;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch order by ID');
+    }
+  }
+
+  // ... other methods in your OrderService
+  async deleteOrder(orderId: string): Promise<void> {
+    try {
+      await this.prisma.order.delete({
+        where: { order_id: orderId },
+      });
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to delete order');
+    }
+  }
 }
