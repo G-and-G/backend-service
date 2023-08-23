@@ -88,6 +88,19 @@ export class MenuController {
 //   }
 
 // }
+@Get('/menuItem/:id')
+async getMenuitem(@Param('id') menuItem_id){
+  try {
+    let menuItem = await prisma.menuItem.findMany();
+    if(!menuItem){
+      throw new Error('Menu Item not found');
+    }
+    return ApiResponse.success('Menu Item got!',menuItem,200);
+  } catch (error) {
+    console.log(error)
+    return ApiResponse.error("Can't find menuItem",null,error.status);
+  }
+}
 
 @Post('/menuItem/new/:menuId/:categoryId')
 async createNewMenuItem(@Req() req:Request, @Res() res:Response, @Body() body:CreateMenuItemDTO,@Param('menuId') menu_id:number,@Param('categoryId') category_id:number){
