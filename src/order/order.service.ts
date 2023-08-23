@@ -1,14 +1,24 @@
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
+import { Order } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getOrders() {
-    throw new Error('Method not implemented.');
+  async getOrders(): Promise<Order[]> {
+    try {
+      const orders = await this.prisma.order.findMany({
+        // Specify any additional options or filters here if needed
+      });
+
+      return orders;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch orders');
+    }
   }
 
   async createOrder(data: CreateOrderDTO) {
@@ -38,6 +48,44 @@ export class OrderService {
     } catch (error) {
       console.log(error)
       return ApiResponse.error("Order couldn't be placed!" + error.message,null,error.status);
+    }
+  }
+  async updateOrder(orderId: string, dataToUpdate: Partial<Order>): Promise<Order | null> {
+    try {
+      const updatedOrder = await this.prisma.order.update({
+        where: { order_id: orderId },
+        data: dataToUpdate,
+      });
+
+      return updatedOrder;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to update order');
+    }
+  }
+  async getOrderById(orderId: string): Promise<Order | null> {
+    try {
+      const order = await this.prisma.order.findUnique({
+        where: { order_id: orderId },
+        // Include any related data if needed
+      });
+
+      return order;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch order by ID');
+    }
+  }
+
+  // ... other methods in your OrderService
+  async deleteOrder(orderId: string): Promise<void> {
+    try {
+      await this.prisma.order.delete({
+        where: { order_id: orderId },
+      });
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to delete order');
     }
   }
 }
