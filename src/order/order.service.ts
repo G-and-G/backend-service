@@ -1,13 +1,23 @@
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getOrders() {
-    throw new Error('Method not implemented.');
+  async getOrders(): Promise<Order[]> {
+    try {
+      const orders = await this.prisma.order.findMany({
+        // Specify any additional options or filters here if needed
+      });
+
+      return orders;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch orders');
+    }
   }
 
   async createOrder(data: CreateOrderDTO) {
