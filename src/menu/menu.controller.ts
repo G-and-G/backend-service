@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import ApiResponse from 'src/utils/ApiResponse';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
+import { ApiParam } from '@nestjs/swagger';
 const prisma = new PrismaClient();
 @Controller('menu')
 export class MenuController {
@@ -89,6 +90,9 @@ export class MenuController {
 
 // }
 @Get('/menuItem/:id')
+@ApiParam({
+  name:'id'
+})
 async getMenuitem(@Param('id') menuItem_id){
   try {
     let menuItem = await prisma.menuItem.findUnique({
