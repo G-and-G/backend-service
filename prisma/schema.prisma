@@ -159,4 +159,5 @@ model Review {
   product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
   product_id  Int
   createdAt   DateTime
+
 }
