@@ -153,13 +153,11 @@ model Category {
 
 model Review {
   review_id   String   @id @unique @default(uuid())
-  user        users    @relation(fields: [user_id], references: [id])
-  user_id     String
+ 
   product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
   product_id  Int
   description String
-  product MenuItem @relation(fields:[product_id],references:[menuItem_id])
-  product_id Int
+  
   createdAt DateTime
   customer users @relation(fields:[customer_id],references:[id])
   customer_id String

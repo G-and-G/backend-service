@@ -39,6 +39,7 @@ export class OrderService {
           },
           products: {
             connect: data.products.map(product => ({
+              
               menuItem_id: product.menuItem_id,
             })),
           },
