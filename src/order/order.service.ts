@@ -38,19 +38,26 @@ export class OrderService {
             },
           },
           products: {
-            connect: data.products.map(product => ({
+            connect: data.products.map((product) => ({
               menuItem_id: product.menuItem_id,
             })),
           },
         },
       });
-      return ApiResponse.success("Order Placed!",newOrder,201);
+      return ApiResponse.success('Order Placed!', newOrder, 201);
     } catch (error) {
-      console.log(error)
-      return ApiResponse.error("Order couldn't be placed!" + error.message,null,error.status);
+      console.log(error);
+      return ApiResponse.error(
+        "Order couldn't be placed!" + error.message,
+        null,
+        error.status,
+      );
     }
   }
-  async updateOrder(orderId: string, dataToUpdate: Partial<Order>): Promise<Order | null> {
+  async updateOrder(
+    orderId: string,
+    dataToUpdate: Partial<Order>,
+  ): Promise<Order | null> {
     try {
       const updatedOrder = await this.prisma.order.update({
         where: { order_id: orderId },

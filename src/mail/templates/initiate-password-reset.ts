@@ -1,6 +1,12 @@
-import config from "src/config";
+import config from 'src/config';
 
-export const initiatePasswordReset = ({ token, names }: { token: string, names: string }) => (
+export const initiatePasswordReset = ({
+  token,
+  names,
+}: {
+  token: string;
+  names: string;
+}) =>
   `
     <!DOCTYPE html>
 <html>
@@ -55,11 +61,12 @@ export const initiatePasswordReset = ({ token, names }: { token: string, names: 
     <p>Hello, ${names}!</p>
     <p>We received a request to reset your password. Click the link below to reset it:</p>
     <div class="reset-link">
-      <a href="${config().client.url + "/auth/forgot-password/" + token}">Reset Password</a>
+      <a href="${
+        config().client.url + '/auth/forgot-password/' + token
+      }">Reset Password</a>
     </div>
   </div>
 </body>
 </html>
 
-    `
-)
+    `;

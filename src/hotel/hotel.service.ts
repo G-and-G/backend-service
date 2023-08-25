@@ -80,9 +80,9 @@ export class HotelService {
 
   async getAllHotels(): Promise<Hotel[]> {
     return this.prisma.hotel.findMany({
-      include:{
-        menu:true
-      }
+      include: {
+        menu: true,
+      },
     });
   }
 
@@ -257,7 +257,7 @@ export class HotelService {
         200,
       );
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error.message.includes('Record to delete does not exist')) {
         return ApiResponse.error(
           'Record to delete does not exist',
@@ -276,12 +276,11 @@ export class HotelService {
     const hotel = await this.prisma.hotel.findFirst({
       where: { admin_id: adminId },
     });
-    
+
     if (!hotel) {
       throw new NotFoundException('Hotel not found for the provided admin ID');
     }
 
     return hotel;
   }
-
 }

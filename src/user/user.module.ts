@@ -5,7 +5,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [CloudinaryModule,MailModule],
+  imports: [CloudinaryModule, MailModule],
   providers: [UserService],
   controllers: [UserController],
   exports: [UserService],

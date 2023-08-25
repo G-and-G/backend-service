@@ -1,6 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseFilters, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseFilters,
+  NotFoundException,
+} from '@nestjs/common';
 import { HotelService } from './hotel.service';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { Hotel, Menu } from '@prisma/client';
 import { CreateMenuDTO } from './dto/create-menu.dto';
@@ -22,7 +38,7 @@ export class HotelController {
   async findById(@Param('id') id: number) {
     return this.hotelService.getHotelById(id);
   }
-  @Get('byAdminId/:adminId') 
+  @Get('byAdminId/:adminId')
   async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
     try {
       const hotel = await this.hotelService.getHotelByAdminId(adminId);
@@ -33,11 +49,11 @@ export class HotelController {
   }
   @Get()
   @ApiResponse({
-    status:200,
-    description:'Hotels returned successfully',  
+    status: 200,
+    description: 'Hotels returned successfully',
   })
   @ApiOperation({
-    summary:'Get all registered hotels'
+    summary: 'Get all registered hotels',
   })
   async findAll() {
     return this.hotelService.getAllHotels();
@@ -45,31 +61,36 @@ export class HotelController {
 
   @Post('/addMenu/:hotelId')
   @ApiBody({
-    type:CreateMenuDTO
+    type: CreateMenuDTO,
   })
   @ApiOperation({
-    summary:'Add a menu to a hotel'
+    summary: 'Add a menu to a hotel',
   })
-  async addMenu(@Body() body:CreateMenuDTO, @Param('hotelId') hotelId:number){
-    return this.hotelService.addMenu(body,hotelId);
+  async addMenu(
+    @Body() body: CreateMenuDTO,
+    @Param('hotelId') hotelId: number,
+  ) {
+    return this.hotelService.addMenu(body, hotelId);
   }
 
   @Delete('/:hotelId')
   @ApiParam({
-    name:'hotel id',
-    description:'The id of the hotel to be deleted',
-    required:true
+    name: 'hotel id',
+    description: 'The id of the hotel to be deleted',
+    required: true,
   })
-  async deleteMenu(@Param('hotelId') hotelId:number){
+  async deleteMenu(@Param('hotelId') hotelId: number) {
     return this.hotelService.deleteMenu(hotelId);
   }
 
-
   @Put('update_hotel/:id')
   @ApiBody({
-    type:CreateHotelDTO
+    type: CreateHotelDTO,
   })
-  async update(@Param('id') id: number, @Body() updateHotelDTO: CreateHotelDTO) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateHotelDTO: CreateHotelDTO,
+  ) {
     return this.hotelService.updateHotel(id, updateHotelDTO);
   }
 
@@ -77,6 +98,4 @@ export class HotelController {
   async remove(@Param('id') id: number) {
     return this.hotelService.deleteHotel(id);
   }
-
-  
 }

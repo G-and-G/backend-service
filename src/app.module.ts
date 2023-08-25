@@ -15,10 +15,18 @@ import { ReviewModule } from './reviews/reviews.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 import { FirebaseController } from './firebase/firebase.controller';
 
-
 @Module({
-  imports: [ NotificationModule, MenuModule,AuthModule,PrismaModule,UserModule,CategoryModule,HotelModule,OrderModule],
+  imports: [
+    NotificationModule,
+    MenuModule,
+    AuthModule,
+    PrismaModule,
+    UserModule,
+    CategoryModule,
+    HotelModule,
+    OrderModule,
+  ],
   controllers: [AppController, FirebaseController],
   providers: [AppService, NotificationGateway],
 })
-export class AppModule  {}
+export class AppModule {}

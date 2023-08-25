@@ -26,12 +26,12 @@ export class CreateHotelDTO {
   @ApiProperty({
     example: {
       latitude: 12.3,
-      longitude:-20.2,
-      street:"KN 45 ST",
-      district: "Nyarugenge",
-      sector: "Nyamirambo",
-      cell: "Nyarufunzo",
-      village: "Rwarutabura ",
+      longitude: -20.2,
+      street: 'KN 45 ST',
+      district: 'Nyarugenge',
+      sector: 'Nyamirambo',
+      cell: 'Nyarufunzo',
+      village: 'Rwarutabura ',
     },
   })
   @ValidateNested()

@@ -44,10 +44,13 @@ export class AuthService {
   }
   async adminAuth(dto: LoginDTO) {
     const user = await this.userService.getUserByEmail(dto.email);
-    if (user.role !=='ADMIN') {
+    if (user.role !== 'ADMIN') {
       console.log('not admin');
 
-      return { status: 400, response: { message: 'Unauthorised not an admin' } };
+      return {
+        status: 400,
+        response: { message: 'Unauthorised not an admin' },
+      };
     } else {
       if (!user) {
         return {

@@ -12,7 +12,7 @@ export class UpdateHotelDTO {
   @IsOptional() // Address can be updated, so it's optional
   @IsString()
   address?: string;
-  
+
   // You can include other fields that can be updated
   // For example, admin_id and menu_id may also be updatable
   @IsOptional()
