@@ -1,7 +1,6 @@
-import { IsEmail } from "class-validator";
+import { IsEmail } from 'class-validator';
 
 export class InitiateResetPasswordDTO {
-
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 }

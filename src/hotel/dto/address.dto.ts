@@ -2,11 +2,9 @@ import { IsNumber, IsString, Min, Max, Length } from 'class-validator';
 
 export class Address {
   @IsNumber({}, { message: 'Latitude must be a number' })
-  
   latitude: number;
 
   @IsNumber({}, { message: 'Longitude must be a number' })
-  
   longitude: number;
 
   @IsString({ message: 'Street must be a string' })

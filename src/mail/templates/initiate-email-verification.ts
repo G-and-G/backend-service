@@ -1,6 +1,11 @@
-export const initiateEmailVerification = ({ names, verificationCode }: { names: string, verificationCode: string }) => (
-
-    `
+export const initiateEmailVerification = ({
+  names,
+  verificationCode,
+}: {
+  names: string;
+  verificationCode: string;
+}) =>
+  `
 
     <!DOCTYPE html>
 <html>
@@ -59,6 +64,4 @@ export const initiateEmailVerification = ({ names, verificationCode }: { names: 
 </html>
 
     
-    `
-
-)
+    `;

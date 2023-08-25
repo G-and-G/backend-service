@@ -138,10 +138,9 @@ CREATE TABLE "Category" (
 CREATE TABLE "Review" (
     "review_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
-    "product_id" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
-    "rating" DOUBLE PRECISION,
+    "product_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("review_id")
 );

@@ -1,5 +1,5 @@
-export const welcome = ({ names }: { names: string }) => (
-    `
+export const welcome = ({ names }: { names: string }) =>
+  `
     <!DOCTYPE html>
     <html>
     <head>
@@ -40,5 +40,4 @@ export const welcome = ({ names }: { names: string }) => (
     </div>
     </body>
     </html>
-    `
-)
+    `;

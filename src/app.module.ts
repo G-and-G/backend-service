@@ -14,11 +14,21 @@ import { OrderModule } from './order/order.module';
 import { ReviewModule } from './reviews/reviews.module';
 import { GoogleModule } from './google/google.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
-
+import { FirebaseController } from './firebase/firebase.controller';
 
 @Module({
-  imports: [ NotificationModule, MenuModule,AuthModule,PrismaModule,UserModule,CategoryModule,HotelModule,OrderModule,ReviewModule,GoogleModule],
-  controllers: [AppController],
+  imports: [
+    NotificationModule,
+    MenuModule,
+    AuthModule,
+    PrismaModule,
+    UserModule,
+    CategoryModule,
+    HotelModule,
+    OrderModule,
+  ],
+  controllers: [AppController, FirebaseController],
+
   providers: [AppService, NotificationGateway],
 })
-export class AppModule  {}
+export class AppModule {}
