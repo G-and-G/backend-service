@@ -12,6 +12,7 @@ import { NotificationGateway } from './notification/notification.gateway';
 import options from './utils/cors';
 import { OrderModule } from './order/order.module';
 import { ReviewModule } from './reviews/reviews.module';
+import { GoogleModule } from './google/google.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 import { FirebaseController } from './firebase/firebase.controller';
 
@@ -27,6 +28,7 @@ import { FirebaseController } from './firebase/firebase.controller';
     OrderModule,
   ],
   controllers: [AppController, FirebaseController],
+
   providers: [AppService, NotificationGateway],
 })
 export class AppModule {}
