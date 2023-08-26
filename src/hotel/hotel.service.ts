@@ -71,7 +71,11 @@ export class HotelService {
   async getHotelById(id: number): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findUnique({
       where: { hotel_id: id },
+      include:{
+        menu:true
+      }
     });
+    
     if (!hotel) {
       throw new NotFoundException('Hotel not found');
     }

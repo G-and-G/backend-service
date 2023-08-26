@@ -36,7 +36,8 @@ model users {
   updated_at     DateTime       @updatedAt
   resetToken     String?
   Review         Review[]
-
+  notifications  Notifications[]
+  notificationToken String?
   @@map("users")
 }
 
@@ -101,6 +102,7 @@ model Hotel {
   startingWorkingTime DateTime @default(now())
   endingWorkingTime   DateTime @default(now())
   image               String
+  notificationToken   String?
 }
 
 model Address {
@@ -160,4 +162,14 @@ model Review {
   product_id  Int
   createdAt   DateTime
 
+}
+
+model Notifications{
+  id String @id @unique @default(uuid())
+  title String
+  content String
+  receiver users @relation(fields: [receiver_id],references: [id])
+  receiver_id String
+  createdAt DateTime ? @default(now())
+  imageLabel String?
 }
