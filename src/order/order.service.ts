@@ -3,7 +3,8 @@ import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
-import { Address } from 'src/hotel/dto/address.dto';
+// import { Address } from 'src/hotel/dto/address.dto';
+import { Address } from './dtos/addressDTO';
 
 @Injectable()
 export class OrderService {
