@@ -45,7 +45,7 @@ export class OrderService {
               village: data.deliveryAddress.village,
               hotel: {
                 connect: {
-                  hotel_id: data.deliveryAddress.hotel_id,
+                  hotel_id: data.deliveryAddress.hotel_id, 
                 },
               },
              
