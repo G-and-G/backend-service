@@ -3,6 +3,7 @@ import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
+import { Address } from 'src/hotel/dto/address.dto';
 
 @Injectable()
 export class OrderService {
@@ -33,10 +34,24 @@ export class OrderService {
           },
           date: data.date,
           deliveryAddress: {
-            connect: {
-              address_id: data.address_id,
+            create: {
+              latitude: data.deliveryAddress.latitude,
+              longitude: data.deliveryAddress.longitude,
+              street: data.deliveryAddress.street,
+              district: data.deliveryAddress.district,
+              sector: data.deliveryAddress.sector,
+              cell: data.deliveryAddress.cell,
+              village: data.deliveryAddress.village,
+              hotel: {
+                connect: {
+                  hotel_id: data.deliveryAddress.hotel_id,
+                },
+              },
+             
             },
+
           },
+          
           products: {
             connect: data.products.map((product) => ({
               menuItem_id: product.menuItem_id,
@@ -54,6 +69,7 @@ export class OrderService {
       );
     }
   }
+  
   async updateOrder(
     orderId: string,
     dataToUpdate: Partial<Order>,

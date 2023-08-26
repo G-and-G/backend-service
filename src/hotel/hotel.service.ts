@@ -47,7 +47,11 @@ export class HotelService {
               village: createHotelDTO.address.village,
             },
           },
-          admin_id: createHotelDTO.admin_id,
+          admin: {
+            connect: {
+              id: createHotelDTO.admin_id,
+            },
+          },
         },
       });
       console.log('This is the hotel: ', hotel);
