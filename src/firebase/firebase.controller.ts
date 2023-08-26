@@ -12,6 +12,5 @@ export class FirebaseController {
    } catch (error) {
     return ApiResponse.error("Something went wrong" + error.message,null,error.status)
    }
-
   }
 }

@@ -33,6 +33,29 @@ export class MenuController {
       return ApiResponse.error(error.message, null, error.status);
     }
   }
+
+  @Get("/:id")
+  async getMenuById(@Param('id') id:number){
+    try {
+      let menu = await prisma.menu.findFirst({
+        where:{
+          menu_id:Number(id)
+        },
+        include:{
+          items:true,
+          categories:true
+        }
+      });
+      if(!menu){
+        return ApiResponse.error('Menu not found',null,404);
+      }
+      return ApiResponse.success('Menu here',menu,200);
+    } catch (error) {
+      console.log(error)
+      return ApiResponse.error('Something Went Wrong! '+ error.message,null,error.status);
+    }
+  }
+  
   @Delete('/:id')
   async deleteMenu(@Param('id') id: number) {
     try {
