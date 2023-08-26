@@ -7,6 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger'; // Import ApiProperty decorator
+import { Address } from '@prisma/client';
 
 class ProductDTO {
   @IsNumber()
@@ -36,7 +37,7 @@ export class CreateOrderDTO {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'The ID of the delivery address' }) // Add ApiProperty decorator
-  address_id: string;
+  deliveryAddress: Address;
 
   @IsArray()
   @ValidateNested({ each: true })

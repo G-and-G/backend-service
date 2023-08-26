@@ -39,6 +39,7 @@
     "cloudinary": "^1.40.0",
     "cookie-parser": "^1.4.6",
     "firebase-admin": "^11.10.1",
+    "flutterwave-node-v3": "^1.1.6",
     "nodemailer": "^6.9.4",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
