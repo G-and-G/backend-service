@@ -15,6 +15,8 @@ import { ReviewModule } from './reviews/reviews.module';
 import { GoogleModule } from './google/google.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
 import { FirebaseController } from './firebase/firebase.controller';
+import { PaymentModule } from './payment/payment.module';
+import { PaymentService } from './payment/payment.service';
 
 @Module({
   imports: [
@@ -25,10 +27,11 @@ import { FirebaseController } from './firebase/firebase.controller';
     UserModule,
     CategoryModule,
     HotelModule,
+    PaymentModule,
     OrderModule,
   ],
   controllers: [AppController, FirebaseController],
 
-  providers: [AppService, NotificationGateway],
+  providers: [AppService, NotificationGateway,PaymentService],
 })
 export class AppModule {}

@@ -1,5 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -22,6 +20,7 @@ enum VerificationStatus {
 }
 
 model users {
+<<<<<<< HEAD
   id             String         @id @default(uuid())
   first_name     String
   last_name      String
@@ -38,6 +37,24 @@ model users {
   Review         Review[]
   notifications  Notifications[]
   notificationToken String?
+=======
+  id              String           @id @default(uuid())
+  first_name      String
+  last_name       String
+  email           String           @unique
+  password        String
+  admin_hotels    Hotel[]
+  role            Role?            @default(NORMAL)
+  verification    Verification?
+  password_reset  PasswordReset?
+  orders          Order[]
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  resetToken      String?
+  Review          Review[]
+  propertyTenants PropertyTenant[]
+
+>>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337
   @@map("users")
 }
 
@@ -67,16 +84,16 @@ model PasswordReset {
 }
 
 model Order {
-  order_id        String     @id @unique @default(uuid())
-  customer        users      @relation(fields: [customer_id], references: [id])
-  customer_id     String
-  date            DateTime
-  deliveryAddress Address    @relation(fields: [address_id], references: [address_id])
-  address_id      String
-  products        MenuItem[]
-  price           Float
-  review          String?
-  rating          Float?
+  order_id          String     @id @unique @default(uuid())
+  customer          users      @relation(fields: [customer_id], references: [id])
+  customer_id       String
+  date              DateTime
+  deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
+  products          MenuItem[]
+  price             Float
+  review            String?
+  rating            Float?
+  address_id        String?   
 }
 
 model CoffeeProduct {
@@ -106,17 +123,19 @@ model Hotel {
 }
 
 model Address {
-  address_id String  @id @default(uuid())
-  hotel      Hotel   @relation(fields: [hotel_id], references: [hotel_id])
-  order      Order[]
-  hotel_id   Int     @unique
-  latitude   Float
-  longitude  Float
-  street     String
-  district   String
-  sector     String
-  cell       String
-  village    String
+  address_id String @id @default(uuid())
+  hotel      Hotel  @relation(fields: [hotel_id], references: [hotel_id])
+//  Order    Order  @relation(fields: [Order], references: [order_id])
+  hotel_id Int   @unique
+  latitude Float
+
+  longitude Float
+  street    String
+  district  String
+  sector    String
+  cell      String
+  village   String
+  Order     Order[]
 }
 
 model Menu {
@@ -161,9 +180,9 @@ model Review {
   product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
   product_id  Int
   createdAt   DateTime
-
 }
 
+<<<<<<< HEAD
 model Notifications{
   id String @id @unique @default(uuid())
   title String
@@ -173,3 +192,22 @@ model Notifications{
   createdAt DateTime ? @default(now())
   imageLabel String?
 }
+=======
+model Property {
+  id              String           @id @default(uuid())
+  postedBy        String
+  // ... other fields of Property
+  propertyTenants PropertyTenant[]
+}
+
+model PropertyTenant {
+  id         String   @id @default(uuid())
+  TenantId   String   @map("TenantId")
+  PropertyId String   @map("PropertyId")
+  Status     String   @map("Status")
+  rentAmount Int
+  // ... other fields of PropertyTenant
+  property   Property @relation(fields: [PropertyId], references: [id])
+  user       users    @relation(fields: [TenantId], references: [id])
+}
+>>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337

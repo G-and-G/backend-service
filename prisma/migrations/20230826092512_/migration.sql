@@ -146,6 +146,25 @@ CREATE TABLE "Review" (
 );
 
 -- CreateTable
+CREATE TABLE "Property" (
+    "id" TEXT NOT NULL,
+    "postedBy" TEXT NOT NULL,
+
+    CONSTRAINT "Property_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PropertyTenant" (
+    "id" TEXT NOT NULL,
+    "TenantId" TEXT NOT NULL,
+    "PropertyId" TEXT NOT NULL,
+    "Status" TEXT NOT NULL,
+    "rentAmount" INTEGER NOT NULL,
+
+    CONSTRAINT "PropertyTenant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_CategoryToMenu" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -237,6 +256,12 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_user_id_fkey" FOREIGN KEY ("user_id"
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "MenuItem"("menuItem_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PropertyTenant" ADD CONSTRAINT "PropertyTenant_PropertyId_fkey" FOREIGN KEY ("PropertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PropertyTenant" ADD CONSTRAINT "PropertyTenant_TenantId_fkey" FOREIGN KEY ("TenantId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CategoryToMenu" ADD CONSTRAINT "_CategoryToMenu_A_fkey" FOREIGN KEY ("A") REFERENCES "Category"("category_id") ON DELETE CASCADE ON UPDATE CASCADE;

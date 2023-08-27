@@ -8,6 +8,7 @@ import {
   Body,
   UseFilters,
   NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { HotelService } from './hotel.service';
 import {
@@ -35,7 +36,7 @@ export class HotelController {
   }
 
   @Get('hotel/:id')
-  async findById(@Param('id') id: number) {
+  async findById(@Param('id',ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
   @Get('byAdminId/:adminId')
