@@ -5,12 +5,13 @@ import ApiResponse from 'src/utils/ApiResponse';
 const prisma = new PrismaClient();
 @Controller('firebase')
 export class FirebaseController {
-  @Post('/:hotelId/:token')
+  @Post('/token/:hotelId/:token')
   async receiveToken(@Param('token') token: string,@Param('hotelId') hotelId:number ) {
+    console.log('token',token)
    try {
-    let hotel = await prisma.hotel.findFirst({
+    let hotel = await prisma.hotel.findUnique({
       where:{
-        hotel_id:hotelId
+        hotel_id:Number(hotelId)
       }
     });
 
@@ -27,16 +28,18 @@ export class FirebaseController {
       });
     return ApiResponse.success("Token received",null,200);
    } catch (error) {
+    console.log(error)
     return ApiResponse.error("Something went wrong" + error.message,null,error.status)
    }
   }
 
-  @Post('/notificationTest')
+  @Post('/notificationTest/:hotelId')
   async testNotification(@Body() body:any,@Param('hotelId') hotelId:number){
+    console.log('HotelId',hotelId)
     try {
-      let hotel = await prisma.hotel.findFirst({
+      let hotel = await prisma.hotel.findUnique({
         where:{
-          hotel_id:hotelId
+          hotel_id:Number(hotelId)
         }
       });
       if(!hotel){
@@ -44,11 +47,9 @@ export class FirebaseController {
       }
       const notificationData = {
         title: 'New message',
-        body:{
-          url:'redirectUrl',
-          label:'https://image.com/dfaehsdaada-da24.jpg'
-        },
+        body:"Work harder than before",
       };
+      console.log(hotel);
       sendNotificationToClient([hotel.notificationToken],notificationData);
     } catch (error) {
       console.log(error)
