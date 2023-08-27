@@ -20,6 +20,24 @@ enum VerificationStatus {
 }
 
 model users {
+<<<<<<< HEAD
+  id             String         @id @default(uuid())
+  first_name     String
+  last_name      String
+  email          String         @unique
+  password       String
+  admin_hotels   Hotel[]
+  role           Role?          @default(NORMAL)
+  verification   Verification?
+  password_reset PasswordReset?
+  orders         Order[]
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+  resetToken     String?
+  Review         Review[]
+  notifications  Notifications[]
+  notificationToken String?
+=======
   id              String           @id @default(uuid())
   first_name      String
   last_name       String
@@ -36,6 +54,7 @@ model users {
   Review          Review[]
   propertyTenants PropertyTenant[]
 
+>>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337
   @@map("users")
 }
 
@@ -100,6 +119,7 @@ model Hotel {
   startingWorkingTime DateTime @default(now())
   endingWorkingTime   DateTime @default(now())
   image               String
+  notificationToken   String?
 }
 
 model Address {
@@ -162,6 +182,17 @@ model Review {
   createdAt   DateTime
 }
 
+<<<<<<< HEAD
+model Notifications{
+  id String @id @unique @default(uuid())
+  title String
+  content String
+  receiver users @relation(fields: [receiver_id],references: [id])
+  receiver_id String
+  createdAt DateTime ? @default(now())
+  imageLabel String?
+}
+=======
 model Property {
   id              String           @id @default(uuid())
   postedBy        String
@@ -179,3 +210,4 @@ model PropertyTenant {
   property   Property @relation(fields: [PropertyId], references: [id])
   user       users    @relation(fields: [TenantId], references: [id])
 }
+>>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337
