@@ -32,10 +32,7 @@ export class CreateOrderDTO {
   @ApiProperty({ description: 'The ID of the customer' }) // Add ApiProperty decorator
   customer_id: string;
 
-  @IsDate()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'The date of the order' }) // Add ApiProperty decorator
-  date: Date;
+ 
 
   @IsString()
   @IsNotEmpty()
