@@ -33,7 +33,7 @@ export class OrderService {
               id: data.customer_id,
             },
           },
-         
+          
           deliveryAddress: {
             create: {
               latitude: data.deliveryAddress.latitude,
@@ -44,15 +44,10 @@ export class OrderService {
               cell: data.deliveryAddress.cell,
               village: data.deliveryAddress.village,
               hotel: {
-                connect: {
-                  hotel_id: data.deliveryAddress.hotel_id, 
-                },
+                connect: { hotel_id: data.deliveryAddress.hotel_id },
               },
-             
             },
-
           },
-          
           products: {
             connect: data.products.map((product) => ({
               menuItem_id: product.menuItem_id,
@@ -62,7 +57,7 @@ export class OrderService {
       });
       return ApiResponse.success('Order Placed!', newOrder, 201);
     } catch (error) {
-      console.log("error",error);
+      console.log(error);
       return ApiResponse.error(
         "Order couldn't be placed!" + error.message,
         null,
@@ -70,6 +65,7 @@ export class OrderService {
       );
     }
   }
+  
   
   async updateOrder(
     orderId: string,

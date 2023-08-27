@@ -6,7 +6,7 @@ import { PaymentService } from './payment.service';
 
 // import { PropertyDTO } from './dto/property.dto';
 // import { UserDTO } from './dto/user.dto';
-import { PayRentDto, PropertyDTO, PropertyTenantDTO } from './payment.dto';
+import { OrderPaymentDto } from './payment.dto';
 import { Property, PropertyTenant, users } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('payment')
@@ -16,9 +16,13 @@ export class PaymentController {
 
   @Post('payRent')
 
-  @Post('payRent')
-  async payRent(@Body() payRentDto: PayRentDto) { // Use PayRentDto
-    return this.paymentService.payRent(payRentDto);
+//   @Post('payRent')
+//   async payRent(@Body() payRentDto: PayRentDto) { // Use PayRentDto
+//     return this.paymentService.payRent(payRentDto);
+//   }
+  @Post('payOrder')
+  async payOrder(@Body() orderPaymentDto: OrderPaymentDto) { // Use OrderPaymentDto
+    return this.paymentService.payOrder(orderPaymentDto);
   }
 }
 
