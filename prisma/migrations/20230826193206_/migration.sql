@@ -49,10 +49,10 @@ CREATE TABLE "Order" (
     "order_id" TEXT NOT NULL,
     "customer_id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "address_id" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "review" TEXT,
     "rating" DOUBLE PRECISION,
+    "address_id" TEXT,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("order_id")
 );
@@ -231,7 +231,7 @@ ALTER TABLE "user_password_resets" ADD CONSTRAINT "user_password_resets_user_id_
 ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

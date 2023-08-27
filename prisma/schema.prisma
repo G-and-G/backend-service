@@ -12,7 +12,10 @@ enum Role {
   NORMAL
   ADMIN
 }
-
+enum Status{
+  PENDING
+  COMPLETED
+}
 enum VerificationStatus {
   UNVERIFIED
   PENDING
@@ -68,13 +71,14 @@ model Order {
   order_id          String     @id @unique @default(uuid())
   customer          users      @relation(fields: [customer_id], references: [id])
   customer_id       String
-  date              DateTime
+  date              DateTime  @default(now())
   deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
   products          MenuItem[]
   price             Float
   review            String?
   rating            Float?
   address_id        String?   
+  status           Status?    @default(PENDING)
 }
 
 model CoffeeProduct {

@@ -33,7 +33,7 @@ export class OrderService {
               id: data.customer_id,
             },
           },
-          date: data.date,
+         
           deliveryAddress: {
             create: {
               latitude: data.deliveryAddress.latitude,
@@ -62,7 +62,7 @@ export class OrderService {
       });
       return ApiResponse.success('Order Placed!', newOrder, 201);
     } catch (error) {
-      console.log(error);
+      console.log("error",error);
       return ApiResponse.error(
         "Order couldn't be placed!" + error.message,
         null,
@@ -100,7 +100,21 @@ export class OrderService {
       throw new Error('Unable to fetch order by ID');
     }
   }
+  async markOrderCompleted(orderId: string): Promise<Order> {
+    try {
+      const updatedOrder = await this.prisma.order.update({
+        where: { order_id: orderId },
+        data: {
+          status: 'COMPLETED', // Set the status to 'Completed'
+        },
+      });
 
+      return updatedOrder;
+    } catch (error) {
+      console.log('Error updating order status:', error);
+      throw new Error('Error updating order status');
+    }
+  }
   // ... other methods in your OrderService
   async deleteOrder(orderId: string): Promise<void> {
     try {
