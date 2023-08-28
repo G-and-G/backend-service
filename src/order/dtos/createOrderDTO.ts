@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger'; // Import ApiProperty decorator
 // import { Address } from '@prisma/client';
 // import {  Address } from 'src/hotel/dto/address.dto';
-import { Address } from './addressDTO';
+import { Address, DeliveryAddress } from './addressDTO';
 import { Type } from 'class-transformer';
 
 class ProductDTO {
@@ -34,23 +34,14 @@ export class CreateOrderDTO {
 
  
 
-  @IsString()
+  
   @IsNotEmpty()
   @ApiProperty({ description: 'The ID of the delivery address' }) // Add ApiProperty decorator
-  @ApiProperty({
-    example: {
-      latitude: 12.3,
-      longitude: -20.2,
-      street: 'KN 45 ST',
-      district: 'Nyarugenge',
-      sector: 'Nyamirambo',
-      cell: 'Nyarufunzo',
-      village: 'Rwarutabura ',
-    },
-  })
-  @ValidateNested()
-  @Type(() => Address)
-  deliveryAddress: Address;
+ 
+   
+ 
+  @Type(() => DeliveryAddress)
+  deliveryAddress:DeliveryAddress ;
 
   @IsArray()
   @ValidateNested({ each: true })

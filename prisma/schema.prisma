@@ -66,13 +66,22 @@ model PasswordReset {
 
   @@map("user_password_resets")
 }
-
+model DeriveryAddress{
+  derivery_id String @id @default(uuid())
+  order       Order  @relation(fields: [order_id], references: [order_id])
+  order_id    String @unique
+  full_name String
+  telephone String
+  address String
+  city String
+}
 model Order {
   order_id          String     @id @unique @default(uuid())
   customer          users      @relation(fields: [customer_id], references: [id])
   customer_id       String
   date              DateTime  @default(now())
-  deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
+  // deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
+  deliveryAddress   DeriveryAddress?
   products          MenuItem[]
   price             Float
   review            String?
@@ -119,7 +128,7 @@ model Address {
   sector    String
   cell      String
   village   String
-  Order     Order[]
+  
 }
 
 model Menu {

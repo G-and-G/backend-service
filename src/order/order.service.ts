@@ -36,16 +36,12 @@ export class OrderService {
           
           deliveryAddress: {
             create: {
-              latitude: data.deliveryAddress.latitude,
-              longitude: data.deliveryAddress.longitude,
-              street: data.deliveryAddress.street,
-              district: data.deliveryAddress.district,
-              sector: data.deliveryAddress.sector,
-              cell: data.deliveryAddress.cell,
-              village: data.deliveryAddress.village,
-              hotel: {
-                connect: { hotel_id: data.deliveryAddress.hotel_id },
-              },
+              full_name: data.deliveryAddress.full_name,
+              telephone: data.deliveryAddress.telephone,
+              address: data.deliveryAddress.address,
+              city: data.deliveryAddress.city,
+              
+            
             },
           },
           products: {
@@ -54,7 +50,10 @@ export class OrderService {
             })),
           },
         },
+        
       });
+      console.log("dataaaaaa",newOrder);
+      
       return ApiResponse.success('Order Placed!', newOrder, 201);
     } catch (error) {
       console.log(error);
