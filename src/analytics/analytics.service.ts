@@ -13,7 +13,15 @@ export class AnalyticsService {
   }
 
   async getTotalClients(): Promise<number> {
-    const totalClients = await this.prisma.users.count();
+    const usersWithOrders = await this.prisma.users.findMany({
+      where: {
+        orders: {
+          some: {} 
+        }
+      }
+    });
+
+    const totalClients = usersWithOrders.length;
     return totalClients;
   }
 }
