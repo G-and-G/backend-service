@@ -16,4 +16,5 @@ console.log(messaging)
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   await app.listen(3000);
 }
+console.log(__dirname)
 bootstrap();
