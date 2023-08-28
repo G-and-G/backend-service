@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+const serviceAccount = require(`/opt/render/project/grabngo-a3844-firebase-adminsdk-ftno0-c4b08dfd02.json`);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
