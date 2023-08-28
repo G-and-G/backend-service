@@ -17,6 +17,7 @@ import { GoogleModule } from './google/google.module';
 import { FirebaseController } from './firebase/firebase.controller';
 import { PaymentModule } from './payment/payment.module';
 import { PaymentService } from './payment/payment.service';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PaymentService } from './payment/payment.service';
     HotelModule,
     PaymentModule,
     OrderModule,
+    AnalyticsModule
   ],
   controllers: [AppController, FirebaseController],
 
