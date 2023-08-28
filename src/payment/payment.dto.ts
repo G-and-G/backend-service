@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
-export class PayRentDto {
+export class OrderPaymentDto {
     @ApiProperty({ example: '1234567890', description: 'Mobile money phone number' })
     @IsNotEmpty()
     @IsString()
-    momoPhoneNumber: string;
+    phoneNumber: string;
   
-    @ApiProperty({ enum: ['momo', 'other'], description: 'Payment method' })
+    @ApiProperty({ enum: ['momo', 'credit_card', 'paypal'], description: 'Payment method' })
     @IsNotEmpty()
     @IsString()
     paymentMethod: string;
@@ -17,47 +17,43 @@ export class PayRentDto {
     @IsString()
     userId: string;
   
-    @ApiProperty({ example: 'property123', description: 'ID of the property tenant' })
+    @ApiProperty({ example: 'order123', description: 'ID of the order' })
     @IsNotEmpty()
     @IsString()
-    propertyTenantId: string;
-  }
-  
+    orderId: string;
 
-export class PropertyDTO {
-  @ApiProperty({ example: 1, description: 'Unique identifier of the property' })
-  @IsNumber()
-  _id: number;
-
-  @ApiProperty({ example: 'user123', description: 'ID of the user who posted the property' })
-  postedBy: string;
-
-  // ... other properties
-  
-  constructor(data: PropertyDTO) {
-    Object.assign(this, data);
-  }
+    @ApiProperty({ example: 50.0, description: 'Payment amount' })
+    @IsNotEmpty()
+    @IsNumber()
+    amount: number;
 }
 
-export class PropertyTenantDTO {
-  @ApiProperty({ example: 1, description: 'Unique identifier of the property tenant' })
-  _id: number;
+export class OrderDTO {
+    @ApiProperty({ example: 'order123', description: 'Unique identifier of the order' })
+    @IsString()
+    _id: string;
 
-  @ApiProperty({ example: 'user123', description: 'ID of the tenant' })
-  TenantId: string;
+    @ApiProperty({ example: 'user123', description: 'ID of the user who placed the order' })
+    createdBy: string;
 
-  @ApiProperty({ example: 'property123', description: 'ID of the property' })
-  PropertyId: string;
+    // ... other order properties
 
-  @ApiProperty({ enum: ['Approved', 'Pending'], description: 'Status of the property tenant' })
-  Status: string;
+    constructor(data: OrderDTO) {
+        Object.assign(this, data);
+    }
+}
 
-  @ApiProperty({ example: 1000, description: 'Rent amount' })
-  rentAmount: number;
+export class TenantDTO {
+    @ApiProperty({ example: 'tenant123', description: 'Unique identifier of the tenant' })
+    @IsString()
+    _id: string;
 
-  // ... other properties
-  
-  constructor(data: Partial<PropertyTenantDTO>) {
-    Object.assign(this, data);
-  }
+    @ApiProperty({ example: 'user123', description: 'ID of the tenant' })
+    tenantId: string;
+
+    // ... other tenant properties
+
+    constructor(data: Partial<TenantDTO>) {
+        Object.assign(this, data);
+    }
 }

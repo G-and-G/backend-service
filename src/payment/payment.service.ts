@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
-
-// import { PrismaService } from '../prisma/prisma.service';
 import { PrismaService } from 'prisma/prisma.service';
-// const { PrismaService } = require('../prisma/prisma.service');
-import { PropertyTenant, Property, users } from '@prisma/client';
-import { PayRentDto } from './payment.dto';
-const Flutterwave  =require('flutterwave-node-v3')
+import { OrderPaymentDto } from './payment.dto'; // Update import
+// import { PropertyTenantDTO } from './payment.dto'; // Update import
+const Flutterwave = require("flutterwave-node-v3")
 @Injectable()
 export class PaymentService {
   private readonly flw: any;
@@ -14,40 +11,29 @@ export class PaymentService {
     private readonly prisma: PrismaService,
   ) {
     this.flw = new Flutterwave(
-      process.env.Flutterwave_PUBLIC_KEY,
-      process.env.Flutterwave_SECRET_KEY,
-    );
+        process.env.Flutterwave_PUBLIC_KEY,
+        process.env.Flutterwave_SECRET_KEY,
+      );
   }
 
-  async payRent(data: PayRentDto) {
+  async payOrder(data: OrderPaymentDto) {
     try {
-      const { propertyTenantId, userId, paymentMethod, momoPhoneNumber } = data;
+      const { orderId, userId, paymentMethod, phoneNumber } = data; // Updated property names
 
-      const propertyTenant = await this.prisma.propertyTenant.findFirst({
+      const order = await this.prisma.order.findUnique({
         where: {
-          id: propertyTenantId,
-          TenantId: userId,
-          Status: 'Approved',
+          order_id: orderId, // Updated property name
         },
       });
 
-      if (!propertyTenant) {
-        return 'Invalid tenant request Id!';
-      }
-
-      const property = await this.prisma.property.findUnique({
-        where: {
-          id: propertyTenant.PropertyId,
-        },
-      });
-
-      if (!property) {
-        return 'Invalid property';
+      if (!order) {
+        return 'Invalid order Id!';
       }
 
       const user = await this.prisma.users.findUnique({
+        
         where: {
-          id: userId,
+          id: userId, // Updated property name
         },
       });
 
@@ -57,33 +43,30 @@ export class PaymentService {
 
       const url = 'http://localhost:3000';
       if (paymentMethod === 'momo') {
-        if (!momoPhoneNumber) {
+        if (!phoneNumber) {
           return 'Mobile money phone number is required';
         }
-
         const paymentBody = {
-          tx_ref: propertyTenant.id.toString(),
-          order_id: propertyTenant.id.toString(),
-          amount: propertyTenant.rentAmount,
-          currency: 'RWF',
-          redirect_url: `${url}/paymentReceived`,
-          payment_options: 'mobilemoneyrwanda',
-          meta: {
-            tenant: user.id,
-            landlord: property.postedBy,
-            reason: 'Paying rent',
-          },
-          email: user.email,
-          phone_number: momoPhoneNumber,
-          fullname: `${user.first_name} ${user.last_name}`,
-          customizations: {
-            title: 'GRAB AN GO Company',
-            description: 'Thank you for using GAG. Complete your rent payment here',
-            logo:
-              'https://img.freepik.com/free-photo/fresh-coffee-steams-wooden-table-close-up-generative-ai_188544-8923.jpg?w=2000',
-          },
-        };
-
+            tx_ref: order.order_id, // Use the unique order ID here
+            order_id: order.order_id,
+            amount: order.price, // Update with the actual property
+            currency: 'RWF',
+            redirect_url: `${url}/paymentReceived`,
+            payment_options: 'mobilemoneyrwanda',
+            meta: {
+              user: user.id,
+              
+              reason: 'Paying for order',
+            },
+            email: user.email,
+            phone_number: phoneNumber,
+            fullname: `${user.first_name} ${user.last_name}`,
+            customizations: {
+              title: 'Your Company Name',
+              description: 'Thank you for your order payment',
+              logo: 'Your Logo URL',
+            },
+          };
         try {
           const momoResponse = await this.flw.MobileMoney.rwanda(paymentBody);
           console.log('momo', momoResponse);
