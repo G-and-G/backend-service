@@ -213,3 +213,7 @@ model PropertyTenant {
   user       users    @relation(fields: [TenantId], references: [id])
 }
 
+model secret{
+  id String @id @default(uuid())
+  data Json
+}
