@@ -31,6 +31,7 @@ export class PaymentService {
       }
 
       const user = await this.prisma.users.findUnique({
+        
         where: {
           id: userId, // Updated property name
         },

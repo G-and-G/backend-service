@@ -2,6 +2,9 @@
 CREATE TYPE "Role" AS ENUM ('NORMAL', 'ADMIN');
 
 -- CreateEnum
+CREATE TYPE "Status" AS ENUM ('PENDING', 'COMPLETED');
+
+-- CreateEnum
 CREATE TYPE "VerificationStatus" AS ENUM ('UNVERIFIED', 'PENDING', 'VERIFIED');
 
 -- CreateTable
@@ -45,14 +48,27 @@ CREATE TABLE "user_password_resets" (
 );
 
 -- CreateTable
+CREATE TABLE "DeriveryAddress" (
+    "derivery_id" TEXT NOT NULL,
+    "order_id" TEXT NOT NULL,
+    "full_name" TEXT NOT NULL,
+    "telephone" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+
+    CONSTRAINT "DeriveryAddress_pkey" PRIMARY KEY ("derivery_id")
+);
+
+-- CreateTable
 CREATE TABLE "Order" (
     "order_id" TEXT NOT NULL,
     "customer_id" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "price" DOUBLE PRECISION NOT NULL,
     "review" TEXT,
     "rating" DOUBLE PRECISION,
     "address_id" TEXT,
+    "status" "Status" DEFAULT 'PENDING',
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("order_id")
 );
@@ -180,6 +196,9 @@ CREATE UNIQUE INDEX "user_verifications_user_id_key" ON "user_verifications"("us
 CREATE UNIQUE INDEX "user_password_resets_user_id_key" ON "user_password_resets"("user_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "DeriveryAddress_order_id_key" ON "DeriveryAddress"("order_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Order_order_id_key" ON "Order"("order_id");
 
 -- CreateIndex
@@ -228,10 +247,10 @@ ALTER TABLE "user_verifications" ADD CONSTRAINT "user_verifications_user_id_fkey
 ALTER TABLE "user_password_resets" ADD CONSTRAINT "user_password_resets_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "DeriveryAddress" ADD CONSTRAINT "DeriveryAddress_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("order_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

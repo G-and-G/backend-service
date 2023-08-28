@@ -27,3 +27,10 @@ export class Address {
   hotel_id: number;
 
 }
+ export class DeliveryAddress{
+ 
+  full_name: string;
+  telephone: string;
+  address: string;
+  city: string;
+ }
