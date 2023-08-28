@@ -53,12 +53,11 @@ export class CategoryController {
   })
   @ApiOperation({ summary: 'Create a new category' })
   async createCategory(
-    @Req() req: Request,
     @Res() res: Response,
     @Body() body: CreateCategoryDto,
   ) {
-    let { description, name, subcategories, image } = body;
-    if (!description || !name || !subcategories || !image) {
+    let { description, name, type, image } = body;
+    if (!description || !name || !type || !image) {
       return res.send(
         buildResponse('Provide all the required details', Status.FAILED),
       );
@@ -68,7 +67,7 @@ export class CategoryController {
         description,
         name,
         image,
-        subcategories,
+        type:type.toLowerCase() == 'food' ? "FOOD":"DRINK",
       },
     });
     return res
@@ -87,11 +86,12 @@ export class CategoryController {
   async updateCategory(
     @Param('id') id,
     @Res() res: Response,
-    @Body() body: any,
+    @Body() body: CreateCategoryDto,
   ) {
     let category = await prisma.category.update({
       data: {
         ...body,
+        type:body.type.toLowerCase() == 'food' ? "FOOD":"DRINK",
       },
       where: {
         category_id: parseInt(id),

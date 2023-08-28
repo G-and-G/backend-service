@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,10 +11,17 @@ enum Role {
   NORMAL
   ADMIN
 }
+
+enum CATTYPE{
+  FOOD
+  DRINK
+}
+
 enum Status{
   PENDING
   COMPLETED
 }
+
 enum VerificationStatus {
   UNVERIFIED
   PENDING
@@ -23,41 +29,24 @@ enum VerificationStatus {
 }
 
 model users {
-<<<<<<< HEAD
-  id             String         @id @default(uuid())
-  first_name     String
-  last_name      String
-  email          String         @unique
-  password       String
-  admin_hotels   Hotel[]
-  role           Role?          @default(NORMAL)
-  verification   Verification?
-  password_reset PasswordReset?
-  orders         Order[]
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
-  resetToken     String?
-  Review         Review[]
-  notifications  Notifications[]
+  id                String           @id @default(uuid())
+  first_name        String
+  last_name         String
+  email             String           @unique
+  password          String
+  admin_hotels      Hotel[]
+  role              Role?            @default(NORMAL)
+  verification      Verification?
+  password_reset    PasswordReset?
+  orders            Order[]
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+  resetToken        String?
+  Review            Review[]
+  notifications     Notifications[]
   notificationToken String?
-=======
-  id              String           @id @default(uuid())
-  first_name      String
-  last_name       String
-  email           String           @unique
-  password        String
-  admin_hotels    Hotel[]
-  role            Role?            @default(NORMAL)
-  verification    Verification?
-  password_reset  PasswordReset?
-  orders          Order[]
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
-  resetToken      String?
-  Review          Review[]
-  propertyTenants PropertyTenant[]
+  PropertyTenant    PropertyTenant[]
 
->>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337
   @@map("users")
 }
 
@@ -138,9 +127,9 @@ model Hotel {
 model Address {
   address_id String @id @default(uuid())
   hotel      Hotel  @relation(fields: [hotel_id], references: [hotel_id])
-//  Order    Order  @relation(fields: [Order], references: [order_id])
-  hotel_id Int   @unique
-  latitude Float
+  //  Order    Order  @relation(fields: [Order], references: [order_id])
+  hotel_id   Int    @unique
+  latitude   Float
 
   longitude Float
   street    String
@@ -177,9 +166,10 @@ model MenuItem {
 
 model Category {
   category_id   Int        @id @unique @default(autoincrement())
-  subcategories String[]
-  menu          Menu[]
-  menuItem      MenuItem[]
+  type          CATTYPE
+  menu          Menu? @relation(fields: [menu_id],references: [menu_id])
+  menu_id       Int?
+  items      MenuItem[]
   description   String
   image         String?
   name          String
@@ -195,17 +185,16 @@ model Review {
   createdAt   DateTime
 }
 
-<<<<<<< HEAD
-model Notifications{
-  id String @id @unique @default(uuid())
-  title String
-  content String
-  receiver users @relation(fields: [receiver_id],references: [id])
+model Notifications {
+  id          String    @id @unique @default(uuid())
+  title       String
+  content     String
+  receiver    users     @relation(fields: [receiver_id], references: [id])
   receiver_id String
-  createdAt DateTime ? @default(now())
-  imageLabel String?
+  createdAt   DateTime? @default(now())
+  imageLabel  String?
 }
-=======
+
 model Property {
   id              String           @id @default(uuid())
   postedBy        String
@@ -223,4 +212,4 @@ model PropertyTenant {
   property   Property @relation(fields: [PropertyId], references: [id])
   user       users    @relation(fields: [TenantId], references: [id])
 }
->>>>>>> e1556c10d6caa5839dfb4e89d0b1ba5d6b61b337
+
