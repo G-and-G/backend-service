@@ -15,6 +15,7 @@ CREATE TABLE "users" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "resetToken" TEXT,
+    "notificationToken" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -49,10 +50,10 @@ CREATE TABLE "Order" (
     "order_id" TEXT NOT NULL,
     "customer_id" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "address_id" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "review" TEXT,
     "rating" DOUBLE PRECISION,
+    "address_id" TEXT,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("order_id")
 );
@@ -81,6 +82,7 @@ CREATE TABLE "Hotel" (
     "startingWorkingTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endingWorkingTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "image" TEXT NOT NULL,
+    "notificationToken" TEXT,
 
     CONSTRAINT "Hotel_pkey" PRIMARY KEY ("hotel_id")
 );
@@ -143,6 +145,18 @@ CREATE TABLE "Review" (
     "createdAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("review_id")
+);
+
+-- CreateTable
+CREATE TABLE "Notifications" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "receiver_id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "imageLabel" TEXT,
+
+    CONSTRAINT "Notifications_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -216,6 +230,9 @@ CREATE UNIQUE INDEX "Category_category_id_key" ON "Category"("category_id");
 CREATE UNIQUE INDEX "Review_review_id_key" ON "Review"("review_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Notifications_id_key" ON "Notifications"("id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_CategoryToMenu_AB_unique" ON "_CategoryToMenu"("A", "B");
 
 -- CreateIndex
@@ -231,7 +248,7 @@ ALTER TABLE "user_password_resets" ADD CONSTRAINT "user_password_resets_user_id_
 ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "Address"("address_id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -256,6 +273,9 @@ ALTER TABLE "Review" ADD CONSTRAINT "Review_user_id_fkey" FOREIGN KEY ("user_id"
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "MenuItem"("menuItem_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Notifications" ADD CONSTRAINT "Notifications_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PropertyTenant" ADD CONSTRAINT "PropertyTenant_PropertyId_fkey" FOREIGN KEY ("PropertyId") REFERENCES "Property"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

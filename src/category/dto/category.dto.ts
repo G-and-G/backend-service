@@ -32,10 +32,9 @@ export class CreateCategoryDto {
     description: 'subcategories found in the given category',
     example: ['fresh juice', 'hot drinks'],
   })
-  @IsArray()
-  @ArrayNotEmpty()
-  @ArrayUnique()
-  subcategories: string[];
+  @IsString()
+  @IsNotEmpty()
+  type: string;
 
   @IsString()
   @ApiProperty({
