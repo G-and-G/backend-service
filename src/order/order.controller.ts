@@ -27,7 +27,7 @@ export class OrderController {
   }
 
   @Post('/newOrder')
-  createOrder(@Body() data: CreateOrderDTO) {
+  createOrder(@Body() data: any) {
     return this.orderService.createOrder(data);
   }
   @Get(':id')

@@ -14,7 +14,7 @@ import { Type } from 'class-transformer';
 import { CreateMenuItemDTO } from 'src/menu/dtos/createMenuItemDTO';
 import { Menu, MenuItem } from '@prisma/client';
 
-class ProductDTO {
+export class ProductDTO {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ description: 'The ID of the menu item' }) // Add ApiProperty decorator
@@ -48,7 +48,7 @@ export class CreateOrderDTO {
   @IsArray()
   @ValidateNested({ each: true })
   @ApiProperty({
-    type: [ProductDTO],
+    type: ProductDTO,
     description: 'Array of products in the order',
   }) // Add ApiProperty decorator
   products: MenuItem[];
