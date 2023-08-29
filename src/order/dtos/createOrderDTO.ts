@@ -11,6 +11,8 @@ import { ApiProperty } from '@nestjs/swagger'; // Import ApiProperty decorator
 // import {  Address } from 'src/hotel/dto/address.dto';
 import { Address, DeliveryAddress } from './addressDTO';
 import { Type } from 'class-transformer';
+import { CreateMenuItemDTO } from 'src/menu/dtos/createMenuItemDTO';
+import { Menu, MenuItem } from '@prisma/client';
 
 class ProductDTO {
   @IsNumber()
@@ -49,5 +51,5 @@ export class CreateOrderDTO {
     type: [ProductDTO],
     description: 'Array of products in the order',
   }) // Add ApiProperty decorator
-  products: ProductDTO[];
+  products: MenuItem[];
 }
