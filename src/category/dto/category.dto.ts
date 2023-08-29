@@ -32,7 +32,7 @@ export class CreateCategoryDto {
     description: 'Type either Foods or Drinks',
     example: 'Foods',
   })
-  @IsString()
+  
   @IsNotEmpty()
   type: string;
 
