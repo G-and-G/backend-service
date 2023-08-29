@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import admin from 'firebase-admin';
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
+const serviceAccount = JSON.parse(process.env.SECRET_JSON)
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: process.env.DB_URL

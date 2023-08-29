@@ -32,4 +32,5 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+grabngo-a3844-firebase-adminsdk-ftno0-c4b08dfd02.json
 .env
