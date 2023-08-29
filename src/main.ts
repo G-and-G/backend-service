@@ -10,11 +10,9 @@ async function bootstrap() {
     .setDescription('The Grab and Go API description')
     .setVersion('1.0')
     .build();
-console.log(messaging)
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   await app.listen(3000);
 }
-console.log(process.env)
 bootstrap();
