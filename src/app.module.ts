@@ -28,8 +28,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
     UserModule,
     CategoryModule,
     HotelModule,
+    ReviewModule,
     PaymentModule,
     OrderModule,
+    GoogleModule
     AnalyticsModule
   ],
   controllers: [AppController, FirebaseController],
