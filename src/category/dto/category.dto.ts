@@ -32,7 +32,7 @@ export class CreateCategoryDto {
     description: 'subcategories found in the given category',
     example: ['fresh juice', 'hot drinks'],
   })
-  @IsString()
+  
   @IsNotEmpty()
   type: string;
 
