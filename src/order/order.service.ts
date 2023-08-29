@@ -52,18 +52,20 @@ export class OrderService {
         },
         
       });
-      console.log("dataaaaaa",newOrder);
+    
       
       return {
         status: 201,
         Response: {messager:"order placed successfully",newOrder},
-
       };
+      console.log("dataaaaaa",data.products);
+
     } catch (error) {
-      console.log("error",error);
+      console.log("errorrrrrrrrrrr",error);
       return {
         status: 500,
         Response: {messager:"order not placed ",error},
+        
       }
         
     }
