@@ -43,7 +43,7 @@ export class UserService {
           error,
         );
       }
-      console.log(Object.keys(error));
+      console.log(error);
       return ApiResponse.error('Internal server error', error);
     }
   }
