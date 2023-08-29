@@ -54,14 +54,18 @@ export class OrderService {
       });
       console.log("dataaaaaa",newOrder);
       
-      return ApiResponse.success('Order Placed!', newOrder, 201);
+      return {
+        status: 201,
+        Response: {messager:"order placed successfully",newOrder},
+
+      };
     } catch (error) {
-      console.log(error);
-      return ApiResponse.error(
-        "Order couldn't be placed!" + error.message,
-        null,
-        error.status,
-      );
+      console.log("error",error);
+      return {
+        status: 500,
+        Response: {messager:"order not placed ",error},
+      }
+        
     }
   }
   
