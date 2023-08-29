@@ -22,15 +22,22 @@ export class Address {
 
   @IsString({ message: 'Village must be a string' })
   village: string;
+
   @IsNumber()
   @ApiProperty({ description: 'ID of the hotel' })
   hotel_id: number;
-
 }
- export class DeliveryAddress{
- 
+
+export class DeliveryAddress {
+  @ApiProperty({ description: 'Full name of the recipient' })
   full_name: string;
+
+  @ApiProperty({ description: 'Telephone number of the recipient' })
   telephone: string;
+
+  @ApiProperty({ description: 'Address details'})
   address: string;
+
+  @ApiProperty({ description: 'City of the delivery address' })
   city: string;
- }
+}

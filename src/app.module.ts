@@ -32,7 +32,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     PaymentModule,
     OrderModule,
     // GoogleModule,
-    AnalyticsModule
+    AnalyticsModule,
   ],
   controllers: [AppController, FirebaseController],
 
