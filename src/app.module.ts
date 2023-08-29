@@ -31,7 +31,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     ReviewModule,
     PaymentModule,
     OrderModule,
-    GoogleModule
+    GoogleModule,
     AnalyticsModule
   ],
   controllers: [AppController, FirebaseController],
