@@ -22,15 +22,15 @@ export class CreateCategoryDto {
   })
   description: string;
 
-  @ApiProperty({ description: 'name of the category', example: 'Drinks' })
+  @ApiProperty({ description: 'name of the category', example: 'sauces' })
   @IsNotEmpty()
   @IsString()
   name: string;
 
   @IsNotEmpty()
   @ApiProperty({
-    description: 'subcategories found in the given category',
-    example: ['fresh juice', 'hot drinks'],
+    description: 'Type either Foods or Drinks',
+    example: 'Foods',
   })
   @IsString()
   @IsNotEmpty()
