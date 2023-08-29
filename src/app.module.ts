@@ -27,8 +27,10 @@ import { PaymentService } from './payment/payment.service';
     UserModule,
     CategoryModule,
     HotelModule,
+    ReviewModule,
     PaymentModule,
     OrderModule,
+    GoogleModule
   ],
   controllers: [AppController, FirebaseController],
 
