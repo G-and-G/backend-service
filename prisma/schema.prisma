@@ -180,6 +180,7 @@ model Review {
   user        users    @relation(fields: [user_id], references: [id])
   user_id     String
   description String
+  title String
   product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
   product_id  Int
   createdAt   DateTime

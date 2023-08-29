@@ -16,6 +16,10 @@ export class CreateReviewDTO {
   @IsNotEmpty()
   @IsString()
   description: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  title: string;
 
   @ApiProperty()
   @IsOptional()

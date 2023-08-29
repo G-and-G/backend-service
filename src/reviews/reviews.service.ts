@@ -10,13 +10,14 @@ export class ReviewService {
   constructor() {}
 
   async createReview(reviewData: CreateReviewDTO): Promise<Review> {
-    const { user_id, product_id, description, rating } = reviewData;
+    const { user_id, product_id, description,title, rating } = reviewData;
 
     return prisma.review.create({
       data: {
         user: { connect: { id: user_id } },
         product: { connect: { menuItem_id: product_id } },
         description,
+        title,
         createdAt: new Date(),
       },
     });
