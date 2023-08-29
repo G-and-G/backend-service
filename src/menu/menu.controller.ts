@@ -34,28 +34,32 @@ export class MenuController {
     }
   }
 
-  @Get("/:id")
-  async getMenuById(@Param('id') id:number){
+  @Get('/:id')
+  async getMenuById(@Param('id') id: number) {
     try {
       let menu = await prisma.menu.findFirst({
-        where:{
-          menu_id:Number(id)
+        where: {
+          menu_id: Number(id),
         },
-        include:{
-          items:true,
-          categories:true
-        }
+        include: {
+          items: true,
+          categories: true,
+        },
       });
-      if(!menu){
-        return ApiResponse.error('Menu not found',null,404);
+      if (!menu) {
+        return ApiResponse.error('Menu not found', null, 404);
       }
-      return ApiResponse.success('Menu here',menu,200);
+      return ApiResponse.success('Menu here', menu, 200);
     } catch (error) {
-      console.log(error)
-      return ApiResponse.error('Something Went Wrong! '+ error.message,null,error.status);
+      console.log(error);
+      return ApiResponse.error(
+        'Something Went Wrong! ' + error.message,
+        null,
+        error.status,
+      );
     }
   }
-  
+
   @Delete('/:id')
   async deleteMenu(@Param('id') id: number) {
     try {
@@ -174,6 +178,21 @@ export class MenuController {
       }
       if (!menu) {
         throw new Error("Menu doesn't exist");
+      }
+
+      if (!category.menu_id) {
+        await prisma.category.update({
+          where: {
+            category_id: Number(category_id),
+          },
+          data: {
+            menu:{
+              connect:{
+                menu_id:Number(menu_id)
+              }
+            }
+          },
+        });
       }
 
       const newItem = await prisma.menuItem.create({
