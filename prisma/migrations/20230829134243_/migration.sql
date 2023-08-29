@@ -133,7 +133,7 @@ CREATE TABLE "Menu" (
 CREATE TABLE "MenuItem" (
     "menuItem_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "menu_id" INTEGER,
+    "menu_id" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "category_id" INTEGER NOT NULL,
     "quantity_available" INTEGER NOT NULL,
@@ -279,7 +279,7 @@ ALTER TABLE "Address" ADD CONSTRAINT "Address_hotel_id_fkey" FOREIGN KEY ("hotel
 ALTER TABLE "Menu" ADD CONSTRAINT "Menu_hotel_id_fkey" FOREIGN KEY ("hotel_id") REFERENCES "Hotel"("hotel_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_menu_id_fkey" FOREIGN KEY ("menu_id") REFERENCES "Menu"("menu_id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_menu_id_fkey" FOREIGN KEY ("menu_id") REFERENCES "Menu"("menu_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MenuItem" ADD CONSTRAINT "MenuItem_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "Category"("category_id") ON DELETE RESTRICT ON UPDATE CASCADE;
