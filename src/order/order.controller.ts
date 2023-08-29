@@ -34,6 +34,16 @@ export class OrderController {
   async getOrderById(@Param('id') orderId: string): Promise<Order | null> {
     return this.orderService.getOrderById(orderId);
   }
+  @Get('user/:userId/orders') // Define the route and HTTP method
+  async getOrdersForUser(@Param('userId') userId: string) {
+    try {
+      const userOrders = await this.orderService.getOrdersForUser(userId);
+      return ApiResponse.success('User orders retrieved successfully', userOrders);
+    } catch (error) {
+      console.log('Error fetching user orders:', error);
+      return ApiResponse.error('Error fetching user orders', error);
+    }
+  }
   @Put('update/:id')
   async updateOrder(
     @Param('id') orderId: string,

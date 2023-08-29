@@ -50,7 +50,7 @@ export class OrderService {
             })),
           },
         },
-        
+        include: { products: true },
       });
     
       
@@ -71,6 +71,41 @@ export class OrderService {
     }
   }
   
+  async getOrdersForUser(userId) {
+    try {
+      const userOrders = await this.prisma.users.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          orders: {
+            include: {
+              deliveryAddress: true,
+              products: true,
+            },
+          },
+        },
+      });
+  
+      if (!userOrders) {
+        return {
+          status: 404,
+          Response: { message: "User not found" },
+        };
+      }
+  
+      return {
+        status: 200,
+        Response: userOrders.orders,
+      };
+    } catch (error) {
+      console.log("errorrrrrrrrrrr", error);
+      return {
+        status: 500,
+        Response: { message: "error fetching orders", error },
+      };
+    }
+  }
   
   async updateOrder(
     orderId: string,
