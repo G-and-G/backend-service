@@ -13,7 +13,9 @@ export class OrderService {
   async getOrders(): Promise<Order[]> {
     try {
       const orders = await this.prisma.order.findMany({
-        // Specify any additional options or filters here if needed
+        include: {
+          products: true // This will include the associated items for each order
+        }
       });
 
       return orders;
