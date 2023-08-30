@@ -117,6 +117,7 @@ export class OrderService {
       const updatedOrder = await this.prisma.order.update({
         where: { order_id: orderId },
         data: dataToUpdate,
+
       });
 
       return updatedOrder;
@@ -129,6 +130,9 @@ export class OrderService {
     try {
       const order = await this.prisma.order.findUnique({
         where: { order_id: orderId },
+        include: {
+          products: true // This will include the associated items for each order
+        }
         // Include any related data if needed
       });
 
@@ -158,6 +162,9 @@ export class OrderService {
     try {
       await this.prisma.order.delete({
         where: { order_id: orderId },
+        include: {
+          products: true // This will include the associated items for each order
+        }
       });
     } catch (error) {
       // Handle errors here
