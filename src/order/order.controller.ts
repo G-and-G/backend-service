@@ -21,13 +21,14 @@ export class OrderController {
   main(): string {
     return 'Welcome to order management!';
   }
+ 
   @Get('/')
   getOrders() {
     return this.orderService.getOrders();
   }
 
   @Post('/newOrder')
-  createOrder(@Body() data: any) {
+  createOrder(@Body() data: CreateOrderDTO|any) {
     return this.orderService.createOrder(data);
   }
   @Get(':id')

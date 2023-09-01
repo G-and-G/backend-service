@@ -34,7 +34,10 @@ export class CreateOrderDTO {
   @ApiProperty({ description: 'The ID of the customer' }) // Add ApiProperty decorator
   customer_id: string;
 
- 
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'The ID of the hotel' }) // Add ApiProperty decorator
+  hotel_id: number;
 
   
   @IsNotEmpty()

@@ -79,6 +79,8 @@ export class PaymentService {
             return 'Something went wrong! Please try again';
           }
         } catch (ex) {
+          console.log('momo error', ex);
+          
           return 'Error during payment processing';
         }
       } else {

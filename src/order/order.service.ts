@@ -14,7 +14,7 @@ export class OrderService {
     try {
       const orders = await this.prisma.order.findMany({
         include: {
-          products: true // This will include the associated items for each order
+          products: true // This will include th3e associated items for each order
         }
       });
 
@@ -35,7 +35,12 @@ export class OrderService {
               id: data.customer_id,
             },
           },
-          
+          hotel:{
+            connect:{
+              hotel_id:data.hotel_id
+            }
+          }
+          ,
           deliveryAddress: {
             create: {
               full_name: data.deliveryAddress.full_name,
