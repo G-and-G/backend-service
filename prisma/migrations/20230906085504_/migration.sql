@@ -67,6 +67,7 @@ CREATE TABLE "DeriveryAddress" (
 CREATE TABLE "Order" (
     "order_id" TEXT NOT NULL,
     "customer_id" TEXT NOT NULL,
+    "hotel_id" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "price" DOUBLE PRECISION NOT NULL,
     "review" TEXT,
@@ -161,6 +162,7 @@ CREATE TABLE "Review" (
     "review_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "product_id" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL,
 
@@ -268,6 +270,9 @@ ALTER TABLE "DeriveryAddress" ADD CONSTRAINT "DeriveryAddress_order_id_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_hotel_id_fkey" FOREIGN KEY ("hotel_id") REFERENCES "Hotel"("hotel_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Hotel" ADD CONSTRAINT "Hotel_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -21,7 +21,9 @@ export class OrderService {
       return orders;
     } catch (error) {
       // Handle errors here
-      throw new Error('Unable to fetch orders');
+      console.log(error);
+      
+      throw new Error('Unable to fetch orders',);
     }
   }
 
