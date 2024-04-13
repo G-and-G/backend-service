@@ -100,7 +100,6 @@ model Order {
   address_id        String?   
   status           Status?    @default(PENDING)
 
-
 }
 
 model CoffeeProduct {
