@@ -88,7 +88,7 @@ export class AuthService {
     await this.userService.updateResetToken(user.id, resetToken);
 
     await this.mailService.sendResetPasswordEmail({
-      email: user.email,
+      email: user.email,    
       token: resetToken,
       names: `${user.first_name} ${user.last_name}`,
     });
