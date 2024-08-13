@@ -22,6 +22,7 @@ import { request } from 'express';
 
 @Controller('user')
 @ApiTags('users')
+
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -45,14 +46,13 @@ export class UserController {
   @Get(':id')
   async get(@Param('id') id: string) {
     const user = await this.userService.getUserById(id);
-
     return ApiResponse.success('User retrieved successfully', user);
   }
   @Get('search/:query')
   async search(@Param('query') query: string) {
     const results = await this.userService.searchUsers(query);
     return ApiResponse.success(
-      'Search results retrieved successfully',
+      'Search results retrieved successfully for user',
       results,
     );
   }
