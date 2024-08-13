@@ -1,4 +1,4 @@
-const whitelist = ['http://localhost:7878', 'http://localhost:5000'];
+const whitelist = ['http://localhost:7878', 'http://localhost:5000',"http://localhost:3000"];
 const options = {
   origin: (origin: string, callback: Function) => {
     console.log(origin);
