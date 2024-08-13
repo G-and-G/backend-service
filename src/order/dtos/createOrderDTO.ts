@@ -46,8 +46,8 @@ export class CreateOrderDTO {
   @IsArray()
   @ValidateNested({ each: true })
   @ApiProperty({
-    type: [ProductDTO],
+    type: [],
     description: 'Array of products in the order',
   }) // Add ApiProperty decorator
-  products: ProductDTO[];
+  products: any[];
 }

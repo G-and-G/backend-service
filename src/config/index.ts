@@ -3,7 +3,7 @@ export default () => ({
   mail: {
     service: process.env.MAIL_SERVICE,
     port: parseInt(process.env.MAIL_PORT, 10) || 587,
-    user: process.env.MAIL_USER,
+    user: process.env.MAIL_USERNAME,
     password: process.env.MAIL_PASSWORD,
   },
   jwt: {

@@ -33,15 +33,13 @@ export class OrderService {
               id: data.customer_id,
             },
           },
-          
+
           deliveryAddress: {
             create: {
               full_name: data.deliveryAddress.full_name,
               telephone: data.deliveryAddress.telephone,
               address: data.deliveryAddress.address,
               city: data.deliveryAddress.city,
-              
-            
             },
           },
           products: {
@@ -50,10 +48,9 @@ export class OrderService {
             })),
           },
         },
-        
       });
-      console.log("dataaaaaa",newOrder);
-      
+      console.log('dataaaaaa', newOrder);
+
       return ApiResponse.success('Order Placed!', newOrder, 201);
     } catch (error) {
       console.log(error);
@@ -64,8 +61,7 @@ export class OrderService {
       );
     }
   }
-  
-  
+
   async updateOrder(
     orderId: string,
     dataToUpdate: Partial<Order>,

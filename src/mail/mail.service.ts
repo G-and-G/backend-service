@@ -41,6 +41,7 @@ export class MailService {
     verificationCode: string;
     names: string;
   }) {
+    console.log(config().mail.user);
     const mailOptions: nodemailer.SendMailOptions = {
       to: email,
       subject: 'Verify your email address',
