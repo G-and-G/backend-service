@@ -291,4 +291,39 @@ export class HotelService {
 
     return hotel;
   }
+  async createHotelAdmin(userId: string, hotelId: number) {
+    try {
+      // Check if the user exists
+      const user = await this.prisma.users.findUnique({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+  
+      // Check if the user is already an admin for another hotel
+      if (user.role === 'ADMIN') {
+        throw new ConflictException('User is already an admin for another hotel');
+      }
+  
+      // Update the Hotel to set the admin
+      const hotel = await this.prisma.hotel.update({
+        where: { hotel_id: hotelId },
+        data: {
+          admin: { connect: { id: userId } },
+        },
+      });
+  
+      // Update the user role to ADMIN
+      await this.prisma.users.update({
+        where: { id: userId },
+        data: { role: 'ADMIN' },
+      });
+  
+      return ApiResponse.success('Hotel admin created successfully', hotel);
+    } catch (error) {
+      console.error('Error creating hotel admin:', error);
+      return ApiResponse.error('Error creating hotel admin', error);
+    }
+  }
 }
