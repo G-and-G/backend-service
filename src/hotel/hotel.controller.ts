@@ -99,4 +99,11 @@ export class HotelController {
   async remove(@Param('id') id: number) {
     return this.hotelService.deleteHotel(id);
   }
+  @Post(':userId/hotels/:hotelId/admin')
+  async createHotelAdmin(
+    @Param('userId') userId: string,
+    @Param('hotelId') hotelId: number,
+  ) {
+    return this.hotelService.createHotelAdmin(userId, hotelId);
+  }
 }
