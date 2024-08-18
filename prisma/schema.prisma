@@ -125,7 +125,7 @@ model Hotel {
   ThisWeekOrders      Int?     @default(0)
   startingWorkingTime DateTime @default(now())
   endingWorkingTime   DateTime @default(now())
-  image               String
+  image               String?
   notificationToken   String?
 }
 
