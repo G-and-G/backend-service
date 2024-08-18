@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { compareSync, hashSync } from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
 import { UserService } from 'src/user/user.service';
 import { LoginDTO } from './dto/login.dto';
-import ApiResponse from 'src/utils/ApiResponse';
-import { compareSync, hashSync } from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
-import { Res } from '@nestjs/common';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +14,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async login(dto: LoginDTO) {
+    console.log('Login DTO: ', dto);
     const user = await this.userService.getUserByEmail(dto.email);
 
     if (!user) {
@@ -35,7 +33,10 @@ export class AuthService {
       };
     }
 
-    const token = this.jwtService.sign({ id: user.id }, { expiresIn: '1d' });
+    const token = this.jwtService.sign(
+      { id: user.id, role: user.role },
+      { expiresIn: '1d' },
+    );
 
     return {
       status: 200,
@@ -88,7 +89,7 @@ export class AuthService {
     await this.userService.updateResetToken(user.id, resetToken);
 
     await this.mailService.sendResetPasswordEmail({
-      email: user.email,    
+      email: user.email,
       token: resetToken,
       names: `${user.first_name} ${user.last_name}`,
     });
