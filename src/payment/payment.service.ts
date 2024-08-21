@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import flw from 'src/config/FLW';
 import { OrderService } from 'src/order/order.service';
+import ApiResponse from 'src/utils/ApiResponse';
 import { InitiateChargeDto } from './dtos/initiate-charge.dto';
 import { OrderPaymentDto } from './dtos/payment.dto';
 
@@ -98,6 +99,15 @@ export class PaymentService {
     return _data;
   }
 
+  async getPayment(paymentId: string) {
+    const payment = await this.prisma.payment.findUnique({
+      where: {
+        id: paymentId,
+      },
+    });
+    return payment;
+  }
+
   async initiatePayment(dto: InitiateChargeDto) {
     try {
       // save payment
@@ -123,7 +133,7 @@ export class PaymentService {
       };
       const response = await this.flw.MobileMoney.rwanda(payload);
       console.log(response);
-      return response;
+      return { response, payment };
     } catch (error) {
       console.log(error);
       return { message: 'Unable to initiate payment', error };
@@ -132,11 +142,37 @@ export class PaymentService {
 
   async afterPayment(data: any) {
     try {
-      console.log(data);
-      return data;
+      if (data.event !== 'charge.completed' || data.status !== 'successful') {
+        const _data = await this.prisma.payment.update({
+          where: {
+            id: data.data.tx_ref,
+          },
+          data: {
+            status: 'CANCELLED',
+          },
+        });
+        return ApiResponse.error('Payment not successful', _data, 200);
+      }
+      const updatedPayment = await this.prisma.payment.update({
+        where: {
+          id: data.tx_ref,
+        },
+        data: {
+          status: 'COMPLETED',
+        },
+      });
+      const paidOrder = await this.prisma.order.update({
+        where: {
+          order_id: updatedPayment.order_id,
+        },
+        data: {
+          isPaid: true,
+        },
+      });
+      return ApiResponse.success('Payment successful', paidOrder, 200);
     } catch (error) {
       console.log(error);
-      return { message: 'Unable to process payment', error };
+      return ApiResponse.error('Unable to process payment', error, 500);
     }
   }
 
