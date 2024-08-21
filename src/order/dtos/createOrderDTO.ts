@@ -1,18 +1,16 @@
+import { ApiProperty } from '@nestjs/swagger'; // Import ApiProperty decorator
 import {
   IsArray,
-  IsDate,
   IsNotEmpty,
   IsNumber,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger'; // Import ApiProperty decorator
 // import { Address } from '@prisma/client';
 // import {  Address } from 'src/hotel/dto/address.dto';
-import { Address, DeliveryAddress } from './addressDTO';
+import { MenuItem } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { CreateMenuItemDTO } from 'src/menu/dtos/createMenuItemDTO';
-import { Menu, MenuItem } from '@prisma/client';
+import { DeliveryAddress } from './addressDTO';
 
 export class ProductDTO {
   @IsNumber()
@@ -39,14 +37,10 @@ export class CreateOrderDTO {
   @ApiProperty({ description: 'The ID of the hotel' }) // Add ApiProperty decorator
   hotel_id: number;
 
-  
   @IsNotEmpty()
   @ApiProperty({ description: 'The ID of the delivery address' }) // Add ApiProperty decorator
- 
-   
- 
   @Type(() => DeliveryAddress)
-  deliveryAddress:DeliveryAddress ;
+  deliveryAddress: DeliveryAddress;
 
   @IsArray()
   @ValidateNested({ each: true })

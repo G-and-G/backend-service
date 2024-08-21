@@ -1,19 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Put,
-  Param,
+  Controller,
   Delete,
-  Patch,
+  Get,
+  Param,
   ParseUUIDPipe,
+  Patch,
+  Post,
+  Put,
 } from '@nestjs/common';
-import { OrderService } from './order.service';
-import { CreateOrderDTO } from './dtos/createOrderDTO';
-import { Order } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { Order } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
+import { CreateOrderDTO } from './dtos/createOrderDTO';
+import { OrderService } from './order.service';
 @ApiTags('orders')
 @Controller('orders')
 export class OrderController {
@@ -21,14 +21,14 @@ export class OrderController {
   main(): string {
     return 'Welcome to order management!';
   }
- 
+
   @Get('/')
   getOrders() {
     return this.orderService.getOrders();
   }
 
   @Post('/newOrder')
-  createOrder(@Body() data: CreateOrderDTO|any) {
+  createOrder(@Body() data: CreateOrderDTO | any) {
     return this.orderService.createOrder(data);
   }
   @Get(':id')
@@ -39,7 +39,10 @@ export class OrderController {
   async getOrdersForUser(@Param('userId') userId: string) {
     try {
       const userOrders = await this.orderService.getOrdersForUser(userId);
-      return ApiResponse.success('User orders retrieved successfully', userOrders);
+      return ApiResponse.success(
+        'User orders retrieved successfully',
+        userOrders,
+      );
     } catch (error) {
       console.log('Error fetching user orders:', error);
       return ApiResponse.error('Error fetching user orders', error);
@@ -61,7 +64,10 @@ export class OrderController {
   async markOrderCompleted(@Param('orderId', ParseUUIDPipe) orderId: string) {
     try {
       const updatedOrder = await this.orderService.markOrderCompleted(orderId);
-      return ApiResponse.success('Order status updated to completed', updatedOrder);
+      return ApiResponse.success(
+        'Order status updated to completed',
+        updatedOrder,
+      );
     } catch (error) {
       console.log('Error updating order status:', error);
       return ApiResponse.error('Error updating order status', error);

@@ -8,17 +8,20 @@ export class AnalyticsService {
 
   async getTotalFinance(): Promise<number> {
     const orders = await this.prisma.order.findMany();
-    const totalFinance = orders.reduce((total, order) => total + order.price, 0);
+    const totalFinance = orders.reduce(
+      (total, order) => total + order.price,
+      0,
+    );
     return totalFinance;
   }
 
   async getTotalClients(): Promise<number> {
-    const usersWithOrders = await this.prisma.users.findMany({
+    const usersWithOrders = await this.prisma.user.findMany({
       where: {
         orders: {
-          some: {} 
-        }
-      }
+          some: {},
+        },
+      },
     });
 
     const totalClients = usersWithOrders.length;
