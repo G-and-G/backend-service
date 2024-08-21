@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { users } from '@prisma/client';
+import { User as users } from '@prisma/client';
 import { UserService } from '../user.service';
 
 export class AdminGuard implements CanActivate {

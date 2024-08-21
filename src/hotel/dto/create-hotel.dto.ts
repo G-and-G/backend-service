@@ -1,18 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { users } from '@prisma/client';
-import { Address } from './address.dto';
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsNumber,
-  IsString,
   IsOptional,
-  IsDate,
+  IsString,
   IsUrl,
-  Min,
-  Max,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Address } from './address.dto';
 
 export class CreateHotelDTO {
   @IsNotEmpty()

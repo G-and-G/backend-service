@@ -11,7 +11,7 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
 // import { CreateHotelDTO } from './dto/update-hotel.dto';
-import { Category, Hotel } from '@prisma/client';
+import { Hotel } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateMenuDTO } from './dto/create-menu.dto';
@@ -25,7 +25,7 @@ export class HotelService {
       if (!createHotelDTO || !createHotelDTO.address) {
         throw new BadRequestException('Invalid input data');
       }
-      const adminUser = await this.prisma.users.findUnique({
+      const adminUser = await this.prisma.user.findUnique({
         where: { id: createHotelDTO.admin_id },
       });
 
@@ -75,11 +75,11 @@ export class HotelService {
   async getHotelById(id: number): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findUnique({
       where: { hotel_id: id },
-      include:{
-        menu:true
-      }
+      include: {
+        menu: true,
+      },
     });
-    
+
     if (!hotel) {
       throw new NotFoundException('Hotel not found');
     }
@@ -107,7 +107,7 @@ export class HotelService {
     }
 
     try {
-      const adminUser = await this.prisma.users.findUnique({
+      const adminUser = await this.prisma.user.findUnique({
         where: { id: updateHotelDTO.admin_id },
       });
 
@@ -294,18 +294,20 @@ export class HotelService {
   async createHotelAdmin(userId: string, hotelId: number) {
     try {
       // Check if the user exists
-      const user = await this.prisma.users.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: { id: userId },
       });
       if (!user) {
         throw new NotFoundException('User not found');
       }
-  
+
       // Check if the user is already an admin for another hotel
       if (user.role === 'ADMIN') {
-        throw new ConflictException('User is already an admin for another hotel');
+        throw new ConflictException(
+          'User is already an admin for another hotel',
+        );
       }
-  
+
       // Update the Hotel to set the admin
       const hotel = await this.prisma.hotel.update({
         where: { hotel_id: hotelId },
@@ -313,13 +315,13 @@ export class HotelService {
           admin: { connect: { id: userId } },
         },
       });
-  
+
       // Update the user role to ADMIN
-      await this.prisma.users.update({
+      await this.prisma.user.update({
         where: { id: userId },
         data: { role: 'ADMIN' },
       });
-  
+
       return ApiResponse.success('Hotel admin created successfully', hotel);
     } catch (error) {
       console.error('Error creating hotel admin:', error);

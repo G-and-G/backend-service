@@ -1,17 +1,12 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaService } from 'prisma/prisma.service';
 import { RegisterDTO } from './dto/create-user.dto';
 // import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import ApiResponse from 'src/utils/ApiResponse';
 import { hash } from 'bcrypt';
+import ApiResponse from 'src/utils/ApiResponse';
 
 @Injectable()
 export class UserService {
@@ -24,7 +19,7 @@ export class UserService {
   async createUser(dto: RegisterDTO) {
     try {
       const hashedPassword = await hash(dto.password, 10);
-      const user = await this.prisma.users.create({
+      const user = await this.prisma.user.create({
         data: {
           // role:dto.role,
           first_name: dto.firstName,
@@ -49,7 +44,7 @@ export class UserService {
   }
   async makeUserAdmin(userId: string) {
     try {
-      const updatedUser = await this.prisma.users.update({
+      const updatedUser = await this.prisma.user.update({
         where: {
           id: userId,
         },
@@ -70,7 +65,7 @@ export class UserService {
 
   async grantHotelAccessToAdmin(adminId: string, hotelId: number) {
     try {
-      const updatedAdmin = await this.prisma.users.update({
+      const updatedAdmin = await this.prisma.user.update({
         where: {
           id: adminId,
         },
@@ -91,7 +86,7 @@ export class UserService {
     }
   }
   async getUserById(id: string) {
-    const user = this.prisma.users.findUnique({
+    const user = this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -100,7 +95,7 @@ export class UserService {
   }
 
   async getUserByEmail(email: string) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
@@ -110,7 +105,7 @@ export class UserService {
 
   async getAllUsers() {
     try {
-      const users = await this.prisma.users.findMany();
+      const users = await this.prisma.user.findMany();
       return users;
     } catch (error) {
       console.log('Error getting all users:', error);
@@ -120,7 +115,7 @@ export class UserService {
 
   async searchUsers(query: string) {
     try {
-      const users = await this.prisma.users.findMany({
+      const users = await this.prisma.user.findMany({
         where: {
           OR: [
             {
@@ -153,7 +148,7 @@ export class UserService {
 
   async deleteUserById(id: string) {
     try {
-      const deletedUser = await this.prisma.users.delete({
+      const deletedUser = await this.prisma.user.delete({
         where: {
           id,
         },
@@ -166,7 +161,7 @@ export class UserService {
   }
   async updateResetToken(userId: string, resetToken: string): Promise<void> {
     try {
-      const updatedUser = await this.prisma.users.updateMany({
+      const updatedUser = await this.prisma.user.updateMany({
         where: { id: userId },
         data: { resetToken },
       });
@@ -178,7 +173,7 @@ export class UserService {
   }
   async getUserByResetToken(resetToken: string) {
     try {
-      const user = await this.prisma.users.findFirst({
+      const user = await this.prisma.user.findFirst({
         where: {
           resetToken,
         },
@@ -197,7 +192,7 @@ export class UserService {
     try {
       const hashedPassword = await hash(newPassword, 10);
 
-      await this.prisma.users.update({
+      await this.prisma.user.update({
         where: { id: userId },
         data: {
           password: hashedPassword,
@@ -211,7 +206,7 @@ export class UserService {
   }
   async verifyEmail(userId: string): Promise<boolean> {
     try {
-      const user = await this.prisma.users.update({
+      const user = await this.prisma.user.update({
         where: { id: userId },
         data: {
           verification: {
@@ -232,5 +227,4 @@ export class UserService {
       throw error;
     }
   }
-  
 }

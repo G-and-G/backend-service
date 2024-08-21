@@ -4,12 +4,7 @@ class ApiResponse {
   message: string;
   data: any;
 
-  constructor(
-    success: boolean,
-    message: string,
-    data: any,
-    status: number = 200,
-  ) {
+  constructor(success: boolean, message: string, data: any, status = 200) {
     this.success = success;
 
     this.message = message;
@@ -17,11 +12,11 @@ class ApiResponse {
     this.status = status;
   }
 
-  static success(message: string, data?: any | null, status: number = 200) {
+  static success(message: string, data?: any | null, status = 200) {
     return new ApiResponse(true, message, data, status);
   }
 
-  static error(message: string, data?: any | null, status: number = 400) {
+  static error(message: string, data?: any | null, status = 400) {
     return new ApiResponse(false, message, data, status);
   }
 }

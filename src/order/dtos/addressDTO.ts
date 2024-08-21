@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, Min, Max, Length } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class Address {
   @IsNumber({}, { message: 'Latitude must be a number' })
@@ -35,7 +35,7 @@ export class DeliveryAddress {
   @ApiProperty({ description: 'Telephone number of the recipient' })
   telephone: string;
 
-  @ApiProperty({ description: 'Address details'})
+  @ApiProperty({ description: 'Address details' })
   address: string;
 
   @ApiProperty({ description: 'City of the delivery address' })

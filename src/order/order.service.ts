@@ -1,10 +1,8 @@
-import { PrismaService } from 'prisma/prisma.service';
-import { CreateOrderDTO } from './dtos/createOrderDTO';
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
-import ApiResponse from 'src/utils/ApiResponse';
+import { PrismaService } from 'prisma/prisma.service';
+import { CreateOrderDTO } from './dtos/createOrderDTO';
 // import { Address } from 'src/hotel/dto/address.dto';
-import { Address } from './dtos/addressDTO';
 
 @Injectable()
 export class OrderService {
@@ -14,16 +12,16 @@ export class OrderService {
     try {
       const orders = await this.prisma.order.findMany({
         include: {
-          products: true // This will include th3e associated items for each order
-        }
+          products: true, // This will include th3e associated items for each order
+        },
       });
 
       return orders;
     } catch (error) {
       // Handle errors here
       console.log(error);
-      
-      throw new Error('Unable to fetch orders',);
+
+      throw new Error('Unable to fetch orders');
     }
   }
 
@@ -37,20 +35,17 @@ export class OrderService {
               id: data.customer_id,
             },
           },
-          hotel:{
-            connect:{
-              hotel_id:data.hotel_id
-            }
-          }
-          ,
+          hotel: {
+            connect: {
+              hotel_id: data.hotel_id,
+            },
+          },
           deliveryAddress: {
             create: {
               full_name: data.deliveryAddress.full_name,
               telephone: data.deliveryAddress.telephone,
               address: data.deliveryAddress.address,
               city: data.deliveryAddress.city,
-              
-            
             },
           },
           products: {
@@ -61,28 +56,24 @@ export class OrderService {
         },
         include: { products: true },
       });
-    
-      
+
       return {
         status: 201,
-        Response: {messager:"order placed successfully",newOrder},
+        Response: { messager: 'order placed successfully', newOrder },
       };
-      console.log("dataaaaaa",data.products);
-
+      console.log('dataaaaaa', data.products);
     } catch (error) {
-      console.log("errorrrrrrrrrrr",error);
+      console.log('errorrrrrrrrrrr', error);
       return {
         status: 500,
-        Response: {messager:"order not placed ",error},
-        
-      }
-        
+        Response: { messager: 'order not placed ', error },
+      };
     }
   }
-  
+
   async getOrdersForUser(userId) {
     try {
-      const userOrders = await this.prisma.users.findUnique({
+      const userOrders = await this.prisma.user.findUnique({
         where: {
           id: userId,
         },
@@ -95,27 +86,27 @@ export class OrderService {
           },
         },
       });
-  
+
       if (!userOrders) {
         return {
           status: 404,
-          Response: { message: "User not found" },
+          Response: { message: 'User not found' },
         };
       }
-  
+
       return {
         status: 200,
         Response: userOrders.orders,
       };
     } catch (error) {
-      console.log("errorrrrrrrrrrr", error);
+      console.log('errorrrrrrrrrrr', error);
       return {
         status: 500,
-        Response: { message: "error fetching orders", error },
+        Response: { message: 'error fetching orders', error },
       };
     }
   }
-  
+
   async updateOrder(
     orderId: string,
     dataToUpdate: Partial<Order>,
@@ -124,7 +115,6 @@ export class OrderService {
       const updatedOrder = await this.prisma.order.update({
         where: { order_id: orderId },
         data: dataToUpdate,
-
       });
 
       return updatedOrder;
@@ -133,13 +123,15 @@ export class OrderService {
       throw new Error('Unable to update order');
     }
   }
-  async getOrderById(orderId: string): Promise<Order | null> {
+  async getOrderById(orderId: string) {
     try {
       const order = await this.prisma.order.findUnique({
         where: { order_id: orderId },
         include: {
-          products: true // This will include the associated items for each order
-        }
+          products: true, // This will include the associated items for each order
+          deliveryAddress: true,
+          customer: true,
+        },
         // Include any related data if needed
       });
 
@@ -170,8 +162,8 @@ export class OrderService {
       await this.prisma.order.delete({
         where: { order_id: orderId },
         include: {
-          products: true // This will include the associated items for each order
-        }
+          products: true, // This will include the associated items for each order
+        },
       });
     } catch (error) {
       // Handle errors here
