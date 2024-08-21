@@ -1,6 +1,13 @@
 // payment.controller.ts
 
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 // import { PropertyTenantDTO } from './dto/property-tenant.dto';
 
@@ -9,7 +16,6 @@ import { PaymentService } from './payment.service';
 import { ApiTags } from '@nestjs/swagger';
 import { InitiateChargeDto } from './dtos/initiate-charge.dto';
 import { OrderPaymentDto } from './dtos/payment.dto';
-import ApiResponse from 'src/utils/ApiResponse';
 @ApiTags('payment')
 @Controller('payment')
 export class PaymentController {
@@ -41,10 +47,16 @@ export class PaymentController {
   @Post('webhook')
   async getWebhook(@Body() body: any) {
     console.log('webhook', body);
-    if (body.event !== 'charge.completed') {
-      return ApiResponse.error('Payment not successful', null, 200);
+    return this.paymentService.afterPayment(body.data);
+  }
+
+  @Get('paymentStatus')
+  async getPaymentStatus(@Query('paymentId') paymentId: string) {
+    try {
+      const payment = await this.paymentService.getPayment(paymentId);
+      return payment;
+    } catch (error) {
+      throw new NotFoundException(error.message);
     }
-    const data = this.paymentService.afterPayment(body.data);
-    return ApiResponse.success('Payment successful', data, 200);
   }
 }
