@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 // import { Address } from '@prisma/client';
 // import {  Address } from 'src/hotel/dto/address.dto';
-import { MenuItem } from '@prisma/client';
+import { CartItem, MenuItem } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { DeliveryAddress } from './addressDTO';
 
@@ -48,5 +48,5 @@ export class CreateOrderDTO {
     type: ProductDTO,
     description: 'Array of products in the order',
   }) // Add ApiProperty decorator
-  products: MenuItem[];
+  products: (CartItem & { product: MenuItem })[];
 }

@@ -86,6 +86,27 @@ export class HotelService {
     return hotel;
   }
 
+  async getHotelByProductId(id: number): Promise<Hotel> {
+    const hotel = await this.prisma.hotel.findFirst({
+      where: {
+        menu: {
+          is: {
+            items: {
+              some: {
+                menuItem_id: id,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!hotel) {
+      throw new NotFoundException('Hotel not found');
+    }
+    return hotel;
+  }
+
   async getAllHotels(): Promise<Hotel[]> {
     return this.prisma.hotel.findMany({
       include: {
@@ -169,10 +190,10 @@ export class HotelService {
         throw new NotFoundException('Hotel not found!');
       }
       let newItem;
-      var newItems = [];
-      var { items, categories } = data;
-      var newCategories = [];
-      for (var item of items) {
+      const newItems = [];
+      const { items, categories } = data;
+      const newCategories = [];
+      for (const item of items) {
         const { category_id, ...itemData } = item;
         newItem = await this.prisma.menuItem.create({
           data: {
@@ -182,8 +203,8 @@ export class HotelService {
         });
         newItems.push(newItem);
       }
-      for (var cat of categories) {
-        let category = await this.prisma.category.findUnique({
+      for (const cat of categories) {
+        const category = await this.prisma.category.findUnique({
           where: {
             category_id: cat as number,
           },
@@ -229,7 +250,7 @@ export class HotelService {
 
   async deleteMenu(hotelId: number) {
     try {
-      let hotel = await this.prisma.hotel.findFirst({
+      const hotel = await this.prisma.hotel.findFirst({
         where: {
           hotel_id: Number(hotelId),
         },

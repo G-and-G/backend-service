@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
+  provider  = "postgresql"
+  url       = env("DB_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -95,7 +96,7 @@ model Order {
   date            DateTime         @default(now())
   // deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
   deliveryAddress DeriveryAddress?
-  products        MenuItem[]
+  products        CartItem[]
   price           Float
   review          String?
   rating          Float?
@@ -180,19 +181,28 @@ model Menu {
 }
 
 model MenuItem {
-  menuItem_id        Int      @id @unique @default(autoincrement())
+  menuItem_id        Int        @id @unique @default(autoincrement())
   name               String
-  Menu               Menu     @relation(fields: [menu_id], references: [menu_id])
+  Menu               Menu       @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int
   price              Float
-  category           Category @relation(fields: [category_id], references: [category_id])
+  category           Category   @relation(fields: [category_id], references: [category_id])
   category_id        Int
   quantity_available Int
   description        String
   image              String?
-  Order              Order?   @relation(fields: [order_id], references: [order_id])
-  order_id           String?  @unique
   Review             Review[]
+  CartItem           CartItem[]
+}
+
+model CartItem {
+  id          String   @id @default(uuid())
+  menuItem    MenuItem @relation(fields: [menuItem_id], references: [menuItem_id])
+  quantity    Int
+  createdAt   DateTime @default(now())
+  menuItem_id Int
+
+  orders Order[]
 }
 
 model Category {

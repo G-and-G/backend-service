@@ -1,16 +1,15 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
-  Delete,
-  Param,
-  Body,
   UseFilters,
-  NotFoundException,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { HotelService } from './hotel.service';
 import {
   ApiBody,
   ApiOperation,
@@ -18,10 +17,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateHotelDTO } from './dto/create-hotel.dto';
-import { Hotel, Menu } from '@prisma/client';
-import { CreateMenuDTO } from './dto/create-menu.dto';
+import { Hotel } from '@prisma/client';
 import { AppExceptionFilter } from 'src/utils/filters/AppExceptionFilter';
+import { CreateHotelDTO } from './dto/create-hotel.dto';
+import { CreateMenuDTO } from './dto/create-menu.dto';
+import { HotelService } from './hotel.service';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
@@ -36,7 +36,7 @@ export class HotelController {
   }
 
   @Get('hotel/:id')
-  async findById(@Param('id',ParseIntPipe) id: number) {
+  async findById(@Param('id', ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
   @Get('byAdminId/:adminId')
@@ -104,6 +104,6 @@ export class HotelController {
     @Param('userId') userId: string,
     @Param('hotelId') hotelId: number,
   ) {
-    return this.hotelService.createHotelAdmin(userId, hotelId);
+    return this.hotelService.createHotelAdmin(userId, Number(hotelId));
   }
 }

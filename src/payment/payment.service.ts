@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import flw from 'src/config/FLW';
@@ -110,6 +110,7 @@ export class PaymentService {
 
   async initiatePayment(dto: InitiateChargeDto) {
     try {
+      const order = await this.orderService.getOrderById(dto.orderId);
       // save payment
       const payment = await this.createPayment({
         order: {
@@ -117,32 +118,36 @@ export class PaymentService {
             order_id: dto.orderId,
           },
         },
-        amount: dto.amount,
+        amount: order.price,
         payment_method: 'MobileMoneyRwanda',
-        currency: dto.currency || 'RWF',
+        currency: 'RWF',
       });
-      const order = await this.orderService.getOrderById(dto.orderId);
       const payload = {
         tx_ref: payment.id,
         order_id: payment.order_id,
-        amount: dto.amount,
-        currency: dto.currency || 'RWF',
+        amount: order.price,
+        currency: 'RWF',
         email: order.customer.email || 'olufemi@flw.com',
-        phone_number: dto.phoneNumber,
+        phone_number: order.deliveryAddress.telephone,
         fullname: order.customer.first_name + ' ' + order.customer.last_name,
       };
       const response = await this.flw.MobileMoney.rwanda(payload);
       console.log(response);
-      return { response, payment };
+      const data = { response, payment };
+      return ApiResponse.success('Payment initiated', data, 200);
     } catch (error) {
       console.log(error);
-      return { message: 'Unable to initiate payment', error };
+      // return { message: 'Unable to initiate payment', error };
+      return new BadRequestException('Unable to initiate payment', error);
     }
   }
 
   async afterPayment(data: any) {
     try {
-      if (data.event !== 'charge.completed' || data.status !== 'successful') {
+      if (
+        data.event !== 'charge.completed' ||
+        data.data.status !== 'successful'
+      ) {
         const _data = await this.prisma.payment.update({
           where: {
             id: data.data.tx_ref,
@@ -155,7 +160,7 @@ export class PaymentService {
       }
       const updatedPayment = await this.prisma.payment.update({
         where: {
-          id: data.tx_ref,
+          id: data.data.tx_ref,
         },
         data: {
           status: 'COMPLETED',
@@ -169,6 +174,8 @@ export class PaymentService {
           isPaid: true,
         },
       });
+      console.log('updatedPayment', updatedPayment);
+      console.log('paidOrder', paidOrder);
       return ApiResponse.success('Payment successful', paidOrder, 200);
     } catch (error) {
       console.log(error);
