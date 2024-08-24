@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
@@ -86,11 +86,15 @@ export class UserService {
     }
   }
   async getUserById(id: string) {
-    const user = this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
     });
+    // console.log('user', user);
+    if (!user) {
+      throw new BadRequestException("User doesn't exist");
+    }
     return user;
   }
 

@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import ApiResponse from 'src/utils/ApiResponse';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
 // import { Address } from 'src/hotel/dto/address.dto';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService, // private readonly hotelService: HotelService,
+  ) {}
 
   async getOrders(): Promise<Order[]> {
     try {
@@ -27,9 +30,18 @@ export class OrderService {
 
   async createOrder(data: CreateOrderDTO) {
     try {
+      if (!data.products.length)
+        throw new BadRequestException('No items in cart');
+      console.log('data.products[0].product', data.products[0].product);
+      const order_hotel = await this.prisma.hotel.findFirst({
+        where: { menu: { is: { menu_id: data.products[0].product.menu_id } } },
+      });
+      const price = data.products.reduce((prev, curr) => {
+        return prev + curr.product.price * curr.quantity;
+      }, 0);
       const newOrder = await this.prisma.order.create({
         data: {
-          price: data.price,
+          price,
           customer: {
             connect: {
               id: data.customer_id,
@@ -37,7 +49,7 @@ export class OrderService {
           },
           hotel: {
             connect: {
-              hotel_id: data.hotel_id,
+              hotel_id: order_hotel.hotel_id,
             },
           },
           deliveryAddress: {
@@ -49,25 +61,20 @@ export class OrderService {
             },
           },
           products: {
-            connect: data.products.map((product) => ({
-              menuItem_id: product.menuItem_id,
+            create: data.products.map((product) => ({
+              quantity: product.quantity,
+              menuItem: {
+                connect: { menuItem_id: product.product.menuItem_id },
+              },
             })),
           },
         },
         include: { products: true },
       });
-
-      return {
-        status: 201,
-        Response: { messager: 'order placed successfully', newOrder },
-      };
-      console.log('dataaaaaa', data.products);
+      return ApiResponse.success('order placed successfully', newOrder, 201);
     } catch (error) {
       console.log('errorrrrrrrrrrr', error);
-      return {
-        status: 500,
-        Response: { messager: 'order not placed ', error },
-      };
+      throw ApiResponse.error('error placing order', error, 500);
     }
   }
 
@@ -81,7 +88,11 @@ export class OrderService {
           orders: {
             include: {
               deliveryAddress: true,
-              products: true,
+              products: {
+                include: {
+                  menuItem: true,
+                },
+              },
             },
           },
         },
