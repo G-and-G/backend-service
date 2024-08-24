@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import flw from 'src/config/FLW';
-import { OrderService } from 'src/order/order.service';
+import { OrderService } from 'src/modules/order/order.service';
 import ApiResponse from 'src/utils/ApiResponse';
 import { InitiateChargeDto } from './dtos/initiate-charge.dto';
 import { OrderPaymentDto } from './dtos/payment.dto';
@@ -173,9 +173,25 @@ export class PaymentService {
         data: {
           isPaid: true,
         },
+        include: {
+          products: true,
+        },
       });
       console.log('updatedPayment', updatedPayment);
       console.log('paidOrder', paidOrder);
+      // reduce stock quantity
+      paidOrder.products.forEach(async (product) => {
+        await this.prisma.menuItem.update({
+          data: {
+            quantity_available: {
+              decrement: product.quantity,
+            },
+          },
+          where: {
+            menuItem_id: product.menuItem_id,
+          },
+        });
+      });
       return ApiResponse.success('Payment successful', paidOrder, 200);
     } catch (error) {
       console.log(error);

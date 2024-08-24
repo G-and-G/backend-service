@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { HotelService } from 'src/hotel/hotel.service';
+import { HotelService } from 'src/modules/hotel/hotel.service';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 

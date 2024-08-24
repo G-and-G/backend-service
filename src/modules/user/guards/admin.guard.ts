@@ -12,7 +12,7 @@ export class AdminGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     console.log('[APPLICATION LOG]: Checking admin...');
     const token = request.headers.authorization;
-    if (token && token.startsWith('Bearer ')) {
+    if (token?.startsWith('Bearer ')) {
       const tokenValue = token.split(' ')[1];
       try {
         const decodedToken = this.jwtService.verify(tokenValue);

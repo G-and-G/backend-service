@@ -7,12 +7,13 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthGuard } from 'src/modules/auth/guards/auth.guard';
 import ApiResponse from 'src/utils/ApiResponse';
 import { RegisterDTO } from './dto/create-user.dto';
 import { AdminGuard } from './guards/admin.guard';
@@ -20,7 +21,6 @@ import { UserService } from './user.service';
 
 @Controller('user')
 @ApiTags('users')
-
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -33,7 +33,9 @@ export class UserController {
 
   @Put('update')
   @UseGuards(AuthGuard)
-  async update() {}
+  async update() {
+    //
+  }
 
   @Get('all')
   async all() {
@@ -74,7 +76,10 @@ export class UserController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async me() {}
+  async me(@Req() req) {
+    const user = await this.userService.getUserById(req.user.id);
+    return ApiResponse.success('User retrieved successfully', user);
+  }
   @Put('make-admin/:id')
   // @UseGuards(AdminGuard)
   async makeUserAdmin(@Param('id') userId: string) {

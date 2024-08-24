@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/modules/user/user.service';
 import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
