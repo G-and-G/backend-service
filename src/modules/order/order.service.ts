@@ -139,7 +139,11 @@ export class OrderService {
       const order = await this.prisma.order.findUnique({
         where: { order_id: orderId },
         include: {
-          products: true, // This will include the associated items for each order
+          products: {
+            include: {
+              menuItem: true,
+            },
+          }, // This will include the associated items for each order
           deliveryAddress: true,
           customer: true,
         },
@@ -179,6 +183,43 @@ export class OrderService {
     } catch (error) {
       // Handle errors here
       throw new Error('Unable to delete order');
+    }
+  }
+
+  async getOrdersForHotel(hotelId: number): Promise<Order[]> {
+    try {
+      const orders = await this.prisma.order.findMany({
+        where: { hotel_id: Number(hotelId) },
+        include: {
+          products: true, // This will include the associated items for each order
+          customer: true,
+        },
+      });
+
+      return orders;
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch orders');
+    }
+  }
+
+  async getOrdersForAdmin(adminId: string): Promise<Order[]> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: adminId },
+        include: {
+          admin_hotels: true,
+        },
+      });
+
+      if (!user) throw new Error('User not found');
+
+      if (user.role !== 'ADMIN') throw new Error('User is not an admin');
+
+      return this.getOrdersForHotel(user.admin_hotels[0].hotel_id);
+    } catch (error) {
+      // Handle errors here
+      throw new Error('Unable to fetch orders');
     }
   }
 }

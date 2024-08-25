@@ -35,6 +35,17 @@ export class OrderController {
   async getOrderById(@Param('id') orderId: string): Promise<Order | null> {
     return this.orderService.getOrderById(orderId);
   }
+
+  @Get('/hotel/:hotelId')
+  async getOrdersForHotel(@Param('hotelId') hotelId: number) {
+    return this.orderService.getOrdersForHotel(hotelId);
+  }
+
+  @Get('/hotel/byAdmin/:adminId')
+  async getOrdersForAdmin(@Param('adminId') adminId: string) {
+    return this.orderService.getOrdersForAdmin(adminId);
+  }
+
   @Get('user/:userId/orders') // Define the route and HTTP method
   async getOrdersForUser(@Param('userId') userId: string) {
     try {
