@@ -77,12 +77,13 @@ model PasswordReset {
 }
 
 model DeriveryAddress {
-  derivery_id String @id @default(uuid())
-  order       Order  @relation(fields: [order_id], references: [order_id])
-  order_id    String @unique
+  derivery_id String  @id @default(uuid())
+  order       Order   @relation(fields: [order_id], references: [order_id])
+  order_id    String  @unique
   full_name   String
   telephone   String
   address     String
+  plateNumber String?
   city        String
 }
 

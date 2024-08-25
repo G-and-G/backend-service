@@ -58,6 +58,7 @@ export class OrderService {
               telephone: data.deliveryAddress.telephone,
               address: data.deliveryAddress.address,
               city: data.deliveryAddress.city,
+              plateNumber: data.deliveryAddress.plateNumber,
             },
           },
           products: {

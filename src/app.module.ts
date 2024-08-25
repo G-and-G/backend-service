@@ -26,6 +26,7 @@ import { PaymentService } from './modules/payment/payment.service';
     UserModule,
     CategoryModule,
     HotelModule,
+    PaymentModule,
     ReviewModule,
     PaymentModule,
     OrderModule,

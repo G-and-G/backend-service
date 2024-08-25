@@ -40,4 +40,6 @@ export class DeliveryAddress {
 
   @ApiProperty({ description: 'City of the delivery address' })
   city: string;
+  @ApiProperty({ description: 'car plateNumber of the delivery address' })
+  plateNumber: string;
 }
