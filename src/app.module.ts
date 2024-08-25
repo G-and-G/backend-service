@@ -28,6 +28,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     UserModule,
     CategoryModule,
     HotelModule,
+    PaymentModule,
     ReviewModule,
     PaymentModule,
     OrderModule,

@@ -1,93 +1,99 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import * as Flutterwave from 'flutterwave-node-v3';
+
 import { PrismaService } from 'prisma/prisma.service';
-import { OrderPaymentDto } from './payment.dto'; // Update import
-// import { PropertyTenantDTO } from './payment.dto'; // Update import
-const Flutterwave = require("flutterwave-node-v3")
+import { CreatePaymentDto } from './payment.dto';
+
+
 @Injectable()
 export class PaymentService {
-  private readonly flw: any;
+  private flw: Flutterwave;
 
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {
+  constructor(private prisma: PrismaService) {
     this.flw = new Flutterwave(
-        process.env.Flutterwave_PUBLIC_KEY,
-        process.env.Flutterwave_SECRET_KEY,
-      );
+      process.env.FLW_PUBLIC_KEY,
+      process.env.FLW_SECRET_KEY,
+    );
   }
 
-  async payOrder(data: OrderPaymentDto) {
+  async initiatePayment(createPaymentDto: CreatePaymentDto) {
+    const { phone_number, amount, payment_type, redirect_url, customerId } = createPaymentDto;
+
     try {
-      const { orderId, userId, paymentMethod, phoneNumber } = data; // Updated property names
+      // Generate unique transaction and order IDs
+      const tx_ref = `amt_tx_ref${Math.floor(Math.random() * 1000000000 + 1)}`;
+      const order_id = `amt_order_id${Math.floor(Math.random() * 1000000000 + 1)}`;
 
-      const order = await this.prisma.order.findUnique({
-        where: {
-          order_id: orderId, // Updated property name
-        },
+      // Fetch customer details from the database
+      const customer = await this.prisma.users.findUnique({
+        where: { id: customerId },
+        select: { email: true,first_name: true, last_name: true },
       });
 
-      if (!order) {
-        return 'Invalid order Id!';
+      if (!customer) {
+        throw new NotFoundException('Customer not found');
       }
 
-      const user = await this.prisma.users.findUnique({
+      const payloadBody = {
+        tx_ref,
+        order_id,
+        phone_number,
+        amount,
+        currency: 'RWF', // Fixed currency code
+        email: 'bugingoeloi@gmail.com', // Fixed email
+        redirect_url,
         
-        where: {
-          id: userId, // Updated property name
+        payment_type,
+        meta: {
+          customer_id: customerId,
+          customer_ip: 'some-ip-address', // You may want to get the real IP
+          reason: 'payment',
         },
-      });
+        fullname: `${customer.first_name} ${customer.last_name}`,
+        customizations: {
+          title: 'A_ment backend',
+          description: 'Thanks for completing your payment with A_ment',
+        },
+      };
 
-      if (!user) {
-        return 'Invalid user';
-      }
+      const response = await this.flw.MobileMoney.rwanda(payloadBody);
 
-      const url = 'http://localhost:3000';
-      if (paymentMethod === 'momo') {
-        if (!phoneNumber) {
-          return 'Mobile money phone number is required';
-        }
-        const paymentBody = {
-            tx_ref: order.order_id, // Use the unique order ID here
-            order_id: order.order_id,
-            amount: order.price, // Update with the actual property
+      if (response.status === 'success') {
+        // Save payment info to the database
+        await this.prisma.payment.create({
+          data: {
+            order_id,
+            amount,
             currency: 'RWF',
-            redirect_url: `${url}/paymentReceived`,
-            payment_options: 'mobilemoneyrwanda',
-            meta: {
-              user: user.id,
-              
-              reason: 'Paying for order',
-            },
-            email: user.email,
-            phone_number: phoneNumber,
-            fullname: `${user.first_name} ${user.last_name}`,
-            customizations: {
-              title: 'Your Company Name',
-              description: 'Thank you for your order payment',
-              logo: 'Your Logo URL',
-            },
-          };
-        try {
-          const momoResponse = await this.flw.MobileMoney.rwanda(paymentBody);
-          console.log('momo', momoResponse);
-          if (momoResponse.status === 'success') {
-            return {
-              message: 'Redirect to the following url to complete payment',
-              url: momoResponse.meta.authorization.redirect,
-            };
-          } else {
-            return 'Something went wrong! Please try again';
-          }
-        } catch (ex) {
-          console.log('momo error', ex);
-          
-          return 'Error during payment processing';
-        }
+            status: 'PENDING',
+            flutterwave_txn_id: response.data.id,
+          },
+        });
+
+        return { message: 'Click on this link to complete payment', url: response.meta.authorization.redirect };
       } else {
-        return "Sorry! For now, we don't support the selected payment method";
+        return { message: 'Something went wrong! Please try again' };
       }
-    } catch (ex) {
-      return 'Internal server error';
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async verifyPayment(txn_id: string) {
+    try {
+      const response = await this.flw.Transaction.verify({ id: txn_id });
+
+      if (response.status === 'success') {
+        // Update payment status in the database
+        await this.prisma.payment.update({
+          where: { flutterwave_txn_id: txn_id },
+          data: { status: 'COMPLETED' },
+        });
+      }
+
+      return response;
+    } catch (error) {
+      throw error;
     }
   }
 }

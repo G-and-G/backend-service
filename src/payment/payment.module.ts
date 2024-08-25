@@ -10,7 +10,7 @@ import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
-   PrismaModule,UserModule,PaymentModule
+   PrismaModule,PaymentModule
   ],
   controllers: [PaymentController],
   providers: [PaymentService,PrismaService],
