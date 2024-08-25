@@ -54,6 +54,12 @@ export class HotelService {
           },
         },
       });
+      await this.prisma.user.update({
+        where: { id: createHotelDTO.admin_id },
+        data: {
+          role: 'ADMIN',
+        },
+      });
       console.log('This is the hotel: ', hotel);
 
       return hotel;
