@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
+  provider  = "postgresql"
+  url       = env("DB_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -12,12 +13,12 @@ enum Role {
   ADMIN
 }
 
-enum CATTYPE{
+enum CATTYPE {
   FOOD
   DRINK
 }
 
-enum Status{
+enum OrderStatus {
   PENDING
   COMPLETED
 }
@@ -28,7 +29,7 @@ enum VerificationStatus {
   VERIFIED
 }
 
-model users {
+model User {
   id                String           @id @default(uuid())
   first_name        String
   last_name         String
@@ -52,7 +53,7 @@ model users {
 
 model Verification {
   id                      String             @id @default(uuid())
-  user                    users              @relation(fields: [user_id], references: [id])
+  user                    User               @relation(fields: [user_id], references: [id])
   user_id                 String             @unique
   verification_status     VerificationStatus @default(UNVERIFIED)
   verificationToken       String
@@ -65,7 +66,7 @@ model Verification {
 
 model PasswordReset {
   id                  String   @id @default(uuid())
-  user                users    @relation(fields: [user_id], references: [id])
+  user                User     @relation(fields: [user_id], references: [id])
   user_id             String   @unique
   passwordResetToken  String
   passwordResetExpiry DateTime
@@ -74,28 +75,60 @@ model PasswordReset {
 
   @@map("user_password_resets")
 }
-model DeriveryAddress{
-  derivery_id String @id @default(uuid())
-  order       Order  @relation(fields: [order_id], references: [order_id])
-  order_id    String @unique
-  full_name String
-  telephone String
-  address String
-  city String
+
+model DeriveryAddress {
+  derivery_id String  @id @default(uuid())
+  order       Order   @relation(fields: [order_id], references: [order_id])
+  order_id    String  @unique
+  full_name   String
+  telephone   String
+  address     String
+  plateNumber String?
+  city        String
 }
+
 model Order {
-  order_id          String     @id @unique @default(uuid())
-  customer          users      @relation(fields: [customer_id], references: [id])
-  customer_id       String
-  date              DateTime  @default(now())
+  order_id String @id @unique @default(uuid())
+  customer User   @relation(fields: [customer_id], references: [id])
+
+  customer_id     String
+  hotel           Hotel            @relation(fields: [hotel_id], references: [hotel_id])
+  hotel_id        Int
+  date            DateTime         @default(now())
   // deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
-  deliveryAddress   DeriveryAddress?
-  products          MenuItem[]
-  price             Float
-  review            String?
-  rating            Float?
-  address_id        String?   
-  status           Status?    @default(PENDING)
+  deliveryAddress DeriveryAddress?
+  products        CartItem[]
+  price           Float
+  review          String?
+  rating          Float?
+  address_id      String?
+  status          OrderStatus?     @default(PENDING)
+  payments        Payment[]
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  isPaid          Boolean          @default(false)
+
+  @@map("orders")
+}
+
+model Payment {
+  id             String         @id @default(uuid())
+  order          Order          @relation(fields: [order_id], references: [order_id])
+  order_id       String
+  payment_method String
+  amount         Float
+  currency       String
+  status         PaymentStatus? @default(PENDING)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
 
 model CoffeeProduct {
@@ -110,17 +143,18 @@ model CoffeeProduct {
 
 model Hotel {
   hotel_id            Int      @id @unique @default(autoincrement())
-  admin               users?   @relation(fields: [admin_id], references: [id])
+  admin               User?    @relation(fields: [admin_id], references: [id])
   admin_id            String?  @unique
   name                String
   menu                Menu?
   address             Address?
+  orders              Order[]
   rating              Float    @default(0)
   lastMonthOrders     Int?     @default(0)
   ThisWeekOrders      Int?     @default(0)
   startingWorkingTime DateTime @default(now())
   endingWorkingTime   DateTime @default(now())
-  image               String
+  image               String?
   notificationToken   String?
 }
 
@@ -137,7 +171,6 @@ model Address {
   sector    String
   cell      String
   village   String
-  
 }
 
 model Menu {
@@ -149,37 +182,47 @@ model Menu {
 }
 
 model MenuItem {
-  menuItem_id        Int      @id @unique @default(autoincrement())
+  menuItem_id        Int        @id @unique @default(autoincrement())
   name               String
-  Menu               Menu    @relation(fields: [menu_id], references: [menu_id])
+  Menu               Menu       @relation(fields: [menu_id], references: [menu_id])
   menu_id            Int
   price              Float
-  category           Category @relation(fields: [category_id], references: [category_id])
+  category           Category   @relation(fields: [category_id], references: [category_id])
   category_id        Int
   quantity_available Int
   description        String
   image              String?
-  Order              Order?   @relation(fields: [order_id], references: [order_id])
-  order_id           String?  @unique
   Review             Review[]
+  CartItem           CartItem[]
+}
+
+model CartItem {
+  id          String   @id @default(uuid())
+  menuItem    MenuItem @relation(fields: [menuItem_id], references: [menuItem_id])
+  quantity    Int
+  createdAt   DateTime @default(now())
+  menuItem_id Int
+
+  orders Order[]
 }
 
 model Category {
-  category_id   Int        @id @unique @default(autoincrement())
-  type          CATTYPE
-  menu          Menu? @relation(fields: [menu_id],references: [menu_id])
-  menu_id       Int?
-  items      MenuItem[]
-  description   String
-  image         String?
-  name          String
+  category_id Int        @id @unique @default(autoincrement())
+  type        CATTYPE
+  menu        Menu?      @relation(fields: [menu_id], references: [menu_id])
+  menu_id     Int?
+  items       MenuItem[]
+  description String
+  image       String?
+  name        String
 }
 
 model Review {
   review_id   String   @id @unique @default(uuid())
-  user        users    @relation(fields: [user_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id])
   user_id     String
   description String
+  title       String
   product     MenuItem @relation(fields: [product_id], references: [menuItem_id])
   product_id  Int
   createdAt   DateTime
@@ -189,7 +232,7 @@ model Notifications {
   id          String    @id @unique @default(uuid())
   title       String
   content     String
-  receiver    users     @relation(fields: [receiver_id], references: [id])
+  receiver    User      @relation(fields: [receiver_id], references: [id])
   receiver_id String
   createdAt   DateTime? @default(now())
   imageLabel  String?
@@ -210,10 +253,10 @@ model PropertyTenant {
   rentAmount Int
   // ... other fields of PropertyTenant
   property   Property @relation(fields: [PropertyId], references: [id])
-  user       users    @relation(fields: [TenantId], references: [id])
+  user       User     @relation(fields: [TenantId], references: [id])
 }
 
-model secret{
-  id String @id @default(uuid())
+model secret {
+  id   String @id @default(uuid())
   data Json
 }
