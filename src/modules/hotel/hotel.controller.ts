@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -22,15 +23,21 @@ import { AppExceptionFilter } from 'src/utils/filters/AppExceptionFilter';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { CreateMenuDTO } from './dto/create-menu.dto';
 import { HotelService } from './hotel.service';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role, RolesGuard } from 'src/common/guards/role.guard';
+import { AdminGuard } from '../user/guards/admin.guard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
 @ApiTags('hotels')
+@UseGuards(RolesGuard)
 @UseFilters(AppExceptionFilter)
 export class HotelController {
   constructor(private readonly hotelService: HotelService) {}
 
   @Post('/new_hotel')
+  @Roles(Role.ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
     return this.hotelService.createHotel(createHotelDTO);
   }
@@ -99,6 +106,9 @@ export class HotelController {
   async remove(@Param('id') id: number) {
     return this.hotelService.deleteHotel(id);
   }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.SUPER_ADMIN)
   @Post(':userId/hotels/:hotelId/admin')
   async createHotelAdmin(
     @Param('userId') userId: string,
@@ -106,4 +116,5 @@ export class HotelController {
   ) {
     return this.hotelService.createHotelAdmin(userId, Number(hotelId));
   }
+
 }

@@ -62,6 +62,26 @@ export class UserService {
       return ApiResponse.error('Error updating user role', error);
     }
   }
+  async makeUserSuperAdmin(userId: string) {
+    try {
+      const updateUser = await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          role: 'SUPER_ADMIN',
+        },
+      });
+
+      return ApiResponse.success(
+        'User role updated to Super Admin successfully',
+        updateUser
+      )
+    } catch (error) {
+      console.log('Error updating user role:', error);
+      return ApiResponse.error('Error updating user role', error);
+    }
+  }
 
   async grantHotelAccessToAdmin(adminId: string, hotelId: number) {
     try {

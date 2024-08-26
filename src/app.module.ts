@@ -16,6 +16,8 @@ import { FirebaseController } from './firebase/firebase.controller';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PaymentService } from './modules/payment/payment.service';
+import { RolesGuard } from './common/guards/role.guard';
+import { AuthGuard } from './modules/auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -35,6 +37,6 @@ import { PaymentService } from './modules/payment/payment.service';
   ],
   controllers: [AppController, FirebaseController],
 
-  providers: [AppService, NotificationGateway, PaymentService],
+  providers: [AppService, NotificationGateway, PaymentService,RolesGuard,AuthGuard],
 })
 export class AppModule {}
