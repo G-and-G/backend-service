@@ -46,8 +46,16 @@ model users {
   notifications     Notifications[]
   notificationToken String?
   PropertyTenant    PropertyTenant[]
-
+    deliverer         Deliverer?   
   @@map("users")
+}
+model Deliverer {
+  id          String   @id @default(uuid())
+  user        users    @relation(fields: [user_id], references: [id])
+  user_id     String   @unique  // Ensure that a user can only be linked to one Deliverer
+  orders      Order[]  @relation("OrderDeliverer")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 model Verification {
@@ -83,6 +91,8 @@ model DeriveryAddress{
   address String
   plateNumber String
   city String
+  latitude String
+  longitude String
 }
 model Order {
   order_id          String     @id @unique @default(uuid())
@@ -101,7 +111,8 @@ model Order {
   address_id        String?   
   status           Status?    @default(PENDING)
   payment           Payment?   
-
+deliverer         Deliverer?   @relation("OrderDeliverer", fields: [deliverer_id], references: [id])
+  deliverer_id      String?      // Foreign key to Deliverer model
 }
 model Payment {
   payment_id    String   @id @default(uuid())
@@ -156,7 +167,6 @@ model Address {
   village   String
   
 }
-
 model Menu {
   menu_id    Int        @id @unique @default(autoincrement())
   hotel      Hotel      @relation(fields: [hotel_id], references: [hotel_id])
