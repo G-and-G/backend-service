@@ -18,6 +18,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { PaymentService } from './modules/payment/payment.service';
 import { RolesGuard } from './common/guards/role.guard';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
+import { DelivererModule } from './modules/deliverer/deliverer.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
     OrderModule,
     // GoogleModule,
     AnalyticsModule,
+    DelivererModule
   ],
   controllers: [AppController, FirebaseController],
 
