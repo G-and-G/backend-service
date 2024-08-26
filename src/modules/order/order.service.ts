@@ -59,13 +59,10 @@ export class OrderService {
               address: data.deliveryAddress.address,
               city: data.deliveryAddress.city,
               plateNumber: data.deliveryAddress.plateNumber,
-<<<<<<< HEAD:src/order/order.service.ts
               longitude: data.deliveryAddress.longitude,
               latitude: data.deliveryAddress.latitude,
               
             
-=======
->>>>>>> 59509d78f7d6afc85b315afa0a6a200c738e89ab:src/modules/order/order.service.ts
             },
           },
           products: {
