@@ -8,18 +8,22 @@ import {
   Put,
   Query,
   Req,
+  Request,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/modules/auth/guards/auth.guard';
 import ApiResponse from 'src/utils/ApiResponse';
 import { RegisterDTO } from './dto/create-user.dto';
 import { AdminGuard } from './guards/admin.guard';
 import { UserService } from './user.service';
+import { Role, RolesGuard } from 'src/common/guards/role.guard';
+import { Roles } from 'src/common/decorators/role.decorator';
 
 @Controller('user')
+@ApiBearerAuth('JWT-auth')
 @ApiTags('users')
 export class UserController {
   constructor(private userService: UserService) {}
@@ -81,11 +85,19 @@ export class UserController {
     return ApiResponse.success('User retrieved successfully', user);
   }
   @Put('make-admin/:id')
-  // @UseGuards(AdminGuard)
-  async makeUserAdmin(@Param('id') userId: string) {
+  @UseGuards(AuthGuard,RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async makeUserAdmin(@Param('id') userId: string,@Request() req) {
+    console.log('[APPLICATION LOG]: Current User:', req.user); 
     const response = await this.userService.makeUserAdmin(userId);
     // console.log("errorrr");
 
+    return response;
+  }
+
+  @Put('make-super-admin/:id')
+  async makeUserSuperAdmin(@Param('id') userId: string){
+    const response = await this.userService.makeUserSuperAdmin(userId);
     return response;
   }
   @Put('updateadmin/:id')
