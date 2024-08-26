@@ -12,6 +12,7 @@ enum Role {
   NORMAL
   ADMIN
   SUPER_ADMIN
+  DELIVERER
 }
 
 enum CATTYPE {
@@ -50,6 +51,16 @@ model User {
   PropertyTenant    PropertyTenant[]
 
   @@map("users")
+  Deliverer Deliverer[]
+}
+model Deliverer{
+  id String @id @default(uuid())
+  user User @relation(fields: [user_id], references: [id])
+  user_id String @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Order Order[] 
+  @@map("deliverers")
 }
 
 model Verification {
@@ -114,6 +125,8 @@ model Order {
   isPaid          Boolean          @default(false)
 
   @@map("orders")
+  Deliverer Deliverer? @relation(fields: [deliverer_id], references: [id])
+  deliverer_id String?
 }
 
 model Payment {
