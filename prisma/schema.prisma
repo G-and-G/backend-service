@@ -48,8 +48,16 @@ model User {
   notifications     Notifications[]
   notificationToken String?
   PropertyTenant    PropertyTenant[]
-
+    deliverer         Deliverer?   
   @@map("users")
+}
+model Deliverer {
+  id          String   @id @default(uuid())
+  user        users    @relation(fields: [user_id], references: [id])
+  user_id     String   @unique  // Ensure that a user can only be linked to one Deliverer
+  orders      Order[]  @relation("OrderDeliverer")
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 model Verification {
@@ -76,6 +84,19 @@ model PasswordReset {
 
   @@map("user_password_resets")
 }
+<<<<<<< HEAD
+model DeriveryAddress{
+  derivery_id String @id @default(uuid())
+  order       Order  @relation(fields: [order_id], references: [order_id])
+  order_id    String @unique
+  full_name String
+  telephone String
+  address String
+  plateNumber String
+  city String
+  latitude String
+  longitude String
+=======
 
 model DeriveryAddress {
   derivery_id String  @id @default(uuid())
@@ -86,6 +107,7 @@ model DeriveryAddress {
   address     String
   plateNumber String?
   city        String
+>>>>>>> 59509d78f7d6afc85b315afa0a6a200c738e89ab
 }
 
 model Order {
@@ -97,6 +119,18 @@ model Order {
   hotel_id        Int
   date            DateTime         @default(now())
   // deliveryAddress   Address?   @relation(fields: [address_id], references: [address_id])
+<<<<<<< HEAD
+  deliveryAddress   DeriveryAddress?
+  products          MenuItem[]
+  price             Float
+  review            String?
+  rating            Float?
+  address_id        String?   
+  status           Status?    @default(PENDING)
+  payment           Payment?   
+deliverer         Deliverer?   @relation("OrderDeliverer", fields: [deliverer_id], references: [id])
+  deliverer_id      String?      // Foreign key to Deliverer model
+=======
   deliveryAddress DeriveryAddress?
   products        CartItem[]
   price           Float
@@ -110,6 +144,7 @@ model Order {
   isPaid          Boolean          @default(false)
 
   @@map("orders")
+>>>>>>> 59509d78f7d6afc85b315afa0a6a200c738e89ab
 }
 
 model Payment {
@@ -173,7 +208,6 @@ model Address {
   cell      String
   village   String
 }
-
 model Menu {
   menu_id    Int        @id @unique @default(autoincrement())
   hotel      Hotel      @relation(fields: [hotel_id], references: [hotel_id])
