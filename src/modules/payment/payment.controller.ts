@@ -15,7 +15,7 @@ import { PaymentService } from './payment.service';
 // import { UserDTO } from './dto/user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import ApiResponse from 'src/utils/ApiResponse';
-import { InitiateChargeDto } from './dtos/initiate-charge.dto';
+import { PayWithCardDto, PayWithMomoDto } from './dtos/initiate-charge.dto';
 import { OrderPaymentDto } from './dtos/payment.dto';
 @ApiTags('payment')
 @Controller('payment')
@@ -35,14 +35,19 @@ export class PaymentController {
   }
 
   @Post('initiatePayment')
-  async initiatePayment(@Body() init: InitiateChargeDto) {
+  async initiatePayment(@Body() init: PayWithMomoDto) {
     console.log(init);
-    return this.paymentService.initiatePayment(init);
+    return this.paymentService.payWithMomo(init);
+  }
+
+  @Post('payWithMomo')
+  async payWithMomo(@Body() momoPayload: PayWithMomoDto) {
+    return this.paymentService.payWithMomo(momoPayload);
   }
 
   @Post('payWithCard')
-  async payWithCard() {
-    return this.paymentService.payWithCard();
+  async payWithCard(@Body() cardPayload: PayWithCardDto) {
+    return this.paymentService.payWithCard(cardPayload);
   }
 
   @Post('webhook')
