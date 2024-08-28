@@ -49,7 +49,6 @@ model User {
   notifications     Notifications[]
   notificationToken String?
   PropertyTenant    PropertyTenant[]
-
   @@map("users")
   Deliverer Deliverer[]
 }
