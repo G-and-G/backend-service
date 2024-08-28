@@ -7,5 +7,6 @@
   "editor.codeActionsOnSaveTimeout": 1500,
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
-  }
+  },
+  "cSpell.words": ["Momo"]
 }

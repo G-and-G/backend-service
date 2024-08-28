@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { PaymentMathod, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import flw from 'src/config/FLW';
 import { OrderService } from 'src/modules/order/order.service';
@@ -24,7 +24,7 @@ export class PaymentService {
 
       const order = await this.prisma.order.findUnique({
         where: {
-          order_id: orderId, // Updated property name
+          id: orderId, // Updated property name
         },
       });
 
@@ -48,8 +48,8 @@ export class PaymentService {
           return 'Mobile money phone number is required';
         }
         const paymentBody = {
-          tx_ref: order.order_id, // Use the unique order ID here
-          order_id: order.order_id,
+          tx_ref: order.id, // Use the unique order ID here
+          order_id: order.id,
           amount: order.price, // Update with the actual property
           currency: 'RWF',
           redirect_url: `${url}/paymentReceived`,
@@ -115,11 +115,11 @@ export class PaymentService {
       const payment = await this.createPayment({
         order: {
           connect: {
-            order_id: dto.orderId,
+            id: dto.orderId,
           },
         },
         amount: order.price,
-        payment_method: 'MobileMoneyRwanda',
+        payment_method: PaymentMathod.CARD,
         currency: 'RWF',
       });
       const payload = {
@@ -247,7 +247,7 @@ export class PaymentService {
       });
       const paidOrder = await this.prisma.order.update({
         where: {
-          order_id: updatedPayment.order_id,
+          id: updatedPayment.order_id,
         },
         data: {
           isPaid: true,
@@ -267,7 +267,7 @@ export class PaymentService {
             },
           },
           where: {
-            menuItem_id: product.menuItem_id,
+            id: product.menuItem_id,
           },
         });
       });

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Order } from '@prisma/client';
+import { Order, Role } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
@@ -49,16 +49,16 @@ export class OrderService {
           },
           hotel: {
             connect: {
-              hotel_id: order_hotel.hotel_id,
+              id: order_hotel.id,
             },
           },
           deliveryAddress: {
             create: {
               full_name: data.deliveryAddress.full_name,
               telephone: data.deliveryAddress.telephone,
+              plateNumber: data.deliveryAddress.plateNumber,
               address: data.deliveryAddress.address,
               city: data.deliveryAddress.city,
-              plateNumber: data.deliveryAddress.plateNumber,
               longitude: data.deliveryAddress.longitude,
               latitude: data.deliveryAddress.latitude,
             },
@@ -67,7 +67,7 @@ export class OrderService {
             create: data.products.map((product) => ({
               quantity: product.quantity,
               menuItem: {
-                connect: { menuItem_id: product.product.menuItem_id },
+                connect: { menuItem_id: product.product.id },
               },
             })),
           },
@@ -93,7 +93,7 @@ export class OrderService {
               deliveryAddress: true,
               products: {
                 include: {
-                  menuItem: true,
+                  menu_item: true,
                 },
               },
             },
@@ -127,7 +127,7 @@ export class OrderService {
   ): Promise<Order | null> {
     try {
       const updatedOrder = await this.prisma.order.update({
-        where: { order_id: orderId },
+        where: { id: orderId },
         data: dataToUpdate,
       });
 
@@ -140,11 +140,11 @@ export class OrderService {
   async getOrderById(orderId: string) {
     try {
       const order = await this.prisma.order.findUnique({
-        where: { order_id: orderId },
+        where: { id: orderId },
         include: {
           products: {
             include: {
-              menuItem: true,
+              menu_item: true,
             },
           }, // This will include the associated items for each order
           deliveryAddress: true,
@@ -162,7 +162,7 @@ export class OrderService {
   async markOrderCompleted(orderId: string): Promise<Order> {
     try {
       const updatedOrder = await this.prisma.order.update({
-        where: { order_id: orderId },
+        where: { id: orderId },
         data: {
           status: 'COMPLETED', // Set the status to 'Completed'
         },
@@ -178,7 +178,7 @@ export class OrderService {
   async deleteOrder(orderId: string): Promise<void> {
     try {
       await this.prisma.order.delete({
-        where: { order_id: orderId },
+        where: { id: orderId },
         include: {
           products: true, // This will include the associated items for each order
         },
@@ -192,7 +192,7 @@ export class OrderService {
   async getOrdersForHotel(hotelId: number): Promise<Order[]> {
     try {
       const orders = await this.prisma.order.findMany({
-        where: { hotel_id: Number(hotelId) },
+        where: { id: Number(hotelId) },
         include: {
           products: true, // This will include the associated items for each order
           customer: true,
@@ -217,9 +217,10 @@ export class OrderService {
 
       if (!user) throw new Error('User not found');
 
-      if (user.role !== 'ADMIN') throw new Error('User is not an admin');
+      if (user.role !== Role.HOTEL_ADMIN)
+        throw new Error('User is not an admin');
 
-      return this.getOrdersForHotel(user.admin_hotels[0].hotel_id);
+      return this.getOrdersForHotel(user.admin_hotels[0].id);
     } catch (error) {
       // Handle errors here
       throw new Error('Unable to fetch orders');

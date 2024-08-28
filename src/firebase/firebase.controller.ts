@@ -18,9 +18,9 @@ export class FirebaseController {
   ) {
     console.log('token', token);
     try {
-      let hotel = await prisma.hotel.findUnique({
+      const hotel = await prisma.hotel.findUnique({
         where: {
-          hotel_id: Number(hotelId),
+          id: Number(hotelId),
         },
       });
 
@@ -29,10 +29,10 @@ export class FirebaseController {
       }
       await prisma.hotel.update({
         where: {
-          hotel_id: Number(hotelId),
+          id: Number(hotelId),
         },
         data: {
-          notificationToken: token,
+          // notificationToken: token,
         },
       });
       return ApiResponse.success('Token received', null, 200);
@@ -50,9 +50,9 @@ export class FirebaseController {
   async testNotification(@Body() body: any, @Param('hotelId') hotelId: number) {
     console.log('HotelId', hotelId);
     try {
-      let hotel = await prisma.hotel.findUnique({
+      const hotel = await prisma.hotel.findUnique({
         where: {
-          hotel_id: Number(hotelId),
+          id: Number(hotelId),
         },
       });
       if (!hotel) {
@@ -63,7 +63,12 @@ export class FirebaseController {
         body: 'Work harder than before',
       };
       console.log(hotel);
-      sendNotificationToClient([hotel.notificationToken], notificationData);
+      sendNotificationToClient(
+        [
+          /* hotel.notificationToken */
+        ],
+        notificationData,
+      );
     } catch (error) {
       console.log(error);
       return ApiResponse.error(

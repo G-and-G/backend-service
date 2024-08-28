@@ -23,6 +23,7 @@ enum ProductCategory {
 enum OrderStatus {
   PENDING
   COMPLETED
+  DELIVERED
 }
 
 enum VerificationStatus {
@@ -132,8 +133,8 @@ model Address {
   name          String
   city          String
   street        String?
-  longitude     String
-  latitude      String
+  longitude     Float
+  latitude      Float
   country       String?
   deliveryInfos DeliveryInfo[]
   hotels        Hotel?
@@ -177,8 +178,7 @@ enum PaymentStatus {
 
 model Hotel {
   id                  Int      @id @unique @default(autoincrement())
-  admin               User?    @relation(fields: [admin_id], references: [id])
-  admin_id            String?  @unique
+  admins              User[]
   name                String
   menu                Menu?
   address             Address  @relation(fields: [address_id], references: [id])
