@@ -21,4 +21,6 @@ export class Address {
 
   @IsString({ message: 'Village must be a string' })
   village: string;
+  city: string;
+  name: string;
 }

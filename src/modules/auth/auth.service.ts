@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
@@ -45,7 +46,7 @@ export class AuthService {
   }
   async adminAuth(dto: LoginDTO) {
     const user = await this.userService.getUserByEmail(dto.email);
-    if (user.role !== 'ADMIN') {
+    if (user.role !== Role.HOTEL_ADMIN) {
       console.log('not admin');
 
       return {

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User as users } from '@prisma/client';
+import { Role, User as users } from '@prisma/client';
 import { UserService } from '../user.service';
 
 export class AdminGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class AdminGuard implements CanActivate {
       try {
         const decodedToken = this.jwtService.verify(tokenValue);
         const user: users = await this.userService.getUserById(decodedToken.id);
-        if (user.role !== 'ADMIN') {
+        if (user.role !== Role.HOTEL_ADMIN) {
           return false;
         }
         console.log('[APPLICATION LOG]: Admin check successful.');

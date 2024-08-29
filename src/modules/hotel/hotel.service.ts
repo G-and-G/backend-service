@@ -11,13 +11,15 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
 // import { CreateHotelDTO } from './dto/update-hotel.dto';
-import { Hotel } from '@prisma/client';
+import { Hotel, Role } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateMenuDTO } from './dto/create-menu.dto';
+import { RegisterDTO } from '../user/dto/create-user.dto';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class HotelService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService ,private readonly userService:UserService) {}
 
   async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
     console.log('Received DTO:', createHotelDTO);
@@ -25,13 +27,7 @@ export class HotelService {
       if (!createHotelDTO || !createHotelDTO.address) {
         throw new BadRequestException('Invalid input data');
       }
-      const adminUser = await this.prisma.user.findUnique({
-        where: { id: createHotelDTO.admin_id },
-      });
 
-      if (!adminUser) {
-        throw new NotFoundException('Admin user not found');
-      }
       const hotel = await this.prisma.hotel.create({
         data: {
           name: createHotelDTO.name,
@@ -41,26 +37,14 @@ export class HotelService {
               latitude: createHotelDTO.address.latitude,
               longitude: createHotelDTO.address.longitude,
               street: createHotelDTO.address.street,
-              district: createHotelDTO.address.district,
-              sector: createHotelDTO.address.sector,
-              cell: createHotelDTO.address.cell,
-              village: createHotelDTO.address.village,
+              name: createHotelDTO.address.name,
+              city: createHotelDTO.address.city,
             },
           },
-          admin: {
-            connect: {
-              id: createHotelDTO.admin_id,
-            },
-          },
+          startingWorkingTime: createHotelDTO.startingWorkingTime,
+          endingWorkingTime: createHotelDTO.closingTime,
         },
       });
-      await this.prisma.user.update({
-        where: { id: createHotelDTO.admin_id },
-        data: {
-          role: 'ADMIN',
-        },
-      });
-      console.log('This is the hotel: ', hotel);
 
       return hotel;
     } catch (error) {
@@ -80,7 +64,7 @@ export class HotelService {
 
   async getHotelById(id: number): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findUnique({
-      where: { hotel_id: id },
+      where: { id: id },
       include: {
         menu: true,
       },
@@ -99,7 +83,7 @@ export class HotelService {
           is: {
             items: {
               some: {
-                menuItem_id: id,
+                id: id,
               },
             },
           },
@@ -126,7 +110,7 @@ export class HotelService {
     updateHotelDTO: CreateHotelDTO,
   ): Promise<Hotel> {
     const existingHotel = await this.prisma.hotel.findUnique({
-      where: { hotel_id: id },
+      where: { id: id },
     });
 
     if (!existingHotel) {
@@ -134,16 +118,8 @@ export class HotelService {
     }
 
     try {
-      const adminUser = await this.prisma.user.findUnique({
-        where: { id: updateHotelDTO.admin_id },
-      });
-
-      if (!adminUser) {
-        throw new NotFoundException('Admin user not found');
-      }
-
       const updatedHotel = await this.prisma.hotel.update({
-        where: { hotel_id: id },
+        where: { id: id },
         data: {
           name: updateHotelDTO.name,
           image: updateHotelDTO.image,
@@ -152,13 +128,10 @@ export class HotelService {
               latitude: updateHotelDTO.address.latitude,
               longitude: updateHotelDTO.address.longitude,
               street: updateHotelDTO.address.street,
-              district: updateHotelDTO.address.district,
-              sector: updateHotelDTO.address.sector,
-              cell: updateHotelDTO.address.cell,
-              village: updateHotelDTO.address.village,
             },
           },
-          admin_id: updateHotelDTO.admin_id,
+          endingWorkingTime: updateHotelDTO.startingWorkingTime,
+          startingWorkingTime: updateHotelDTO.closingTime,
         },
       });
 
@@ -167,29 +140,29 @@ export class HotelService {
   }
   async deleteHotel(id: number): Promise<void> {
     const existingHotel = await this.prisma.hotel.findUnique({
-      where: { hotel_id: Number(id) },
+      where: { id: Number(id) },
     });
     if (!existingHotel) {
       throw new NotFoundException('Hotel not found');
     }
     await this.prisma.hotel.update({
       where: {
-        hotel_id: Number(id),
+        id: Number(id),
       },
       data: {
         address: {
-          disconnect: true,
+          // disconnect: true,
         },
       },
     });
-    await this.prisma.hotel.delete({ where: { hotel_id: Number(id) } });
+    await this.prisma.hotel.delete({ where: { id: Number(id) } });
   }
 
   async addMenu(data: CreateMenuDTO, hotelId: number) {
     try {
       const hotel = await this.prisma.hotel.findUnique({
         where: {
-          hotel_id: Number(hotelId),
+          id: Number(hotelId),
         },
       });
       if (!hotel) {
@@ -210,9 +183,9 @@ export class HotelService {
         newItems.push(newItem);
       }
       for (const cat of categories) {
-        const category = await this.prisma.category.findUnique({
+        const category = await this.prisma.subCategory.findUnique({
           where: {
-            category_id: cat as number,
+            id: cat as number,
           },
         });
         if (!category) {
@@ -229,15 +202,15 @@ export class HotelService {
       }));
       const newMenu = await this.prisma.menu.create({
         data: {
-          categories: {
-            connect: [...(categoryConnections as any[])],
-          },
+          // categories: {
+          //   connect: [...(categoryConnections as any[])],
+          // },
           items: {
             connect: [...(itemsConnections as any[])],
           },
           hotel: {
             connect: {
-              hotel_id: hotel.hotel_id,
+              id: hotel.id,
             },
           },
         },
@@ -258,7 +231,7 @@ export class HotelService {
     try {
       const hotel = await this.prisma.hotel.findFirst({
         where: {
-          hotel_id: Number(hotelId),
+          id: Number(hotelId),
         },
         include: {
           menu: true,
@@ -268,12 +241,12 @@ export class HotelService {
       if (!hotel) {
         throw new Error('Hotel not found!');
       }
-      if (!hotel.menu.menu_id) {
+      if (!hotel.menu.id) {
         throw new Error("Hotel doesn't have a menu");
       }
       await this.prisma.hotel.update({
         where: {
-          hotel_id: hotel.hotel_id,
+          id: hotel.id,
         },
         data: {
           menu: {
@@ -283,7 +256,7 @@ export class HotelService {
       });
       await this.prisma.menu.delete({
         where: {
-          menu_id: hotel.menu.menu_id,
+          id: hotel.menu.id,
         },
       });
       return ApiResponse.success(
@@ -309,7 +282,7 @@ export class HotelService {
   }
   async getHotelByAdminId(adminId: string): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findFirst({
-      where: { admin_id: adminId },
+      where: { admins: { some: { id: adminId } } },
     });
 
     if (!hotel) {
@@ -318,35 +291,29 @@ export class HotelService {
 
     return hotel;
   }
-  async createHotelAdmin(userId: string, hotelId: number) {
+  async addHotelAdmin(registerDTO: RegisterDTO, hotelId: number) {
     try {
       // Check if the user exists
-      const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-      });
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
+      const user = await this.userService.createUser(registerDTO);
 
-      // Check if the user is already an admin for another hotel
-      if (user.role === 'ADMIN') {
-        throw new ConflictException(
-          'User is already an admin for another hotel',
-        );
+      if (!user.data) {
+        throw new NotFoundException("User couldn't be created");
       }
 
       // Update the Hotel to set the admin
       const hotel = await this.prisma.hotel.update({
-        where: { hotel_id: hotelId },
+        where: { id: hotelId },
         data: {
-          admin: { connect: { id: userId } },
+          admins: {
+            connect: { id: user.data.id },
+          },
         },
       });
 
       // Update the user role to ADMIN
       await this.prisma.user.update({
-        where: { id: userId },
-        data: { role: 'ADMIN' },
+        where: { id: user.data.id },
+        data: { role: Role.HOTEL_ADMIN },
       });
 
       return ApiResponse.success('Hotel admin created successfully', hotel);
@@ -355,4 +322,39 @@ export class HotelService {
       return ApiResponse.error('Error creating hotel admin', error);
     }
   }
+  async removeHotelAdmin(hotelId: string, adminId: string) {
+    try {
+      const hotel = await this.prisma.hotel.findFirst({
+        where: {
+          id: Number(hotelId),
+        },
+      });
+      if (!hotel) {
+        throw new Error('Hotel not found!');
+      }
+      const hotelAdmin = await this.prisma.user.findFirst({
+        where: {
+          id: adminId,
+        },
+      });
+
+      if (!hotelAdmin) {
+        throw new Error('Hotel admin not found!');
+      }
+      await this.prisma.hotel.update({
+        where: {
+          id: Number(hotelId),
+        },
+        data: {
+          admins: {
+            disconnect: { id: adminId },
+          },
+        },
+      });
+
+    } catch (error) {
+      return ApiResponse.error('Error deleting hotel Admin', error.message);
+    }
+  }
+
 }

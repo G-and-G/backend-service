@@ -36,7 +36,7 @@ export class CategoryController {
   @Get('/')
   async getCategories(@Req() req: Request, @Res() res: Response) {
     try {
-      const categories = await prisma.category.findMany();
+      const categories = await prisma.subCategory.findMany();
       // console.log(categories);
       return res.send(buildResponse('Categories', Status.SUCCESS, categories));
     } catch (error) {
@@ -52,13 +52,13 @@ export class CategoryController {
   })
   @ApiOperation({ summary: 'Create a new category' })
   async createCategory(@Res() res: Response, @Body() body: CreateCategoryDto) {
-    let { description, name, type, image } = body;
+    const { description, name, type, image } = body;
     if (!description || !name || !type || !image) {
       return res.send(
         buildResponse('Provide all the required details', Status.FAILED),
       );
     }
-    const newCategory = await prisma.category.create({
+    const newCategory = await prisma.subCategory.create({
       data: {
         description,
         name,
@@ -84,13 +84,13 @@ export class CategoryController {
     @Res() res: Response,
     @Body() body: CreateCategoryDto,
   ) {
-    let category = await prisma.category.update({
+    const category = await prisma.subCategory.update({
       data: {
         ...body,
         type: body.type.toLowerCase() == 'food' ? 'FOOD' : 'DRINK',
       },
       where: {
-        category_id: parseInt(id),
+        id: parseInt(id),
       },
     });
     if (category) {
@@ -112,9 +112,9 @@ export class CategoryController {
   })
   @ApiOperation({ summary: 'Delete a category' })
   async deleteUpdate(@Param('id') id, @Res() res: Response) {
-    const cat = await prisma.category.delete({
+    const cat = await prisma.subCategory.delete({
       where: {
-        category_id: parseInt(id),
+        id: parseInt(id),
       },
     });
     if (cat) {
