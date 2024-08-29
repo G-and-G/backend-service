@@ -27,6 +27,10 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { Role, RolesGuard } from 'src/common/guards/role.guard';
 import { AdminGuard } from '../user/guards/admin.guard';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { RegisterDTO } from '../user/dto/create-user.dto';
+import { UserService } from '../user/user.service';
+import { UpdateHotelDTO } from './dto/Update-hotel.dto';
+import { UpdateUserDTO } from '../user/dto/update-user.dto';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
@@ -34,9 +38,9 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 @UseGuards(RolesGuard)
 @UseFilters(AppExceptionFilter)
 export class HotelController {
-  constructor(private readonly hotelService: HotelService) {}
+  constructor(private readonly hotelService: HotelService,private readonly userService:UserService) {}
 
-  @Post('/new_hotel')
+  @Post('/newHotel')
   @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
     return this.hotelService.createHotel(createHotelDTO);
@@ -46,7 +50,7 @@ export class HotelController {
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
-  @Get('byAdminId/:adminId')
+  @Get('hotel/:adminId')
   async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
     try {
       const hotel = await this.hotelService.getHotelByAdminId(adminId);
@@ -74,6 +78,7 @@ export class HotelController {
   @ApiOperation({
     summary: 'Add a menu to a hotel',
   })
+  @Roles(Role.HOTEL_ADMIN)
   async addMenu(
     @Body() body: CreateMenuDTO,
     @Param('hotelId') hotelId: number,
@@ -81,15 +86,16 @@ export class HotelController {
     return this.hotelService.addMenu(body, hotelId);
   }
 
-  @Delete('/:hotelId')
+  @Delete('deleteMenu/:hotelId')
   @ApiParam({
     name: 'hotel id',
-    description: 'The id of the hotel to be deleted',
+    description: "The id of the hotel's menu to be deleted",
     required: true,
   })
   async deleteMenu(@Param('hotelId') hotelId: number) {
     return this.hotelService.deleteMenu(hotelId);
   }
+
 
   @Put('update_hotel/:id')
   @ApiBody({
@@ -102,19 +108,27 @@ export class HotelController {
     return this.hotelService.updateHotel(id, updateHotelDTO);
   }
 
-  @Delete('delete_hotel/:id')
+  @Delete('deleteHotel/:id')
   async remove(@Param('id') id: number) {
     return this.hotelService.deleteHotel(id);
   }
 
   @UseGuards(AuthGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Post(':userId/hotels/:hotelId/admin')
-  async createHotelAdmin(
-    @Param('userId') userId: string,
+  @Post('/add-admin')
+  async addHotelAdmin(
+    @Body() registerDTO: RegisterDTO,
     @Param('hotelId') hotelId: number,
   ) {
-    return this.hotelService.createHotelAdmin(userId, Number(hotelId));
+    return this.hotelService.addHotelAdmin(registerDTO, Number(hotelId));
+  }
+  @Put('/removeAdmin/:hotelId/:adminId')
+  async removeHotelAdmin(@Param('adminId') adminId:string, @Param('hotelId') hotelId:string){
+  return this.hotelService.removeHotelAdmin(hotelId,adminId);
   }
 
+  @Put('/updateAdmin/:adminId')
+  async updateHotelAdmin(@Param('adminId') adminId:string,@Body() updateUserDTO:UpdateUserDTO){
+    return this.userService.updateUser(adminId,updateUserDTO);
+  }
 }

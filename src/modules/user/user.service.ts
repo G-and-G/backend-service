@@ -8,6 +8,7 @@ import { RegisterDTO } from './dto/create-user.dto';
 import { Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import ApiResponse from 'src/utils/ApiResponse';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -61,6 +62,23 @@ export class UserService {
     } catch (error) {
       console.log('Error updating user role:', error);
       return ApiResponse.error('Error updating user role', error);
+    }
+  }
+  async updateUser(userId: string, updateDTO: UpdateUserDTO) {
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          first_name: updateDTO.firstName,
+          last_name: updateDTO.lastName,
+        },
+      });
+      return ApiResponse.success('User updated successfully', updatedUser);
+    } catch (err) {
+      console.error('Error updating user', err);
+      return ApiResponse.error('Error updating user', err.message);
     }
   }
   async makeUserSuperAdmin(userId: string) {
