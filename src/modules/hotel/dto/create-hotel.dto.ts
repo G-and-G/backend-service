@@ -29,6 +29,7 @@ export class CreateHotelDTO {
       sector: 'Nyamirambo',
       cell: 'Nyarufunzo',
       village: 'Rwarutabura ',
+      name:"Nyarugenge, Nyamirambo, Nyarufunzo"
     },
   })
   @ValidateNested()
