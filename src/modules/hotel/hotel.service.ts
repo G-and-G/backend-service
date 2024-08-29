@@ -102,6 +102,7 @@ export class HotelService {
     return this.prisma.hotel.findMany({
       include: {
         menu: true,
+        admins:true
       },
     });
   }
@@ -293,17 +294,17 @@ export class HotelService {
     return hotel;
   }
   async addHotelAdmin(registerDTO: RegisterDTO, hotelId: number) {
+    console.log("APPLICATION LOG: Hotel ID =>",hotelId)
     try {
       // Check if the user exists
       const user = await this.userService.createUser(registerDTO);
-
       if (!user.data) {
         throw new NotFoundException("User couldn't be created");
       }
 
       // Update the Hotel to set the admin
       const hotel = await this.prisma.hotel.update({
-        where: { id: hotelId },
+        where: { id: Number(hotelId) },
         data: {
           admins: {
             connect: { id: user.data.id },
