@@ -8,22 +8,25 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { Category, MenuItem, PrismaClient } from '@prisma/client';
+import { ApiParam } from '@nestjs/swagger';
+import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import ApiResponse from 'src/utils/ApiResponse';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
-import { ApiParam } from '@nestjs/swagger';
 const prisma = new PrismaClient();
 @Controller('menu')
 export class MenuController {
   @Get('/')
   async getMenu() {
     try {
-      let menus = await prisma.menu.findMany({
+      const menus = await prisma.menu.findMany({
         include: {
-          categories: true, // Include categories
-          items: true, // Include items
+          items: {
+            include: {
+              sub_category: true,
+            },
+          }, // Include items
         },
       });
       // console.log(menus[0].items)
@@ -37,13 +40,16 @@ export class MenuController {
   @Get('/:id')
   async getMenuById(@Param('id') id: number) {
     try {
-      let menu = await prisma.menu.findFirst({
+      const menu = await prisma.menu.findFirst({
         where: {
-          menu_id: Number(id),
+          id: Number(id),
         },
         include: {
-          items: true,
-          categories: true,
+          items: {
+            include: {
+              sub_category: true,
+            },
+          },
         },
       });
       if (!menu) {
@@ -65,7 +71,7 @@ export class MenuController {
     try {
       await prisma.menu.delete({
         where: {
-          menu_id: Number(id),
+          id: Number(id),
         },
       });
       return ApiResponse.success('Deleted successfully', null, 200);
@@ -93,7 +99,7 @@ export class MenuController {
   //     });
   //     const itemsRecords = await prisma.menuItem.findMany({
   //       where:{
-  //         menuItem_id:{
+  //         id:{
   //           in: items
   //         }
   //       }
@@ -108,14 +114,14 @@ export class MenuController {
   //     })
   //     await prisma.menu.update({
   //       where:{
-  //         menu_id:newMenu.menu_id
+  //         id:newMenu.id
   //       },
   //       data:{
   //         categories:{
   //           connect: categoriesRecords.map(category => ({category_id:category.category_id}))
   //         },
   //         items:{
-  //           connect: itemsRecords.map(item => ({menuItem_id:item.menuItem_id}))
+  //           connect: itemsRecords.map(item => ({id:item.id}))
   //         }
   //       }
   //     })
@@ -134,11 +140,11 @@ export class MenuController {
   @ApiParam({
     name: 'id',
   })
-  async getMenuitem(@Param('id') menuItem_id) {
+  async getMenuitem(@Param('id') id) {
     try {
-      let menuItem = await prisma.menuItem.findUnique({
+      const menuItem = await prisma.menuItem.findUnique({
         where: {
-          menuItem_id: Number(menuItem_id),
+          id: Number(id),
         },
       });
       if (!menuItem) {
@@ -156,18 +162,18 @@ export class MenuController {
     @Req() req: Request,
     @Res() res: Response,
     @Body() body: CreateMenuItemDTO,
-    @Param('menuId') menu_id: number,
+    @Param('menuId') id: number,
     @Param('categoryId') category_id: number,
   ) {
     try {
-      let category = await prisma.category.findFirst({
+      const category = await prisma.subCategory.findFirst({
         where: {
-          category_id: Number(category_id),
+          id: Number(category_id),
         },
       });
-      let menu = await prisma.menu.findFirst({
+      const menu = await prisma.menu.findFirst({
         where: {
-          menu_id: Number(menu_id),
+          id: Number(id),
         },
         include: {
           items: true,
@@ -180,32 +186,32 @@ export class MenuController {
         throw new Error("Menu doesn't exist");
       }
 
-      if (!category.menu_id) {
-        await prisma.category.update({
-          where: {
-            category_id: Number(category_id),
-          },
-          data: {
-            menu:{
-              connect:{
-                menu_id:Number(menu_id)
-              }
-            }
-          },
-        });
-      }
+      // if (!category.id) {
+      //   await prisma.subCategory.update({
+      //     where: {
+      //       id: Number(category_id),
+      //     },
+      //     data: {
+      //       menu: {
+      //         connect: {
+      //           id: Number(id),
+      //         },
+      //       },
+      //     },
+      //   });
+      // }
 
       const newItem = await prisma.menuItem.create({
         data: {
           ...body,
-          category: {
+          sub_category: {
             connect: {
-              category_id: Number(category_id),
+              id: Number(category_id),
             },
           },
-          Menu: {
+          menu: {
             connect: {
-              menu_id: Number(menu_id),
+              id: Number(id),
             },
           },
         },

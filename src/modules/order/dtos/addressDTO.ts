@@ -43,7 +43,8 @@ export class DeliveryAddress {
   @ApiProperty({ description: 'car plateNumber of the delivery address' })
   plateNumber: string;
   @ApiProperty({ description: 'Customer longitude  of the delivery address' })
-  longitude: string;
+  longitude: number;
   @ApiProperty({ description: 'Customer latitude  of the delivery address' })
-  latitude: string;
+  latitude: number;
+  name: string;
 }

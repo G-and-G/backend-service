@@ -5,6 +5,7 @@ import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'prisma/prisma.service';
 import { RegisterDTO } from './dto/create-user.dto';
 // import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import ApiResponse from 'src/utils/ApiResponse';
 
@@ -49,7 +50,7 @@ export class UserService {
           id: userId,
         },
         data: {
-          role: 'ADMIN', // Set the role to 'admin'
+          role: Role.HOTEL_ADMIN, // Set the role to 'admin'
         },
       });
 
@@ -75,8 +76,8 @@ export class UserService {
 
       return ApiResponse.success(
         'User role updated to Super Admin successfully',
-        updateUser
-      )
+        updateUser,
+      );
     } catch (error) {
       console.log('Error updating user role:', error);
       return ApiResponse.error('Error updating user role', error);
@@ -91,7 +92,7 @@ export class UserService {
         },
         data: {
           admin_hotels: {
-            connect: { hotel_id: hotelId }, // Connect the admin to the specific hotel
+            connect: { id: hotelId }, // Connect the admin to the specific hotel
           },
         },
       });
@@ -187,7 +188,7 @@ export class UserService {
     try {
       const updatedUser = await this.prisma.user.updateMany({
         where: { id: userId },
-        data: { resetToken },
+        data: {},
       });
       console.log(updatedUser);
     } catch (error) {
@@ -197,11 +198,7 @@ export class UserService {
   }
   async getUserByResetToken(resetToken: string) {
     try {
-      const user = await this.prisma.user.findFirst({
-        where: {
-          resetToken,
-        },
-      });
+      const user = await this.prisma.user.findFirst({});
       return user;
     } catch (error) {
       console.log('Error getting user by reset token:', error);
@@ -220,7 +217,6 @@ export class UserService {
         where: { id: userId },
         data: {
           password: hashedPassword,
-          resetToken: null, // Clear the reset token
         },
       });
     } catch (error) {

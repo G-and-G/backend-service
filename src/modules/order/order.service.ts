@@ -34,7 +34,7 @@ export class OrderService {
         throw new BadRequestException('No items in cart');
       console.log('data.products[0].product', data.products[0].product);
       const order_hotel = await this.prisma.hotel.findFirst({
-        where: { menu: { is: { menu_id: data.products[0].product.menu_id } } },
+        where: { menu: { is: { id: data.products[0].product.menu_id } } },
       });
       const price = data.products.reduce((prev, curr) => {
         return prev + curr.product.price * curr.quantity;
@@ -57,17 +57,21 @@ export class OrderService {
               full_name: data.deliveryAddress.full_name,
               telephone: data.deliveryAddress.telephone,
               plateNumber: data.deliveryAddress.plateNumber,
-              address: data.deliveryAddress.address,
-              city: data.deliveryAddress.city,
-              longitude: data.deliveryAddress.longitude,
-              latitude: data.deliveryAddress.latitude,
+              address: {
+                create: {
+                  name: data.deliveryAddress.name,
+                  city: data.deliveryAddress.city,
+                  longitude: data.deliveryAddress.longitude,
+                  latitude: data.deliveryAddress.latitude,
+                },
+              },
             },
           },
           products: {
             create: data.products.map((product) => ({
               quantity: product.quantity,
-              menuItem: {
-                connect: { menuItem_id: product.product.id },
+              menu_item: {
+                connect: { id: product.product.id },
               },
             })),
           },
@@ -192,7 +196,7 @@ export class OrderService {
   async getOrdersForHotel(hotelId: number): Promise<Order[]> {
     try {
       const orders = await this.prisma.order.findMany({
-        where: { id: Number(hotelId) },
+        where: { hotel_id: hotelId },
         include: {
           products: true, // This will include the associated items for each order
           customer: true,
