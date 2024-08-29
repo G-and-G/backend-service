@@ -12,6 +12,9 @@ import {
 import { DelivererService } from './deliverer.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AssignOrderDto, CreateDelivererDto, UpdateDelivererDto } from './deliverer.dto';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/common/guards/role.guard';
+
 
 @ApiTags('deliverers')
 @Controller('deliverers')
@@ -19,6 +22,7 @@ export class DelivererController {
   constructor(private readonly delivererService: DelivererService) {}
 
   @Post("/create")
+  @Roles(Role.HOTEL_ADMIN)
   @ApiOperation({ summary: 'Create a new deliverer for a specific hotel' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -44,6 +48,8 @@ export class DelivererController {
   }
 
   @Put('update/:id')
+  @Roles(Role.HOTEL_ADMIN)
+
   @ApiOperation({ summary: 'Update a deliverer' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -69,6 +75,8 @@ export class DelivererController {
   }
 
   @Delete('delete/:id')
+  @Roles(Role.HOTEL_ADMIN)
+
   @ApiOperation({ summary: 'Delete a deliverer' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -91,6 +99,8 @@ export class DelivererController {
   }
 
   @Post('assign-order')
+  @Roles(Role.HOTEL_ADMIN)
+
   @ApiOperation({ summary: 'Assign an order to a deliverer' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -113,6 +123,8 @@ export class DelivererController {
   }
 
   @Get('hotel/:hotelId')
+  @Roles(Role.HOTEL_ADMIN)
+
   @ApiOperation({ summary: 'Get all deliverers for a specific hotel' })
   @ApiResponse({
     status: HttpStatus.OK,
