@@ -120,12 +120,12 @@ export class HotelController {
 
   @UseGuards(AuthGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Post('/add-admin')
+  @Post('/add-admin/:hotelId')
   async addHotelAdmin(
     @Body() registerDTO: RegisterDTO,
     @Param('hotelId') hotelId: number,
   ) {
-    return this.hotelService.addHotelAdmin(registerDTO, Number(hotelId));
+    return this.hotelService.addHotelAdmin(registerDTO, hotelId);
   }
   @Put('/removeAdmin/:hotelId/:adminId')
   async removeHotelAdmin(@Param('adminId') adminId:string, @Param('hotelId') hotelId:string){
