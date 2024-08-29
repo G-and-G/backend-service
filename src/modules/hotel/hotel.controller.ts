@@ -37,7 +37,7 @@ export class HotelController {
   constructor(private readonly hotelService: HotelService) {}
 
   @Post('/new_hotel')
-  @Roles(Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
     return this.hotelService.createHotel(createHotelDTO);
   }

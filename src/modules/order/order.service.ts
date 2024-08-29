@@ -61,8 +61,6 @@ export class OrderService {
               plateNumber: data.deliveryAddress.plateNumber,
               longitude: data.deliveryAddress.longitude,
               latitude: data.deliveryAddress.latitude,
-              
-            
             },
           },
           products: {

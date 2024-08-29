@@ -1,0 +1,96 @@
+response {
+  status: 'success',
+  message: 'Charge initiated',
+  data: {
+    id: 6573083,
+    tx_ref: 'example01',
+    flw_ref: 'FLW-MOCK-2acc043c4cad0d522d70761cd06466c7',
+    device_fingerprint: 'N/A',
+    amount: 100,
+    charged_amount: 100,
+    app_fee: 3.8,
+    merchant_fee: 0,
+    processor_response: 'Please enter the OTP sent to your mobile number 080****** and email te**@rave**.com',
+    auth_model: 'VBVSECURECODE',
+    currency: 'NGN',
+    ip: '52.209.154.143',
+    narration: 'CARD Transaction ',
+    status: 'pending',
+    payment_type: 'card',
+    plan: null,
+    fraud_status: 'ok',
+    charge_type: 'normal',
+    created_at: '2024-08-27T17:00:45.000Z',
+    account_id: 2522707,
+    customer: {
+      id: 2481580,
+      phone_number: '09000000000',
+      name: 'Flutterwave Developers',
+      email: 'developers@flutterwavego.com',
+      created_at: '2024-08-27T17:00:45.000Z'
+    },
+    card: {
+      first_6digits: '418742',
+      last_4digits: '4246',
+      issuer: 'VISA ACCESS BANK PLC DEBIT CLASSIC',
+      country: 'NG',
+      type: 'VISA',
+      expiry: '09/32'
+    }
+  },
+  meta: {
+    authorization: {
+      mode: 'redirect',
+      redirect: 'https://ravesandboxapi.flutterwave.com/mockvbvpage?ref=FLW-MOCK-2acc043c4cad0d522d70761cd06466c7&code=00&message=Approved.%20Successful&receiptno=RN1724778045508'
+    }
+  }
+}
+
+
+response ---> {
+  status: 'success',
+  message: 'Charge initiated',
+  data: {
+    id: 6573083,
+    tx_ref: 'example01',
+    flw_ref: 'FLW-MOCK-2acc043c4cad0d522d70761cd06466c7',
+    device_fingerprint: 'N/A',
+    amount: 100,
+    charged_amount: 100,
+    app_fee: 3.8,
+    merchant_fee: 0,
+    processor_response: 'Please enter the OTP sent to your mobile number 080****** and email te**@rave**.com',
+    auth_model: 'VBVSECURECODE',
+    currency: 'NGN',
+    ip: '52.209.154.143',
+    narration: 'CARD Transaction ',
+    status: 'pending',
+    payment_type: 'card',
+    plan: null,
+    fraud_status: 'ok',
+    charge_type: 'normal',
+    created_at: '2024-08-27T17:00:45.000Z',
+    account_id: 2522707,
+    customer: {
+      id: 2481580,
+      phone_number: '09000000000',
+      name: 'Flutterwave Developers',
+      email: 'developers@flutterwavego.com',
+      created_at: '2024-08-27T17:00:45.000Z'
+    },
+    card: {
+      first_6digits: '418742',
+      last_4digits: '4246',
+      issuer: 'VISA ACCESS BANK PLC DEBIT CLASSIC',
+      country: 'NG',
+      type: 'VISA',
+      expiry: '09/32'
+    }
+  },
+  meta: {
+    authorization: {
+      mode: 'redirect',
+      redirect: 'https://ravesandboxapi.flutterwave.com/mockvbvpage?ref=FLW-MOCK-2acc043c4cad0d522d70761cd06466c7&code=00&message=Approved.%20Successful&receiptno=RN1724778045508'
+    }
+  }
+}

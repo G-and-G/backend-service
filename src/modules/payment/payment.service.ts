@@ -4,7 +4,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import flw from 'src/config/FLW';
 import { OrderService } from 'src/modules/order/order.service';
 import ApiResponse from 'src/utils/ApiResponse';
-import { InitiateChargeDto } from './dtos/initiate-charge.dto';
+import { PayWithCardDto, PayWithMomoDto } from './dtos/initiate-charge.dto';
 import { OrderPaymentDto } from './dtos/payment.dto';
 
 @Injectable()
@@ -108,7 +108,7 @@ export class PaymentService {
     return payment;
   }
 
-  async initiatePayment(dto: InitiateChargeDto) {
+  async payWithMomo(dto: PayWithMomoDto) {
     try {
       const order = await this.orderService.getOrderById(dto.orderId);
       // save payment
@@ -128,7 +128,7 @@ export class PaymentService {
         amount: order.price,
         currency: 'RWF',
         email: order.customer.email || 'olufemi@flw.com',
-        phone_number: order.deliveryAddress.telephone,
+        phone_number: dto.phoneNumber ?? order.deliveryAddress.telephone,
         fullname: order.customer.first_name + ' ' + order.customer.last_name,
       };
       const response = await this.flw.MobileMoney.rwanda(payload);
@@ -137,8 +137,87 @@ export class PaymentService {
       return ApiResponse.success('Payment initiated', data, 200);
     } catch (error) {
       console.log(error);
-      // return { message: 'Unable to initiate payment', error };
-      return new BadRequestException('Unable to initiate payment', error);
+      throw new BadRequestException('Unable to initiate payment', error);
+    }
+  }
+
+  async payWithCard(dto: PayWithCardDto) {
+    try {
+      /*   const order = await this.orderService.getOrderById(dto.orderId);
+      // save payment
+      const payment = await this.createPayment({
+        order: {
+          connect: {
+            order_id: dto.orderId,
+          },
+        },
+        amount: order.price,
+        payment_method: 'Card',
+        currency: 'RWF',
+        status: 'PENDING',
+      });
+      const payload = {
+        card_number: dto.cardNumber,
+        expiry_month: dto.expiry.split('/')[0],
+        expiry_year: dto.expiry.split('/')[1],
+        cvv: dto.cvv,
+        currency: 'RWF',
+        amount: order.price,
+        email: order.customer.email || 'developers@flutterwavego.com',
+        fullname: order.customer.first_name + ' ' + order.customer.last_name,
+        phone_number: order.deliveryAddress.telephone,
+        tx_ref: order.order_id,
+        enckey: process.env.FLW_ENCRYPTION_KEY,
+      }; */
+      const payload = {
+        card_number: '4187427415564246',
+        cvv: '828',
+        expiry_month: '09',
+        expiry_year: '32',
+        currency: 'NGN',
+        amount: '100',
+        redirect_url: 'https://www.google.com',
+        fullname: 'Flutterwave Developers',
+        email: 'developers@flutterwavego.com',
+        phone_number: '09000000000',
+        enckey: process.env.FLW_ENCRYPTION_KEY,
+        tx_ref: 'example01',
+      };
+      const response = await this.flw.Charge.card(payload);
+      console.log('response', response);
+      // For PIN transactions
+      if (response?.meta?.authorization.mode === 'pin') {
+        if (!dto.pin)
+          throw new BadRequestException('Pin is required for PIN transactions');
+        const payload2 = {
+          ...payload,
+          authorization: {
+            mode: 'pin',
+            fields: ['pin'],
+            pin: Number(dto.pin),
+          },
+        };
+        const reCallCharge = await flw.Charge.card(payload2);
+
+        // Add the OTP to authorize the transaction
+        const callValidate = await flw.Charge.validate({
+          otp: '12345',
+          flw_ref: reCallCharge.data.flw_ref,
+        });
+        console.log(callValidate);
+      }
+      // For 3DS or VBV transactions, redirect users to their issue to authorize the transaction
+      // if (response.meta.authorization.mode === 'redirect') {
+      //   var url = response.meta.authorization.redirect;
+      //   open(url);
+      // }
+
+      console.log('response --->', response);
+      const data = { response /* payment */ };
+      return ApiResponse.success('Payment initiated', data, 200);
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Unable to initiate payment', error);
     }
   }
 
@@ -196,31 +275,6 @@ export class PaymentService {
     } catch (error) {
       console.log(error);
       return ApiResponse.error('Unable to process payment', error, 500);
-    }
-  }
-
-  async payWithCard() {
-    try {
-      const payload = {
-        card_number: '4576691022852794',
-        expiry_month: '05',
-        expiry_year: '26',
-        cvv: '878',
-        currency: 'RWF',
-        amount: '100',
-        email: 'developers@flutterwavego.com',
-        fullname: 'Ndungutse Charles',
-        phone_number: '+2507900777264',
-        tx_ref: 'UNIQUE_TRANSACTION_REFERENCE',
-        redirect_url: 'https://example_company.com/success',
-        enckey: process.env.FLW_ENCRYPTION_KEY,
-      };
-      const response = await this.flw.Charge.card(payload);
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.log(error);
-      return { message: 'Unable to initiate payment', error };
     }
   }
 }

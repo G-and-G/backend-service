@@ -19,9 +19,9 @@ import {
 } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateCategoryDto } from './dto/category.dto';
-import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 // import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 
 const prisma = new PrismaClient();
@@ -51,10 +51,7 @@ export class CategoryController {
     // Replace with the actual DTO class for the response
   })
   @ApiOperation({ summary: 'Create a new category' })
-  async createCategory(
-    @Res() res: Response,
-    @Body() body: CreateCategoryDto,
-  ) {
+  async createCategory(@Res() res: Response, @Body() body: CreateCategoryDto) {
     let { description, name, type, image } = body;
     if (!description || !name || !type || !image) {
       return res.send(
@@ -66,7 +63,7 @@ export class CategoryController {
         description,
         name,
         image,
-        type:type.toLowerCase() == 'food' ? "FOOD":"DRINK",
+        type: type.toLowerCase() == 'food' ? 'FOOD' : 'DRINK',
       },
     });
     return res
@@ -90,7 +87,7 @@ export class CategoryController {
     let category = await prisma.category.update({
       data: {
         ...body,
-        type:body.type.toLowerCase() == 'food' ? "FOOD":"DRINK",
+        type: body.type.toLowerCase() == 'food' ? 'FOOD' : 'DRINK',
       },
       where: {
         category_id: parseInt(id),
@@ -144,7 +141,7 @@ export class CategoryController {
   //         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   //         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ftno0%40grabngo-a3844.iam.gserviceaccount.com",
   //         "universe_domain": "googleapis.com"
-  //       }        
+  //       }
   //     }
   //     });
   //     return res.send(buildResponse('succes',Status.SUCCESS,newSecret))
