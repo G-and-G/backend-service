@@ -17,11 +17,12 @@ import ApiResponse from 'src/utils/ApiResponse';
 import { CreateMenuDTO } from './dto/create-menu.dto';
 import { RegisterDTO } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
+import { ApiResponseMetadata } from '@nestjs/swagger';
 @Injectable()
 export class HotelService {
   constructor(private readonly prisma: PrismaService ,private readonly userService:UserService) {}
 
-  async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+  async createHotel(createHotelDTO: CreateHotelDTO): Promise<ApiResponse> {
     console.log('Received DTO:', createHotelDTO);
     try {
       if (!createHotelDTO || !createHotelDTO.address) {
@@ -46,7 +47,7 @@ export class HotelService {
         },
       });
 
-      return hotel;
+      return ApiResponse.success("Hotel created successfully",hotel);
     } catch (error) {
       console.log(error);
 

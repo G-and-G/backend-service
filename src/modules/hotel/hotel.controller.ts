@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -31,18 +32,22 @@ import { RegisterDTO } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { UpdateHotelDTO } from './dto/Update-hotel.dto';
 import { UpdateUserDTO } from '../user/dto/update-user.dto';
+import { Auth } from 'firebase-admin/lib/auth/auth';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
 @ApiTags('hotels')
-@UseGuards(RolesGuard)
+@ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard,RolesGuard)
 @UseFilters(AppExceptionFilter)
 export class HotelController {
   constructor(private readonly hotelService: HotelService,private readonly userService:UserService) {}
 
   @Post('/newHotel')
+  @UseGuards(AuthGuard)
   @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
+    console.log("creating hotel...")
     return this.hotelService.createHotel(createHotelDTO);
   }
 

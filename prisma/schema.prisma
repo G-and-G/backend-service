@@ -187,8 +187,8 @@ model Hotel {
   rating              Float    @default(0)
   lastMonthOrders     Int?     @default(0)
   ThisWeekOrders      Int?     @default(0)
-  startingWorkingTime DateTime @default(now())
-  endingWorkingTime   DateTime @default(now())
+  startingWorkingTime String 
+  endingWorkingTime   String 
   image               String
 
   created_at DateTime @default(now())

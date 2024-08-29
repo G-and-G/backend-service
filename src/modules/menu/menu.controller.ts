@@ -15,6 +15,7 @@ import ApiResponse from 'src/utils/ApiResponse';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
 const prisma = new PrismaClient();
+
 @Controller('menu')
 export class MenuController {
   @Get('/')
@@ -84,58 +85,8 @@ export class MenuController {
       );
     }
   }
-  //     @Post('/new')
-  // async createMenu(@Req() req: Request, @Res() res: Response, @Body() body) {
-  //   try {
-  //     const { categories, items, hotel_id } = body;
-  //     if (!hotel_id || items.length <= 0 || categories.length <= 0) {
-  //       throw new Error("Provide the required details")
-  //     }
-
-  //     const newMenu = await prisma.menu.create({
-  //       data: {
-  //         hotel_id,
-  //       },
-  //     });
-  //     const itemsRecords = await prisma.menuItem.findMany({
-  //       where:{
-  //         id:{
-  //           in: items
-  //         }
-  //       }
-  //     });
-
-  //     const categoriesRecords = await prisma.category.findMany({
-  //       where:{
-  //         category_id:{
-  // in: categories
-  //         }
-  //       }
-  //     })
-  //     await prisma.menu.update({
-  //       where:{
-  //         id:newMenu.id
-  //       },
-  //       data:{
-  //         categories:{
-  //           connect: categoriesRecords.map(category => ({category_id:category.category_id}))
-  //         },
-  //         items:{
-  //           connect: itemsRecords.map(item => ({id:item.id}))
-  //         }
-  //       }
-  //     })
-  //     return res.send(
-  //       buildResponse("Menu created", Status.SUCCESS, newMenu)
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.send(
-  //       buildResponse("Something went wrong!"+ ` ${error.message}`, Status.FAILED, null)
-  //     );
-  //   }
-
-  // }
+  //  @Post("/new")
+  //  as
   @Get('/menuItem/:id')
   @ApiParam({
     name: 'id',
