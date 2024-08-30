@@ -47,7 +47,7 @@ export class UserController {
     return ApiResponse.success('Users retrieved successfully', users);
   }
 
-  @Get(':id')
+  @Get('byId/:id')
   async get(@Param('id') id: string) {
     const user = await this.userService.getUserById(id);
     return ApiResponse.success('User retrieved successfully', user);
@@ -78,12 +78,13 @@ export class UserController {
     return ApiResponse.success('User deleted successfully', deletedUser);
   }
 
-  @Get('me')
+  @Get('/me')
   @UseGuards(AuthGuard)
   async me(@Req() req) {
     const user = await this.userService.getUserById(req.user.id);
     return ApiResponse.success('User retrieved successfully', user);
   }
+
   @Put('make-admin/:id')
   @UseGuards(AuthGuard,RolesGuard)
   @Roles(Role.SUPER_ADMIN)
