@@ -8,7 +8,6 @@ export class PayWithMomoDto {
   orderId: string;
 
   @ApiProperty()
-  @IsString()
   phoneNumber: string;
 }
 
