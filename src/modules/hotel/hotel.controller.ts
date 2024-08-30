@@ -57,6 +57,10 @@ export class HotelController {
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
+  @Get('hotel/admins/:hotelId')
+  async getHotelAdmins(@Param('hotelId') hotelId:number){
+    return this.hotelService.getHotelAdmins(hotelId);
+  }
   @Get('hotel/byAdmin/:adminId')
   async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
     try {

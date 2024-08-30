@@ -77,6 +77,26 @@ export class HotelService {
     return hotel;
   }
 
+  async getHotelAdmins(hotelId:number):Promise<ApiResponse>{
+    try {
+      const hotel = await this.prisma.hotel.findFirst({
+        where:{
+          id:Number(hotelId)
+        },
+        include:{
+          admins:true
+        }
+      });
+     if(!hotel){
+      throw new Error("No hotel found");
+     }
+      return ApiResponse.success("Successfully fetched admins",hotel.admins);
+      
+    } catch (error) {
+      return ApiResponse.error("Error fetching admins",error.message);
+    }
+  }
+
   async getHotelByProductId(id: number): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findFirst({
       where: {
