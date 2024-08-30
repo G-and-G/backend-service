@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { ProductCategory } from '@prisma/client';
+import {
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
+  IsNotEmpty,
+  IsString,
+  Length,
+  min,
+} from 'class-validator';
+
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -25,7 +35,7 @@ export class CreateCategoryDto {
     example: 'Foods',
   })
   @IsNotEmpty()
-  type: string;
+  type: ProductCategory;
 
   @IsString()
   @ApiProperty({
