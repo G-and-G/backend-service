@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  ArrayNotEmpty,
-  ArrayUnique,
-  IsArray,
-  IsNotEmpty,
-  IsString,
-  Length,
-  min,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -32,7 +24,6 @@ export class CreateCategoryDto {
     description: 'Type either Foods or Drinks',
     example: 'Foods',
   })
-  
   @IsNotEmpty()
   type: string;
 
@@ -41,6 +32,5 @@ export class CreateCategoryDto {
     description: 'url of the image to the label of the category',
     example: 'https://images.com/img.png',
   })
-  @IsNotEmpty()
   image: string;
 }

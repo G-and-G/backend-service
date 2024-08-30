@@ -53,7 +53,7 @@ export class CategoryController {
   @ApiOperation({ summary: 'Create a new category' })
   async createCategory(@Res() res: Response, @Body() body: CreateCategoryDto) {
     const { description, name, type, image } = body;
-    if (!description || !name || !type || !image) {
+    if (!description || !name || !type) {
       return res.send(
         buildResponse('Provide all the required details', Status.FAILED),
       );
