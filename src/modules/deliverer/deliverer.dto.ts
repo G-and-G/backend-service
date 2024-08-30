@@ -1,12 +1,13 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+// create-deliverer.dto.ts
+import { IsString, IsEmail, IsEnum, IsOptional } from 'class-validator';
+import { Role } from '@prisma/client';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateDelivererDto {
   @ApiProperty({
     description: 'The first name of the deliverer',
     example: 'John',
   })
-  @IsNotEmpty()
   @IsString()
   first_name: string;
 
@@ -14,71 +15,83 @@ export class CreateDelivererDto {
     description: 'The last name of the deliverer',
     example: 'Doe',
   })
-  @IsNotEmpty()
   @IsString()
   last_name: string;
 
   @ApiProperty({
     description: 'The email address of the deliverer',
-    example: 'john.doe@example.com',
+    example: 'johndoe@example.com',
   })
-  @IsNotEmpty()
   @IsEmail()
   email: string;
 
   @ApiProperty({
-    description: 'The password of the deliverer',
-    example: 'securePassword123',
+    description: 'The password for the deliverer account',
+    example: 'securepassword123',
   })
-  @IsNotEmpty()
-  @MinLength(6)
+  @IsString()
   password: string;
+
+  @ApiProperty({
+    description: 'The role of the deliverer',
+    enum: Role,
+    example: Role.DELIVERER,
+    default: Role.DELIVERER,
+  })
+  @IsEnum(Role)
+  role: Role = Role.DELIVERER;
 }
 
-export class UpdateDelivererDto extends PartialType(CreateDelivererDto) {
-  @ApiProperty({
+
+
+export class UpdateDelivererDto {
+  @ApiPropertyOptional({
     description: 'The first name of the deliverer',
     example: 'John',
-    required: false,
   })
   @IsOptional()
   @IsString()
   first_name?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The last name of the deliverer',
     example: 'Doe',
-    required: false,
   })
   @IsOptional()
   @IsString()
   last_name?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The email address of the deliverer',
-    example: 'john.doe@example.com',
-    required: false,
+    example: 'johndoe@example.com',
   })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiProperty({
-    description: 'The password of the deliverer',
-    example: 'securePassword123',
-    required: false,
+  @ApiPropertyOptional({
+    description: 'The password for the deliverer account',
+    example: 'newsecurepassword123',
   })
   @IsOptional()
   @IsString()
   password?: string;
 }
 
+// assign-order.dto.ts
+
 export class AssignOrderDto {
   @ApiProperty({
-    description: 'The ID of the order to be assigned',
-    example: 'order123',
+    description: 'The ID of the deliverer',
+    example: 'uuid-of-deliverer',
   })
-  @IsNotEmpty()
+  @IsString()
+  userId: string;
+
+  @ApiProperty({
+    description: 'The ID of the order to be assigned',
+    example: 'uuid-of-order',
+  })
   @IsString()
   orderId: string;
 }

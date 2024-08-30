@@ -129,8 +129,11 @@ export class UserService {
       where: {
         id,
       },
+      include: {
+        admin_hotels: true,
+      },
     });
-    // console.log('user', user);
+    console.log('user', user);
     if (!user) {
       throw new BadRequestException("User doesn't exist");
     }
