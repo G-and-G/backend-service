@@ -38,16 +38,18 @@ import { Auth } from 'firebase-admin/lib/auth/auth';
 @Controller('hotels')
 @ApiTags('hotels')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard,RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @UseFilters(AppExceptionFilter)
 export class HotelController {
-  constructor(private readonly hotelService: HotelService,private readonly userService:UserService) {}
-
+  constructor(
+    private readonly hotelService: HotelService,
+    private readonly userService: UserService,
+  ) {}
   @Post('/newHotel')
   @UseGuards(AuthGuard)
   @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
-    console.log("creating hotel...")
+    console.log('creating hotel...');
     return this.hotelService.createHotel(createHotelDTO);
   }
 
@@ -55,7 +57,7 @@ export class HotelController {
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
-  @Get('hotel/:adminId')
+  @Get('hotel/byAdmin/:adminId')
   async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
     try {
       const hotel = await this.hotelService.getHotelByAdminId(adminId);
@@ -101,7 +103,6 @@ export class HotelController {
     return this.hotelService.deleteMenu(hotelId);
   }
 
-
   @Put('update_hotel/:id')
   @ApiBody({
     type: CreateHotelDTO,
@@ -128,12 +129,18 @@ export class HotelController {
     return this.hotelService.addHotelAdmin(registerDTO, hotelId);
   }
   @Put('/removeAdmin/:hotelId/:adminId')
-  async removeHotelAdmin(@Param('adminId') adminId:string, @Param('hotelId') hotelId:string){
-  return this.hotelService.removeHotelAdmin(hotelId,adminId);
+  async removeHotelAdmin(
+    @Param('adminId') adminId: string,
+    @Param('hotelId') hotelId: string,
+  ) {
+    return this.hotelService.removeHotelAdmin(hotelId, adminId);
   }
 
   @Put('/updateAdmin/:adminId')
-  async updateHotelAdmin(@Param('adminId') adminId:string,@Body() updateUserDTO:UpdateUserDTO){
-    return this.userService.updateUser(adminId,updateUserDTO);
+  async updateHotelAdmin(
+    @Param('adminId') adminId: string,
+    @Body() updateUserDTO: UpdateUserDTO,
+  ) {
+    return this.userService.updateUser(adminId, updateUserDTO);
   }
 }
