@@ -125,6 +125,7 @@ export class UserService {
     }
   }
   async getUserById(id: string) {
+    console.log("user id from req =",id);
     const user = await this.prisma.user.findUnique({
       where: {
         id,
