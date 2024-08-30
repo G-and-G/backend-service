@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductCategory } from '@prisma/client';
 import {
   ArrayNotEmpty,
   ArrayUnique,
@@ -34,7 +35,7 @@ export class CreateCategoryDto {
   })
   
   @IsNotEmpty()
-  type: string;
+  type: ProductCategory;
 
   @IsString()
   @ApiProperty({

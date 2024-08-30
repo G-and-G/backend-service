@@ -22,26 +22,22 @@ import { Request, Response } from 'express';
 import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 import { Status, buildResponse } from 'src/utils/responseBuilder';
 import { CreateCategoryDto } from './dto/category.dto';
+import { CategoryService } from './category.service';
 // import { ErrorInterceptor } from 'src/interceptors/ErrorHandling.interceptor';
 
 const prisma = new PrismaClient();
-@Controller('category')
-@ApiTags('categories')
+@Controller('subcategories')
+@ApiTags('subCategories')
 @UseInterceptors(ErrorInterceptor)
 export class CategoryController {
+  constructor(private readonly categoryService: CategoryService){ }
   @ApiResponse({
     status: 200,
-    description: 'Categories returned successfully',
+    description: 'SubCategories returned successfully',
   })
   @Get('/')
-  async getCategories(@Req() req: Request, @Res() res: Response) {
-    try {
-      const categories = await prisma.subCategory.findMany();
-      // console.log(categories);
-      return res.send(buildResponse('Categories', Status.SUCCESS, categories));
-    } catch (error) {
-      console.log(error);
-    }
+  async getCategories() {
+   return this.categoryService.getSubCategories();
   }
 
   @Post('/new')
@@ -50,78 +46,36 @@ export class CategoryController {
     description: 'The request was successful',
     // Replace with the actual DTO class for the response
   })
-  @ApiOperation({ summary: 'Create a new category' })
-  async createCategory(@Res() res: Response, @Body() body: CreateCategoryDto) {
-    const { description, name, type, image } = body;
-    if (!description || !name || !type || !image) {
-      return res.send(
-        buildResponse('Provide all the required details', Status.FAILED),
-      );
-    }
-    const newCategory = await prisma.subCategory.create({
-      data: {
-        description,
-        name,
-        image,
-        type: type.toLowerCase() == 'food' ? 'FOOD' : 'DRINK',
-      },
-    });
-    return res
-      .status(201)
-      .send(buildResponse('Category created!', Status.SUCCESS, newCategory));
+  @ApiOperation({ summary: 'Create a new subcategory' })
+  async createCategory(@Body() body: CreateCategoryDto) {
+    return this.categoryService.createSubCategory(body);
   }
 
   @Put('/:id')
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'Id of the category to be updated',
+    description: 'Id of the subcategory to be updated',
     required: true,
   })
-  @ApiOperation({ summary: 'Update an already existing category' })
+  @ApiOperation({ summary: 'Update an already existing subcategory' })
   async updateCategory(
     @Param('id') id,
-    @Res() res: Response,
     @Body() body: CreateCategoryDto,
   ) {
-    const category = await prisma.subCategory.update({
-      data: {
-        ...body,
-        type: body.type.toLowerCase() == 'food' ? 'FOOD' : 'DRINK',
-      },
-      where: {
-        id: parseInt(id),
-      },
-    });
-    if (category) {
-      return res.send(
-        buildResponse('Category updated!', Status.SUCCESS, category),
-      );
-    }
+    return this.categoryService.updateSubCategory(body,id);
   }
 
   @Delete('/:id')
   @ApiParam({
     name: 'id',
     type: Number,
-    description: 'Id of the category to be deleted',
+    description: 'Id of the subcategory to be deleted',
     required: true,
   })
-  @ApiBody({
-    description: '',
-  })
-  @ApiOperation({ summary: 'Delete a category' })
-  async deleteUpdate(@Param('id') id, @Res() res: Response) {
-    const cat = await prisma.subCategory.delete({
-      where: {
-        id: parseInt(id),
-      },
-    });
-    if (cat) {
-      return res.send(buildResponse('Category deleted!', Status.SUCCESS, cat));
-    } else {
-      throw new Error('Category not found!');
-    }
+  @ApiOperation({ summary: 'Delete a subcategory' })
+  async deleteUpdate(@Param('id') id:number) {
+   return this.categoryService.deleteSubcategory(id);
   }
 
   // @Post('/secret')
