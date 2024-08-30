@@ -120,13 +120,19 @@ export class HotelService {
     return hotel;
   }
 
-  async getAllHotels(): Promise<Hotel[]> {
-    return this.prisma.hotel.findMany({
-      include: {
-        menu: true,
-        admins: true,
-      },
-    });
+  async getAllHotels(): Promise<ApiResponse> {
+    try {
+      const hotels = await this.prisma.hotel.findMany({
+        include: {
+          menu: true,
+          admins: true,
+          address:true
+        },
+      });
+     return ApiResponse.success("Hotels fetched successfully",hotels);
+    } catch (error) {
+      return ApiResponse.error("Error fetching hotels",error.message);
+    }
   }
 
   async updateHotel(

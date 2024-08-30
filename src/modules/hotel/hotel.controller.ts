@@ -38,7 +38,6 @@ import { Auth } from 'firebase-admin/lib/auth/auth';
 @Controller('hotels')
 @ApiTags('hotels')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(AuthGuard, RolesGuard)
 @UseFilters(AppExceptionFilter)
 export class HotelController {
   constructor(
@@ -46,7 +45,7 @@ export class HotelController {
     private readonly userService: UserService,
   ) {}
   @Post('/newHotel')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
     console.log('creating hotel...');
@@ -78,6 +77,7 @@ export class HotelController {
   @ApiOperation({
     summary: 'Get all registered hotels',
   })
+  @UseGuards(AuthGuard)
   async findAll() {
     return this.hotelService.getAllHotels();
   }
@@ -123,7 +123,7 @@ export class HotelController {
     return this.hotelService.deleteHotel(id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Post('/add-admin/:hotelId')
   async addHotelAdmin(
