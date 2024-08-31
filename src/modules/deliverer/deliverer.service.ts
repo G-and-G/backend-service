@@ -17,13 +17,13 @@ export class DelivererService {
         },
       });
       return {
-        status: HttpStatus.CREATED,
+        status: 201,
         response: { message: 'Deliverer created successfully', deliverer },
       };
     } catch (error) {
       console.error('Error creating deliverer:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to create deliverer' },
       };
     }
@@ -37,13 +37,13 @@ export class DelivererService {
         data: dto,
       });
       return {
-        status: HttpStatus.OK,
+        status: 200,
         response: { message: 'Deliverer updated successfully', deliverer },
       };
     } catch (error) {
       console.error('Error updating deliverer:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to update deliverer' },
       };
     }
@@ -56,13 +56,13 @@ export class DelivererService {
         where: { id },
       });
       return {
-        status: HttpStatus.OK,
+        status: 200,
         response: { message: 'Deliverer deleted successfully' },
       };
     } catch (error) {
       console.error('Error deleting deliverer:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to delete deliverer' },
       };
     }
@@ -78,13 +78,13 @@ export class DelivererService {
         },
       });
       return {
-        status: HttpStatus.OK,
+        status: 200,
         response: { message: 'Order assigned to deliverer successfully', assignment },
       };
     } catch (error) {
       console.error('Error assigning order to deliverer:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to assign order to deliverer' },
       };
     }
@@ -100,18 +100,19 @@ export class DelivererService {
         },
       });
       return {
-        status: HttpStatus.OK,
+        status: 200,
         response: { message: 'Deliverers retrieved successfully', deliverers },
       };
     } catch (error) {
       console.error('Error retrieving deliverers:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to retrieve deliverers' },
       };
     }
   }
-  //get assigned orders by aderiverer
+
+  // Get assigned orders by a deliverer
   async getAssignedOrders(delivererId: string) {
     try {
       const orders = await this.prisma.assignedOrder.findMany({
@@ -121,16 +122,15 @@ export class DelivererService {
         },
       });
       return {
-        status: HttpStatus.OK,
+        status: 200,
         response: { message: 'Orders retrieved successfully', orders },
       };
     } catch (error) {
       console.error('Error retrieving orders:', error);
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: 500,
         response: { message: 'Failed to retrieve orders' },
       };
     }
   }
-  
 }
