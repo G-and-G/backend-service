@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -31,18 +32,23 @@ import { RegisterDTO } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { UpdateHotelDTO } from './dto/Update-hotel.dto';
 import { UpdateUserDTO } from '../user/dto/update-user.dto';
+import { Auth } from 'firebase-admin/lib/auth/auth';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
 @ApiTags('hotels')
-@UseGuards(RolesGuard)
+@ApiBearerAuth('JWT-auth')
 @UseFilters(AppExceptionFilter)
 export class HotelController {
-  constructor(private readonly hotelService: HotelService,private readonly userService:UserService) {}
-
+  constructor(
+    private readonly hotelService: HotelService,
+    private readonly userService: UserService,
+  ) {}
   @Post('/newHotel')
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   async create(@Body() createHotelDTO: CreateHotelDTO) {
+    console.log('creating hotel...');
     return this.hotelService.createHotel(createHotelDTO);
   }
 
@@ -50,7 +56,11 @@ export class HotelController {
   async findById(@Param('id', ParseIntPipe) id: number) {
     return this.hotelService.getHotelById(id);
   }
-  @Get('hotel/:adminId')
+  @Get('hotel/admins/:hotelId')
+  async getHotelAdmins(@Param('hotelId') hotelId:number){
+    return this.hotelService.getHotelAdmins(hotelId);
+  }
+  @Get('hotel/byAdmin/:adminId')
   async getHotelByAdminId(@Param('adminId') adminId: string): Promise<Hotel> {
     try {
       const hotel = await this.hotelService.getHotelByAdminId(adminId);
@@ -67,6 +77,7 @@ export class HotelController {
   @ApiOperation({
     summary: 'Get all registered hotels',
   })
+  @UseGuards(AuthGuard)
   async findAll() {
     return this.hotelService.getAllHotels();
   }
@@ -96,7 +107,6 @@ export class HotelController {
     return this.hotelService.deleteMenu(hotelId);
   }
 
-
   @Put('update_hotel/:id')
   @ApiBody({
     type: CreateHotelDTO,
@@ -113,22 +123,28 @@ export class HotelController {
     return this.hotelService.deleteHotel(id);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Post('/add-admin')
+  @Post('/add-admin/:hotelId')
   async addHotelAdmin(
     @Body() registerDTO: RegisterDTO,
     @Param('hotelId') hotelId: number,
   ) {
-    return this.hotelService.addHotelAdmin(registerDTO, Number(hotelId));
+    return this.hotelService.addHotelAdmin(registerDTO, hotelId);
   }
   @Put('/removeAdmin/:hotelId/:adminId')
-  async removeHotelAdmin(@Param('adminId') adminId:string, @Param('hotelId') hotelId:string){
-  return this.hotelService.removeHotelAdmin(hotelId,adminId);
+  async removeHotelAdmin(
+    @Param('adminId') adminId: string,
+    @Param('hotelId') hotelId: string,
+  ) {
+    return this.hotelService.removeHotelAdmin(hotelId, adminId);
   }
 
   @Put('/updateAdmin/:adminId')
-  async updateHotelAdmin(@Param('adminId') adminId:string,@Body() updateUserDTO:UpdateUserDTO){
-    return this.userService.updateUser(adminId,updateUserDTO);
+  async updateHotelAdmin(
+    @Param('adminId') adminId: string,
+    @Body() updateUserDTO: UpdateUserDTO,
+  ) {
+    return this.userService.updateUser(adminId, updateUserDTO);
   }
 }

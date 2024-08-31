@@ -39,6 +39,7 @@ model User {
   email             String          @unique
   password          String
   admin_hotels      Hotel[]
+  // hotel             Hotel?          @relation(fields: [hotelId], references: [id])
   role              Role            @default(NORMAL)
   verification      Verification?
   password_reset    PasswordReset?
@@ -50,6 +51,7 @@ model User {
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  // hotelId    Int?
 
   @@map("users")
 }
@@ -177,18 +179,18 @@ enum PaymentStatus {
 }
 
 model Hotel {
-  id                  Int      @id @unique @default(autoincrement())
+  id                  Int     @id @unique @default(autoincrement())
   admins              User[]
   name                String
   menu                Menu?
-  address             Address  @relation(fields: [address_id], references: [id])
-  address_id          String   @unique
+  address             Address @relation(fields: [address_id], references: [id])
+  address_id          String  @unique
   orders              Order[]
-  rating              Float    @default(0)
-  lastMonthOrders     Int?     @default(0)
-  ThisWeekOrders      Int?     @default(0)
-  startingWorkingTime DateTime @default(now())
-  endingWorkingTime   DateTime @default(now())
+  rating              Float   @default(0)
+  lastMonthOrders     Int?    @default(0)
+  ThisWeekOrders      Int?    @default(0)
+  startingWorkingTime String
+  endingWorkingTime   String
   image               String
 
   created_at DateTime @default(now())
@@ -248,7 +250,7 @@ model SubCategory {
   items       MenuItem[]
   description String
   image       String?
-  name        String
+  name        String          @unique
   created_at  DateTime        @default(now())
   updated_at  DateTime        @updatedAt
 

@@ -35,9 +35,6 @@ export class DeliveryAddress {
   @ApiProperty({ description: 'Telephone number of the recipient' })
   telephone: string;
 
-  @ApiProperty({ description: 'Address details' })
-  address: string;
-
   @ApiProperty({ description: 'City of the delivery address' })
   city: string;
   @ApiProperty({ description: 'car plateNumber of the delivery address' })

@@ -67,7 +67,7 @@ export class OrderController {
     return this.orderService.updateOrder(orderId, dataToUpdate);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   async deleteOrder(@Param('id') orderId: string): Promise<void> {
     return this.orderService.deleteOrder(orderId);
   }

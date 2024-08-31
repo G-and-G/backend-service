@@ -36,6 +36,7 @@ export class OrderService {
       const order_hotel = await this.prisma.hotel.findFirst({
         where: { menu: { is: { id: data.products[0].product.menu_id } } },
       });
+      if (!order_hotel) throw new BadRequestException('Hotel not found');
       const price = data.products.reduce((prev, curr) => {
         return prev + curr.product.price * curr.quantity;
       }, 0);

@@ -125,12 +125,16 @@ export class UserService {
     }
   }
   async getUserById(id: string) {
+    console.log("user id from req =",id);
     const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
+      include: {
+        admin_hotels: true,
+      },
     });
-    // console.log('user', user);
+    console.log('user', user);
     if (!user) {
       throw new BadRequestException("User doesn't exist");
     }

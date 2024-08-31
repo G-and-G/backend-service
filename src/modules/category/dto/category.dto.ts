@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductCategory } from '@prisma/client';
 import {
   ArrayNotEmpty,
   ArrayUnique,
@@ -8,6 +9,7 @@ import {
   Length,
   min,
 } from 'class-validator';
+
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -32,15 +34,13 @@ export class CreateCategoryDto {
     description: 'Type either Foods or Drinks',
     example: 'Foods',
   })
-  
   @IsNotEmpty()
-  type: string;
+  type: ProductCategory;
 
   @IsString()
   @ApiProperty({
     description: 'url of the image to the label of the category',
     example: 'https://images.com/img.png',
   })
-  @IsNotEmpty()
   image: string;
 }

@@ -14,14 +14,17 @@ import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { Hotel, Role } from '@prisma/client';
 // import { Hotel } from './hotel.entity';
 import ApiResponse from 'src/utils/ApiResponse';
-import { CreateMenuDTO } from './dto/create-menu.dto';
 import { RegisterDTO } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
+import { CreateMenuDTO } from './dto/create-menu.dto';
 @Injectable()
 export class HotelService {
-  constructor(private readonly prisma: PrismaService ,private readonly userService:UserService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
 
-  async createHotel(createHotelDTO: CreateHotelDTO): Promise<Hotel> {
+  async createHotel(createHotelDTO: CreateHotelDTO): Promise<ApiResponse> {
     console.log('Received DTO:', createHotelDTO);
     try {
       if (!createHotelDTO || !createHotelDTO.address) {
@@ -46,7 +49,7 @@ export class HotelService {
         },
       });
 
-      return hotel;
+      return ApiResponse.success('Hotel created successfully', hotel);
     } catch (error) {
       console.log(error);
 
@@ -76,6 +79,26 @@ export class HotelService {
     return hotel;
   }
 
+  async getHotelAdmins(hotelId:number):Promise<ApiResponse>{
+    try {
+      const hotel = await this.prisma.hotel.findFirst({
+        where:{
+          id:Number(hotelId)
+        },
+        include:{
+          admins:true
+        }
+      });
+     if(!hotel){
+      throw new Error("No hotel found");
+     }
+      return ApiResponse.success("Successfully fetched admins",hotel.admins);
+      
+    } catch (error) {
+      return ApiResponse.error("Error fetching admins",error.message);
+    }
+  }
+
   async getHotelByProductId(id: number): Promise<Hotel> {
     const hotel = await this.prisma.hotel.findFirst({
       where: {
@@ -97,12 +120,19 @@ export class HotelService {
     return hotel;
   }
 
-  async getAllHotels(): Promise<Hotel[]> {
-    return this.prisma.hotel.findMany({
-      include: {
-        menu: true,
-      },
-    });
+  async getAllHotels(): Promise<ApiResponse> {
+    try {
+      const hotels = await this.prisma.hotel.findMany({
+        include: {
+          menu: true,
+          admins: true,
+          address:true
+        },
+      });
+     return ApiResponse.success("Hotels fetched successfully",hotels);
+    } catch (error) {
+      return ApiResponse.error("Error fetching hotels",error.message);
+    }
   }
 
   async updateHotel(
@@ -292,17 +322,17 @@ export class HotelService {
     return hotel;
   }
   async addHotelAdmin(registerDTO: RegisterDTO, hotelId: number) {
+    console.log('APPLICATION LOG: Hotel ID =>', hotelId);
     try {
       // Check if the user exists
       const user = await this.userService.createUser(registerDTO);
-
       if (!user.data) {
         throw new NotFoundException("User couldn't be created");
       }
 
       // Update the Hotel to set the admin
       const hotel = await this.prisma.hotel.update({
-        where: { id: hotelId },
+        where: { id: Number(hotelId) },
         data: {
           admins: {
             connect: { id: user.data.id },
@@ -351,10 +381,8 @@ export class HotelService {
           },
         },
       });
-
     } catch (error) {
       return ApiResponse.error('Error deleting hotel Admin', error.message);
     }
   }
-
 }
