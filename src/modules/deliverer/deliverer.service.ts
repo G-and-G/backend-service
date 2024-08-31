@@ -1,6 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { AssignOrderDto, CreateDelivererDto, UpdateDelivererDto } from './deliverer.dto';
+import { log } from 'console';
 
 @Injectable()
 export class DelivererService {
@@ -21,7 +22,8 @@ export class DelivererService {
         response: { message: 'Deliverer created successfully', deliverer },
       };
     } catch (error) {
-      console.error('Error creating deliverer:', error);
+      
+      
       return {
         status: 500,
         response: { message: 'Failed to create deliverer' },
@@ -41,7 +43,7 @@ export class DelivererService {
         response: { message: 'Deliverer updated successfully', deliverer },
       };
     } catch (error) {
-      console.error('Error updating deliverer:', error);
+      
       return {
         status: 500,
         response: { message: 'Failed to update deliverer' },
@@ -60,7 +62,7 @@ export class DelivererService {
         response: { message: 'Deliverer deleted successfully' },
       };
     } catch (error) {
-      console.error('Error deleting deliverer:', error);
+      
       return {
         status: 500,
         response: { message: 'Failed to delete deliverer' },
@@ -82,7 +84,7 @@ export class DelivererService {
         response: { message: 'Order assigned to deliverer successfully', assignment },
       };
     } catch (error) {
-      console.error('Error assigning order to deliverer:', error);
+      
       return {
         status: 500,
         response: { message: 'Failed to assign order to deliverer' },
@@ -104,7 +106,7 @@ export class DelivererService {
         response: { message: 'Deliverers retrieved successfully', deliverers },
       };
     } catch (error) {
-      console.error('Error retrieving deliverers:', error);
+      
       return {
         status: 500,
         response: { message: 'Failed to retrieve deliverers' },
@@ -126,7 +128,7 @@ export class DelivererService {
         response: { message: 'Orders retrieved successfully', orders },
       };
     } catch (error) {
-      console.error('Error retrieving orders:', error);
+      
       return {
         status: 500,
         response: { message: 'Failed to retrieve orders' },
