@@ -7,7 +7,6 @@ import {
   Delete,
   Query,
   Get,
-  HttpStatus,
 } from '@nestjs/common';
 import { DelivererService } from './deliverer.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -27,30 +26,11 @@ export class DelivererController {
     status: 201,
     description: 'The deliverer has been successfully created.',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid input data.',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
   async createDeliverer(
     @Body() createDelivererDto: CreateDelivererDto,
-    @Query('hotelId') hotelId: number,
+    @Query('hotelId') hotelId: string,
   ) {
-    try {
-      const result = await this.delivererService.createDeliverer(createDelivererDto, hotelId);
-      return {
-        status: 201,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to create deliverer', error: error.message },
-      };
-    }
+    return this.delivererService.createDeliverer(createDelivererDto, hotelId);
   }
 
   @Put('update/:id')
@@ -60,30 +40,11 @@ export class DelivererController {
     status: 200,
     description: 'The deliverer has been successfully updated.',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid input data.',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
   async updateDeliverer(
     @Param('id') id: string,
     @Body() updateDelivererDto: UpdateDelivererDto,
   ) {
-    try {
-      const result = await this.delivererService.updateDeliverer(id, updateDelivererDto);
-      return {
-        status: 200,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to update deliverer', error: error.message },
-      };
-    }
+    return this.delivererService.updateDeliverer(id, updateDelivererDto);
   }
 
   @Delete('delete/:id')
@@ -93,23 +54,8 @@ export class DelivererController {
     status: 200,
     description: 'The deliverer has been successfully deleted.',
   })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
   async deleteDeliverer(@Param('id') id: string) {
-    try {
-      const result = await this.delivererService.deleteDeliverer(id);
-      return {
-        status: 200,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to delete deliverer', error: error.message },
-      };
-    }
+    return this.delivererService.deleteDeliverer(id);
   }
 
   @Post('assign-order')
@@ -119,27 +65,8 @@ export class DelivererController {
     status: 200,
     description: 'The order has been successfully assigned.',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Failed to assign order.',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
   async assignOrder(@Body() assignOrderDto: AssignOrderDto) {
-    try {
-      const result = await this.delivererService.assignOrder(assignOrderDto);
-      return {
-        status: 200,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to assign order', error: error.message },
-      };
-    }
+    return this.delivererService.assignOrder(assignOrderDto);
   }
 
   @Get('hotel/:hotelId')
@@ -149,23 +76,8 @@ export class DelivererController {
     status: 200,
     description: 'Deliverers retrieved successfully.',
   })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
-  async getDeliverersByHotel(@Param('hotelId') hotelId: number) {
-    try {
-      const result = await this.delivererService.getDeliverersByHotel(hotelId);
-      return {
-        status: 200,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to retrieve deliverers', error: error.message },
-      };
-    }
+  async getDeliverersByHotel(@Param('hotelId') hotelId: string) {
+    return this.delivererService.getDeliverersByHotel(hotelId);
   }
 
   @Get('assigned-orders/:delivererId')
@@ -174,22 +86,7 @@ export class DelivererController {
     status: 200,
     description: 'Orders retrieved successfully.',
   })
-  @ApiResponse({
-    status: 500,
-    description: 'Internal server error.',
-  })
   async getAssignedOrders(@Param('delivererId') delivererId: string) {
-    try {
-      const result = await this.delivererService.getAssignedOrders(delivererId);
-      return {
-        status: 200,
-        response: result,
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        response: { message: 'Failed to retrieve orders', error: error.message },
-      };
-    }
+    return this.delivererService.getAssignedOrders(delivererId);
   }
 }
