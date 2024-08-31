@@ -31,15 +31,6 @@ export class CreateDelivererDto {
   })
   @IsString()
   password: string;
-
-  @ApiProperty({
-    description: 'The role of the deliverer',
-    enum: Role,
-    example: Role.DELIVERER,
-    default: Role.DELIVERER,
-  })
-  @IsEnum(Role)
-  role: Role = Role.DELIVERER;
 }
 
 
