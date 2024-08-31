@@ -89,4 +89,14 @@ export class DelivererController {
   async getAssignedOrders(@Param('delivererId') delivererId: string) {
     return this.delivererService.getAssignedOrders(delivererId);
   }
+  @Get('admin/:adminId')
+  @Roles(Role.HOTEL_ADMIN) // Optionally restrict access if needed
+  @ApiOperation({ summary: 'Get all deliverers managed by a specific hotel admin' })
+  @ApiResponse({
+    status: 200,
+    description: 'Deliverers managed by the hotel admin retrieved successfully.',
+  })
+  async getDeliverersByHotelAdmin(@Param('adminId') adminId: string) {
+    return this.delivererService.getDeliverersByHotelAdmin(adminId);
+  }
 }
