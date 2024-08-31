@@ -145,4 +145,35 @@ export class DelivererService {
       };
     }
   }
+   // Get all deliverers managed by a specific hotel admin
+   async getDeliverersByHotelAdmin(adminId: string) {
+    try {
+      const hotels = await this.prisma.hotel.findMany({
+        where: {
+          admins: { some: { id: adminId } },
+        },
+        select: { id: true },
+      });
+
+      const hotelIds = hotels.map(hotel => hotel.id);
+
+      const deliverers = await this.prisma.user.findMany({
+        where: {
+          admin_hotels: { some: { id: { in: hotelIds } } },
+          role: 'DELIVERER',
+        },
+      });
+
+      return {
+        status: 200,
+        response: { message: 'Deliverers retrieved successfully', deliverers },
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        response: { message: 'Failed to retrieve deliverers', error: error.message },
+      };
+    }
+  }
+
 }
