@@ -115,7 +115,7 @@ export class DelivererService {
       });
       return {
         status: 200,
-        response: { message: 'Deliverers retrieved successfully', data },
+        data: data
       };
     } catch (error) {
       return {
