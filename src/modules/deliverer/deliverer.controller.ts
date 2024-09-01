@@ -1,18 +1,22 @@
 import {
-  Controller,
-  Post,
   Body,
-  Put,
-  Param,
+  Controller,
   Delete,
-  Query,
   Get,
+  Param,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
-import { DelivererService } from './deliverer.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { AssignOrderDto, CreateDelivererDto, UpdateDelivererDto } from './deliverer.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Role } from 'src/common/guards/role.guard';
+import {
+  AssignOrderDto,
+  CreateDelivererDto,
+  UpdateDelivererDto,
+} from './deliverer.dto';
+import { DelivererService } from './deliverer.service';
 
 @ApiTags('deliverers')
 @Controller('deliverers')
@@ -91,10 +95,13 @@ export class DelivererController {
   }
   @Get('admin/:adminId')
   @Roles(Role.HOTEL_ADMIN) // Optionally restrict access if needed
-  @ApiOperation({ summary: 'Get all deliverers managed by a specific hotel admin' })
+  @ApiOperation({
+    summary: 'Get all deliverers managed by a specific hotel admin',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Deliverers managed by the hotel admin retrieved successfully.',
+    description:
+      'Deliverers managed by the hotel admin retrieved successfully.',
   })
   async getDeliverersByHotelAdmin(@Param('adminId') adminId: string) {
     return this.delivererService.getDeliverersByHotelAdmin(adminId);
