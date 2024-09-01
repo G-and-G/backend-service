@@ -107,7 +107,7 @@ export class DelivererService {
         throw new Error('Invalid hotelId provided');
       }
 
-      const deliverers = await this.prisma.user.findMany({
+      const data = await this.prisma.user.findMany({
         where: {
           admin_hotels: { some: { id: hotelIdNumber } },
           role: 'DELIVERER',
@@ -115,7 +115,7 @@ export class DelivererService {
       });
       return {
         status: 200,
-        response: { message: 'Deliverers retrieved successfully', deliverers },
+        response: { message: 'Deliverers retrieved successfully', data },
       };
     } catch (error) {
       return {
