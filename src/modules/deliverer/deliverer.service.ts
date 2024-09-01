@@ -89,13 +89,24 @@ export class DelivererService {
         response: { message: 'Order assigned to deliverer successfully', assignment },
       };
     } catch (error) {
+      if (error.code === 'P2002' && error.meta?.target.includes('user_id')) {
+        return {
+          status: 400,
+          response: {
+            message: `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
+          },
+        };
+      }
+  
+      console.error('Unexpected error occurred:', error);
+  
       return {
         status: 500,
-        response: { message: 'Failed to assign order to deliverer' },
+        response: { message: 'Failed to assign order to deliverer due to an internal server error.' },
       };
     }
   }
-
+  
   // Get all deliverers for a specific hotel
   async getDeliverersByHotel(hotelId: string) {
     try {
