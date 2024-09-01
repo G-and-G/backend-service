@@ -70,9 +70,26 @@ export class DelivererService {
           order_id: dto.orderId,
         },
       });
-      return ApiResponse.success('Order assigned successfully', assignment);
+      return {
+        status: 200,
+        response: { message: 'Order assigned to deliverer successfully', assignment },
+      };
     } catch (error) {
-      throw new InternalServerErrorException(error);
+      if (error.code === 'P2002' && error.meta?.target.includes('user_id')) {
+        return {
+          status: 400,
+          response: {
+            message: `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
+          },
+        };
+      }
+  
+      console.error('Unexpected error occurred:', error);
+  
+      return {
+        status: 500,
+        response: { message: 'Failed to assign order to deliverer due to an internal server error.' },
+      };
     }
   }
   
