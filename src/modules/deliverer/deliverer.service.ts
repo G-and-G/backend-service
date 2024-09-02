@@ -106,7 +106,7 @@ export class DelivererService {
       const orders = await this.prisma.assignedOrder.findMany({
         where: {
           user_id: delivererId,
-          order: { status: OrderStatus.DELIVERED },
+          order: { status: { not: OrderStatus.DELIVERED } },
         },
         include: {
           order: {
