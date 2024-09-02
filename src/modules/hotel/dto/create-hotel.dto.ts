@@ -29,7 +29,7 @@ export class CreateHotelDTO {
       sector: 'Nyamirambo',
       cell: 'Nyarufunzo',
       village: 'Rwarutabura ',
-      name:"Nyarugenge, Nyamirambo, Nyarufunzo"
+      name: 'Nyarugenge, Nyamirambo, Nyarufunzo',
     },
   })
   @ValidateNested()
@@ -58,10 +58,10 @@ export class CreateHotelDTO {
   closingTime: string;
 
   @ApiProperty({
-    description:"The hotel's rating meaning the number of stars",
-    example:4,
-    type:Number
+    description: "The hotel's rating meaning the number of stars",
+    example: 4,
+    type: Number,
   })
   @IsNumber()
-  rating:Number;
+  rating: Number;
 }

@@ -39,7 +39,6 @@ export class AuthController {
     try {
       await this.authService.resetPassword(token, dto.newPassword);
     } catch (error) {
-         
       console.log('Error resetting password:', error);
     }
   }

@@ -27,12 +27,16 @@ export class AuthGuard implements CanActivate {
         }; // Attaching the user to the request object
         return true;
       } catch (error) {
-        console.log('[APPLICATION LOG]: Authentication failed - Invalid token.');
+        console.log(
+          '[APPLICATION LOG]: Authentication failed - Invalid token.',
+        );
         return false;
       }
     }
 
-    console.log('[A PPLICATION LOG]: Authentication failed - No token provided.');
+    console.log(
+      '[A PPLICATION LOG]: Authentication failed - No token provided.',
+    );
     return false;
   }
 }
