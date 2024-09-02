@@ -85,6 +85,17 @@ export class UserController {
     return ApiResponse.success('User retrieved successfully', user);
   }
 
+  // @Put('make-admin/:id')
+  // @UseGuards(AuthGuard,RolesGuard)
+  // @Roles(Role.SUPER_ADMIN)
+  // async makeUserAdmin(@Param('id') userId: string,@Request() req) {
+  //   console.log('[APPLICATION LOG]: Current User:', req.user); 
+  //   const response = await this.userService.makeUserAdmin(userId);
+  //   // console.log("errorrr");
+
+  //   return response;
+  // }
+
   @Put('make-admin/:id')
   @UseGuards(AuthGuard,RolesGuard)
   @Roles(Role.SUPER_ADMIN)

@@ -7,6 +7,15 @@
     CreateDelivererDto,
     UpdateDelivererDto,
   } from './deliverer.dto';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { OrderStatus } from '@prisma/client';
+import { PrismaService } from 'prisma/prisma.service';
+import ApiResponse from 'src/utils/ApiResponse';
+import {
+  AssignOrderDto,
+  CreateDelivererDto,
+  UpdateDelivererDto,
+} from './deliverer.dto';
 
   @Injectable()
   export class DelivererService {
