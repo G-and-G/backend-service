@@ -25,11 +25,8 @@ export class CreateHotelDTO {
       latitude: 12.3,
       longitude: -20.2,
       street: 'KN 45 ST',
-      district: 'Nyarugenge',
-      sector: 'Nyamirambo',
-      cell: 'Nyarufunzo',
-      village: 'Rwarutabura ',
-      name: 'Nyarugenge, Nyamirambo, Nyarufunzo',
+      name:"Nyarugenge, Nyamirambo, Nyarufunzo",
+      country:"Rwanda"
     },
   })
   @ValidateNested()
