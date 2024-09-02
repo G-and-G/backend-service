@@ -190,7 +190,7 @@ model Hotel {
   lastMonthOrders     Int?    @default(0)
   ThisWeekOrders      Int?    @default(0)
   startingWorkingTime String
-  endingWorkingTime   String
+  closingTime   String        @default("22:00")
   image               String
 
   created_at DateTime @default(now())

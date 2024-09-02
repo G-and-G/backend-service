@@ -21,6 +21,14 @@ export class UserService {
   async createUser(dto: RegisterDTO) {
     try {
       const hashedPassword = await hash(dto.password, 10);
+      const existingUser = await this.prisma.user.findFirst({
+        where:{
+          email: dto.email
+        }
+      });
+      if(existingUser){
+        throw new Error("Email is in use!")
+      }
       const user = await this.prisma.user.create({
         data: {
           // role:dto.role,
