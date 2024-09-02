@@ -79,32 +79,44 @@ export class AuthService {
     }
   }
   async initiateResetPassword(email: string) {
-    const user = await this.userService.getUserByEmail(email);
+    try{
+      const user = await this.userService.getUserByEmail(email);
 
-    if (!user) {
-      return;
+      if (!user) {
+        return;
+      }
+  
+      const resetToken = randomBytes(32).toString('hex');
+  
+      await this.userService.updateResetToken(user.id, resetToken);
+  
+      await this.mailService.sendResetPasswordEmail({
+        email: user.email,
+        token: resetToken,
+        names: `${user.first_name} ${user.last_name}`,
+      });
+    
+    }catch(err){
+      console.log(err);
+      
     }
-
-    const resetToken = randomBytes(32).toString('hex');
-
-    await this.userService.updateResetToken(user.id, resetToken);
-
-    await this.mailService.sendResetPasswordEmail({
-      email: user.email,
-      token: resetToken,
-      names: `${user.first_name} ${user.last_name}`,
-    });
   }
   async resetPassword(token: string, newPassword: string) {
-    const user = await this.userService.getUserByResetToken(token);
+    try{
+      const user = await this.userService.getUserByResetToken(token);
 
-    if (!user) {
-      return;
+      if (!user) {
+        return;
+      }
+  
+      const hashedPassword = hashSync(newPassword, 10);
+  
+      await this.userService.updatePasswordAndClearToken(user.id, hashedPassword);
+    }catch(err){
+      console.log(err);
+      
     }
-
-    const hashedPassword = hashSync(newPassword, 10);
-
-    await this.userService.updatePasswordAndClearToken(user.id, hashedPassword);
+    
   }
 
   async initiateEmailVerification(email: string) {

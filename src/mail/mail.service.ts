@@ -25,7 +25,7 @@ export class MailService {
   async sendWelcomeEmail({ names, email }: { email: string; names: string }) {
     const mailOptions: nodemailer.SendMailOptions = {
       to: email,
-      subject: 'Welcome to Liquor Store',
+      subject: 'Welcome to Grab and Go',
       html: welcome({ names }),
     };
     console.log('[APPLICATION LOG]: Sending welcome email to ' + email);
