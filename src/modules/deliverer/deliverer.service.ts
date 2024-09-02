@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import ApiResponse from 'src/utils/ApiResponse';
 import {
@@ -103,9 +104,21 @@ export class DelivererService {
   async getAssignedOrders(delivererId: string) {
     try {
       const orders = await this.prisma.assignedOrder.findMany({
-        where: { user_id: delivererId },
+        where: {
+          user_id: delivererId,
+          order: { status: OrderStatus.DELIVERED },
+        },
         include: {
-          order: true,
+          order: {
+            include: {
+              products: {
+                include: {
+                  menu_item: true,
+                },
+              },
+              customer: true,
+            },
+          },
         },
       });
       return ApiResponse.success('Orders retrieved successfully', orders);
