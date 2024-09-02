@@ -22,12 +22,12 @@ export class UserService {
     try {
       const hashedPassword = await hash(dto.password, 10);
       const existingUser = await this.prisma.user.findFirst({
-        where:{
-          email: dto.email
-        }
+        where: {
+          email: dto.email,
+        },
       });
-      if(existingUser){
-        throw new Error("Email is in use!")
+      if (existingUser) {
+        throw new Error('Email is in use!');
       }
       const user = await this.prisma.user.create({
         data: {
@@ -133,7 +133,7 @@ export class UserService {
     }
   }
   async getUserById(id: string) {
-    console.log("user id from req =",id);
+    console.log('user id from req =', id);
     const user = await this.prisma.user.findUnique({
       where: {
         id,

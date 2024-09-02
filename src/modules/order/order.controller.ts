@@ -67,7 +67,7 @@ export class OrderController {
     return this.orderService.updateOrder(orderId, dataToUpdate);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   async deleteOrder(@Param('id') orderId: string): Promise<void> {
     return this.orderService.deleteOrder(orderId);
   }
@@ -77,6 +77,20 @@ export class OrderController {
       const updatedOrder = await this.orderService.markOrderCompleted(orderId);
       return ApiResponse.success(
         'Order status updated to completed',
+        updatedOrder,
+      );
+    } catch (error) {
+      console.log('Error updating order status:', error);
+      return ApiResponse.error('Error updating order status', error);
+    }
+  }
+
+  @Patch(':orderId/deliver') // Define the route and HTTP method
+  async markOrderDelivered(@Param('orderId', ParseUUIDPipe) orderId: string) {
+    try {
+      const updatedOrder = await this.orderService.markOrderDelivered(orderId);
+      return ApiResponse.success(
+        'Order status updated to delivered',
         updatedOrder,
       );
     } catch (error) {

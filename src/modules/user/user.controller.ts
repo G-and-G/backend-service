@@ -89,7 +89,7 @@ export class UserController {
   // @UseGuards(AuthGuard,RolesGuard)
   // @Roles(Role.SUPER_ADMIN)
   // async makeUserAdmin(@Param('id') userId: string,@Request() req) {
-  //   console.log('[APPLICATION LOG]: Current User:', req.user); 
+  //   console.log('[APPLICATION LOG]: Current User:', req.user);
   //   const response = await this.userService.makeUserAdmin(userId);
   //   // console.log("errorrr");
 
@@ -97,10 +97,10 @@ export class UserController {
   // }
 
   @Put('make-admin/:id')
-  @UseGuards(AuthGuard,RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  async makeUserAdmin(@Param('id') userId: string,@Request() req) {
-    console.log('[APPLICATION LOG]: Current User:', req.user); 
+  async makeUserAdmin(@Param('id') userId: string, @Request() req) {
+    console.log('[APPLICATION LOG]: Current User:', req.user);
     const response = await this.userService.makeUserAdmin(userId);
     // console.log("errorrr");
 
@@ -108,7 +108,7 @@ export class UserController {
   }
 
   @Put('make-super-admin/:id')
-  async makeUserSuperAdmin(@Param('id') userId: string){
+  async makeUserSuperAdmin(@Param('id') userId: string) {
     const response = await this.userService.makeUserSuperAdmin(userId);
     return response;
   }

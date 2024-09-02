@@ -30,14 +30,14 @@ const prisma = new PrismaClient();
 @ApiTags('subCategories')
 @UseInterceptors(ErrorInterceptor)
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService){ }
+  constructor(private readonly categoryService: CategoryService) {}
   @ApiResponse({
     status: 200,
     description: 'SubCategories returned successfully',
   })
   @Get('/')
   async getCategories() {
-   return this.categoryService.getSubCategories();
+    return this.categoryService.getSubCategories();
   }
 
   @Post('/new')
@@ -59,11 +59,8 @@ export class CategoryController {
     required: true,
   })
   @ApiOperation({ summary: 'Update an already existing subcategory' })
-  async updateCategory(
-    @Param('id') id,
-    @Body() body: CreateCategoryDto,
-  ) {
-    return this.categoryService.updateSubCategory(body,id);
+  async updateCategory(@Param('id') id, @Body() body: CreateCategoryDto) {
+    return this.categoryService.updateSubCategory(body, id);
   }
 
   @Delete('/:id')
@@ -74,8 +71,8 @@ export class CategoryController {
     required: true,
   })
   @ApiOperation({ summary: 'Delete a subcategory' })
-  async deleteUpdate(@Param('id') id:number) {
-   return this.categoryService.deleteSubcategory(id);
+  async deleteUpdate(@Param('id') id: number) {
+    return this.categoryService.deleteSubcategory(id);
   }
 
   // @Post('/secret')

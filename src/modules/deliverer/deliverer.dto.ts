@@ -1,7 +1,6 @@
 // create-deliverer.dto.ts
-import { IsString, IsEmail, IsEnum, IsOptional } from 'class-validator';
-import { Role } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateDelivererDto {
   @ApiProperty({
@@ -25,24 +24,19 @@ export class CreateDelivererDto {
   @IsEmail()
   email: string;
 
+  // @ApiProperty({
+  //   description: 'The Phone number of the deliverer',
+  //   example: '08123456789',
+  // })
+  // phone_number: string; // Add this property after in schema
+
   @ApiProperty({
     description: 'The password for the deliverer account',
     example: 'securepassword123',
   })
   @IsString()
   password: string;
-
-  @ApiProperty({
-    description: 'The role of the deliverer',
-    enum: Role,
-    example: Role.DELIVERER,
-    default: Role.DELIVERER,
-  })
-  @IsEnum(Role)
-  role: Role = Role.DELIVERER;
 }
-
-
 
 export class UpdateDelivererDto {
   @ApiPropertyOptional({

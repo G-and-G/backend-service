@@ -10,7 +10,6 @@ import {
   min,
 } from 'class-validator';
 
-
 export class CreateCategoryDto {
   @ApiProperty({
     description: 'description of the new category',

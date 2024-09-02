@@ -35,10 +35,16 @@ import { DelivererModule } from './modules/deliverer/deliverer.module';
     OrderModule,
     // GoogleModule,
     AnalyticsModule,
-    DelivererModule
+    DelivererModule,
   ],
   controllers: [AppController, FirebaseController],
 
-  providers: [AppService, NotificationGateway, PaymentService,RolesGuard,AuthGuard],
+  providers: [
+    AppService,
+    NotificationGateway,
+    PaymentService,
+    RolesGuard,
+    AuthGuard,
+  ],
 })
 export class AppModule {}
