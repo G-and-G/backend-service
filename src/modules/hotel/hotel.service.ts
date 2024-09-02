@@ -45,7 +45,7 @@ export class HotelService {
             },
           },
           startingWorkingTime: createHotelDTO.startingWorkingTime,
-          endingWorkingTime: createHotelDTO.closingTime,
+          closingTime: createHotelDTO.closingTime,
         },
       });
 
@@ -159,7 +159,7 @@ export class HotelService {
               street: updateHotelDTO.address.street,
             },
           },
-          endingWorkingTime: updateHotelDTO.startingWorkingTime,
+          closingTime: updateHotelDTO.startingWorkingTime,
           startingWorkingTime: updateHotelDTO.closingTime,
         },
       });
