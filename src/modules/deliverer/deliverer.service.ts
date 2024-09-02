@@ -116,6 +116,11 @@ export class DelivererService {
                   menu_item: true,
                 },
               },
+              deliveryAddress: {
+                include: {
+                  address: true,
+                },
+              },
               customer: true,
             },
           },
