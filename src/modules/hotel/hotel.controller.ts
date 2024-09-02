@@ -71,7 +71,6 @@ export class HotelController {
   }
   @Get()
   @ApiResponse({
-    status: 200,
     description: 'Hotels returned successfully',
   })
   @ApiOperation({
