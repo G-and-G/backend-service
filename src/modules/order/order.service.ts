@@ -179,6 +179,23 @@ export class OrderService {
       throw new Error('Error updating order status');
     }
   }
+
+  async markOrderDelivered(orderId: string): Promise<Order> {
+    try {
+      const updatedOrder = await this.prisma.order.update({
+        where: { id: orderId },
+        data: {
+          status: 'DELIVERED', // Set the status to 'Completed'
+        },
+      });
+
+      return updatedOrder;
+    } catch (error) {
+      console.log('Error updating order status:', error);
+      throw new Error('Error updating order status');
+    }
+  }
+
   // ... other methods in your OrderService
   async deleteOrder(orderId: string): Promise<void> {
     try {

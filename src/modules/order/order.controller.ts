@@ -84,4 +84,18 @@ export class OrderController {
       return ApiResponse.error('Error updating order status', error);
     }
   }
+
+  @Patch(':orderId/deliver') // Define the route and HTTP method
+  async markOrderDelivered(@Param('orderId', ParseUUIDPipe) orderId: string) {
+    try {
+      const updatedOrder = await this.orderService.markOrderDelivered(orderId);
+      return ApiResponse.success(
+        'Order status updated to delivered',
+        updatedOrder,
+      );
+    } catch (error) {
+      console.log('Error updating order status:', error);
+      return ApiResponse.error('Error updating order status', error);
+    }
+  }
 }
