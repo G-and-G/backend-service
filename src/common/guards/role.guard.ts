@@ -1,11 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/role.decorator'; // Import the custom roles decorator
-export enum Role{
+export enum Role {
   HOTEL_ADMIN,
   NORMAL,
   DELIVERER,
-  SUPER_ADMIN
+  SUPER_ADMIN,
 } // Import the Role enum (or define it in this file)
 
 @Injectable()

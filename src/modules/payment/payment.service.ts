@@ -109,8 +109,12 @@ export class PaymentService {
   }
 
   async payWithMomo(dto: PayWithMomoDto) {
+    console.log(dto);
+    const order = await this.orderService.getOrderById(dto.orderId);
+    if (!order) {
+      throw new BadRequestException('Order not found');
+    }
     try {
-      const order = await this.orderService.getOrderById(dto.orderId);
       // save payment
       const payment = await this.createPayment({
         order: {

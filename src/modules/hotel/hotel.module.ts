@@ -5,9 +5,9 @@ import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service';
 
 @Module({
-  imports:[UserModule],
+  imports: [UserModule],
   controllers: [HotelController],
-  providers: [HotelService,UserService],
+  providers: [HotelService, UserService],
   exports: [HotelService],
 })
 export class HotelModule {}

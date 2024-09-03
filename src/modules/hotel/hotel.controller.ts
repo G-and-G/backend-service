@@ -20,19 +20,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Hotel } from '@prisma/client';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role, RolesGuard } from 'src/common/guards/role.guard';
 import { AppExceptionFilter } from 'src/utils/filters/AppExceptionFilter';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RegisterDTO } from '../user/dto/create-user.dto';
+import { UpdateUserDTO } from '../user/dto/update-user.dto';
+import { UserService } from '../user/user.service';
 import { CreateHotelDTO } from './dto/create-hotel.dto';
 import { CreateMenuDTO } from './dto/create-menu.dto';
 import { HotelService } from './hotel.service';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { Role, RolesGuard } from 'src/common/guards/role.guard';
-import { AdminGuard } from '../user/guards/admin.guard';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RegisterDTO } from '../user/dto/create-user.dto';
-import { UserService } from '../user/user.service';
-import { UpdateHotelDTO } from './dto/Update-hotel.dto';
-import { UpdateUserDTO } from '../user/dto/update-user.dto';
-import { Auth } from 'firebase-admin/lib/auth/auth';
 // import { UpdateHotelDTO } from './dto/update-hotel.dto';
 
 @Controller('hotels')
@@ -57,7 +54,7 @@ export class HotelController {
     return this.hotelService.getHotelById(id);
   }
   @Get('hotel/admins/:hotelId')
-  async getHotelAdmins(@Param('hotelId') hotelId:number){
+  async getHotelAdmins(@Param('hotelId') hotelId: number) {
     return this.hotelService.getHotelAdmins(hotelId);
   }
   @Get('hotel/byAdmin/:adminId')

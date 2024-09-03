@@ -107,15 +107,22 @@ export class AuthService {
    }
   }
   async resetPassword(token: string, newPassword: string) {
-    const user = await this.userService.getUserByResetToken(token);
+    try {
+      const user = await this.userService.getUserByResetToken(token);
 
-    if (!user) {
-      return;
+      if (!user) {
+        return;
+      }
+
+      const hashedPassword = hashSync(newPassword, 10);
+
+      await this.userService.updatePasswordAndClearToken(
+        user.id,
+        hashedPassword,
+      );
+    } catch (err) {
+      console.log(err);
     }
-
-    const hashedPassword = hashSync(newPassword, 10);
-
-    await this.userService.updatePasswordAndClearToken(user.id, hashedPassword);
   }
 
   async initiateEmailVerification(email: string) {

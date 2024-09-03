@@ -1,31 +1,42 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { AssignOrderDto, CreateDelivererDto, UpdateDelivererDto } from './deliverer.dto';
+import ApiResponse from 'src/utils/ApiResponse';
+import * as bcrypt from 'bcrypt';
+import {
+  AssignOrderDto,
+  CreateDelivererDto,
+  UpdateDelivererDto,
+} from './deliverer.dto';
 
 @Injectable()
 export class DelivererService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Create a new deliverer for a specific hotel
-  async createDeliverer(dto: CreateDelivererDto, hotelId: number) {
+  async createDeliverer(dto: CreateDelivererDto, hotelId: string) {
     try {
+      // Convert hotelId to a number
+      const hotelIdNumber = parseInt(hotelId, 10);
+
+      // Ensure hotelId is a valid number
+      if (isNaN(hotelIdNumber)) {
+        throw new Error('Invalid hotelId provided');
+      }
+
+      const hashedPassword = await bcrypt.hash(dto.password, 10);
+
       const deliverer = await this.prisma.user.create({
         data: {
           ...dto,
+          password: hashedPassword,
           role: 'DELIVERER',
-          admin_hotels: { connect: { id: hotelId } },  
+          admin_hotels: { connect: { id: hotelIdNumber } },
         },
       });
-      return {
-        status: HttpStatus.CREATED,
-        response: { message: 'Deliverer created successfully', deliverer },
-      };
+
+      return ApiResponse.success('Deliverer created successfully', deliverer);
     } catch (error) {
-      console.error('Error creating deliverer:', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to create deliverer' },
-      };
+      console.error(error);
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -36,16 +47,9 @@ export class DelivererService {
         where: { id },
         data: dto,
       });
-      return {
-        status: HttpStatus.OK,
-        response: { message: 'Deliverer updated successfully', deliverer },
-      };
+      return ApiResponse.success('Deliverer updated successfully', deliverer);
     } catch (error) {
-      console.error('Error updating deliverer:', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to update deliverer' },
-      };
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -55,16 +59,9 @@ export class DelivererService {
       await this.prisma.user.delete({
         where: { id },
       });
-      return {
-        status: HttpStatus.OK,
-        response: { message: 'Deliverer deleted successfully' },
-      };
+      return ApiResponse.success('Deliverer deleted successfully', null, 200);
     } catch (error) {
-      console.error('Error deleting deliverer:', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to delete deliverer' },
-      };
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -78,40 +75,58 @@ export class DelivererService {
         },
       });
       return {
-        status: HttpStatus.OK,
-        response: { message: 'Order assigned to deliverer successfully', assignment },
+        status: 200,
+        response: {
+          message: 'Order assigned to deliverer successfully',
+          assignment,
+        },
       };
     } catch (error) {
-      console.error('Error assigning order to deliverer:', error);
+      if (error.code === 'P2002' && error.meta?.target.includes('user_id')) {
+        return {
+          status: 400,
+          response: {
+            message: `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
+          },
+        };
+      }
+
+      console.error('Unexpected error occurred:', error);
+
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to assign order to deliverer' },
+        status: 500,
+        response: {
+          message:
+            'Failed to assign order to deliverer due to an internal server error.',
+        },
       };
     }
   }
 
   // Get all deliverers for a specific hotel
-  async getDeliverersByHotel(hotelId: number) {
+  async getDeliverersByHotel(hotelId: string) {
     try {
-      const deliverers = await this.prisma.user.findMany({
+      // Convert hotelId to a number
+      const hotelIdNumber = parseInt(hotelId, 10);
+
+      // Ensure hotelId is a valid number
+      if (isNaN(hotelIdNumber)) {
+        throw new Error('Invalid hotelId provided');
+      }
+
+      const data = await this.prisma.user.findMany({
         where: {
-          admin_hotels: { some: { id: hotelId } },
+          admin_hotels: { some: { id: hotelIdNumber } },
           role: 'DELIVERER',
         },
       });
-      return {
-        status: HttpStatus.OK,
-        response: { message: 'Deliverers retrieved successfully', deliverers },
-      };
+      return ApiResponse.success('Deliverers retrieved successfully', data);
     } catch (error) {
-      console.error('Error retrieving deliverers:', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to retrieve deliverers' },
-      };
+      throw new InternalServerErrorException(error);
     }
   }
-  //get assigned orders by aderiverer
+
+  // Get assigned orders by a deliverer
   async getAssignedOrders(delivererId: string) {
     try {
       const orders = await this.prisma.assignedOrder.findMany({
@@ -120,17 +135,36 @@ export class DelivererService {
           order: true,
         },
       });
-      return {
-        status: HttpStatus.OK,
-        response: { message: 'Orders retrieved successfully', orders },
-      };
+      return ApiResponse.success('Orders retrieved successfully', orders);
     } catch (error) {
-      console.error('Error retrieving orders:', error);
-      return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        response: { message: 'Failed to retrieve orders' },
-      };
+      throw new InternalServerErrorException(error);
     }
   }
-  
+  // Get all deliverers managed by a specific hotel admin
+  async getDeliverersByHotelAdmin(adminId: string) {
+    try {
+      const hotels = await this.prisma.hotel.findMany({
+        where: {
+          admins: { some: { id: adminId } },
+        },
+        select: { id: true },
+      });
+
+      const hotelIds = hotels.map((hotel) => hotel.id);
+
+      const deliverers = await this.prisma.user.findMany({
+        where: {
+          admin_hotels: { some: { id: { in: hotelIds } } },
+          role: 'DELIVERER',
+        },
+      });
+
+      return ApiResponse.success(
+        'Deliverers retrieved successfully',
+        deliverers,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
 }
