@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
+import { Role, VerificationStatus } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
 import { UserService } from 'src/modules/user/user.service';
 import { LoginDTO } from './dto/login.dto';
 import ApiResponse from 'src/utils/ApiResponse';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -14,36 +15,37 @@ export class AuthService {
     private userService: UserService,
     private mailService: MailService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
   async login(dto: LoginDTO) {
-    console.log('Login DTO: ', dto);
-    const user = await this.userService.getUserByEmail(dto.email);
+    try {
+      const user = await this.userService.getUserByEmail(dto.email);
 
-    if (!user) {
-      return {
-        status: 400,
-        response: { message: 'Invalid email or password' },
-      };
+      const match = compareSync(dto.password, user.password);
+
+      if (!match || !user) {
+        return {
+          status: 400,
+          response: { message: 'Invalid email or password' },
+        };
+      }
+      const verification = await this.prisma.verification.findFirst({
+        where: {
+          user_id: user.id,
+        },
+      });
+      if (verification.verification_status !== VerificationStatus.VERIFIED) {
+        throw new Error('Email is not verified!');
+      }
+      const token = this.jwtService.sign(
+        { id: user.id, role: user.role },
+        { expiresIn: '1d' },
+      );
+      return ApiResponse.success('Logged in successfully', { token, user });
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error('Error signing in', error.message);
     }
-
-    const match = compareSync(dto.password, user.password);
-
-    if (!match) {
-      return {
-        status: 400,
-        response: { message: 'Invalid email or password' },
-      };
-    }
-
-    const token = this.jwtService.sign(
-      { id: user.id, role: user.role },
-      { expiresIn: '1d' },
-    );
-
-    return {
-      status: 200,
-      response: { message: 'Login successful', token, user },
-    };
   }
   async adminAuth(dto: LoginDTO) {
     const user = await this.userService.getUserByEmail(dto.email);
@@ -79,34 +81,37 @@ export class AuthService {
       };
     }
   }
-  async initiateResetPassword(email: string) {
-   try {
-    const user = await this.userService.getUserByEmail(email);
+  async initiateResetPassword(email: string): Promise<ApiResponse> {
+    try {
+      const user = await this.userService.getUserByEmail(email);
 
-    if (!user) {
-      throw new Error("Email not found!");
+      if (!user) {
+        throw new Error('Email not found!');
+      }
+
+      const resetToken = randomBytes(32).toString('hex');
+
+      await this.userService.updateResetToken(user.id, resetToken);
+
+      await this.mailService.sendResetPasswordEmail({
+        email: user.email,
+        token: resetToken,
+        names: `${user.first_name} ${user.last_name}`,
+      });
+
+      return ApiResponse.success('Initiated reset password successfully!');
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.error(
+        'Error occurred initiating password reset',
+        error.message,
+      );
     }
-
-    const resetToken = randomBytes(32).toString('hex');
-
-    await this.userService.updateResetToken(user.id, resetToken);
-
-    await this.mailService.sendResetPasswordEmail({
-      email: user.email,
-      token: resetToken,
-      names: `${user.first_name} ${user.last_name}`,
-    });
-    
-    return ApiResponse.success("Initiated reset password successfully!");
-
-   } catch (error) {
-
-    console.log(error);
-    return ApiResponse.error("Error occurred initiating password reset",error.message);
-    
-   }
   }
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<ApiResponse> {
     try {
       const user = await this.userService.getUserByResetToken(token);
 
@@ -120,6 +125,7 @@ export class AuthService {
         user.id,
         hashedPassword,
       );
+      return ApiResponse.success('Email reset successfully!', user);
     } catch (err) {
       console.log(err);
     }

@@ -48,7 +48,7 @@ export const initiatePasswordReset = ({
     .reset-link a {
       display: inline-block;
       padding: 10px 20px;
-      background-color: #0066cc;
+      background-color: rgb(160,20,0);
       color: #ffffff;
       text-decoration: none;
       border-radius: 4px;
@@ -62,7 +62,7 @@ export const initiatePasswordReset = ({
     <p>We received a request to reset your password. Click the link below to reset it:</p>
     <div class="reset-link">
       <a href="${
-        config().client.url + '/auth/forgot-password/' + token
+        config().client.url + '/auth/resetPassword/?token=' + token
       }">Reset Password</a>
     </div>
   </div>
