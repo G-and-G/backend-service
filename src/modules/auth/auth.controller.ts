@@ -27,9 +27,7 @@ export class AuthController {
 
   @Post('initiate-reset-password')
   async initiateResetPassword(@Body() dto: InitiateResetPasswordDTO) {
-    await this.authService.initiateResetPassword(dto.email);
-
-    return { message: 'Password reset initiated successfully' };
+    return await this.authService.initiateResetPassword(dto.email);
   }
   @Put('reset-password/:token')
   async resetPassword(
