@@ -23,7 +23,7 @@ export class AdminGuard implements CanActivate {
         }
         console.log('[APPLICATION LOG]: Admin check successful.');
         console.log('[APPLICATION LOG]: User: ', decodedToken);
-        request.user = { ...decodedToken, hotel_id: user.admin_hotels[0].id };
+        request.user = { ...decodedToken, hotel_id: user.hotelId };
         return true;
       } catch (error) {
         console.log('[APPLICATION LOG]: Admin check failed.', error);

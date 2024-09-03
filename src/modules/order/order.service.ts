@@ -232,9 +232,6 @@ export class OrderService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: adminId },
-        include: {
-          admin_hotels: true,
-        },
       });
 
       if (!user) throw new Error('User not found');
@@ -242,7 +239,7 @@ export class OrderService {
       if (user.role !== Role.HOTEL_ADMIN)
         throw new Error('User is not an admin');
 
-      return this.getOrdersForHotel(user.admin_hotels[0].id);
+      return this.getOrdersForHotel(user.hotelId);
     } catch (error) {
       // Handle errors here
       throw new Error('Unable to fetch orders');

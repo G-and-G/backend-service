@@ -117,9 +117,7 @@ export class UserService {
           id: adminId,
         },
         data: {
-          admin_hotels: {
-            connect: { id: hotelId }, // Connect the admin to the specific hotel
-          },
+          hotelId: hotelId,
         },
       });
 
@@ -139,7 +137,7 @@ export class UserService {
         id,
       },
       include: {
-        admin_hotels: true,
+        hotel: true,
       },
     });
     console.log('user', user);

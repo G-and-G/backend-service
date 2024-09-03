@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma/prisma.service';
 import ApiResponse from 'src/utils/ApiResponse';
-import * as bcrypt from 'bcrypt';
 import {
   AssignOrderDto,
   CreateDelivererDto,
@@ -29,7 +29,7 @@ export class DelivererService {
           ...dto,
           password: hashedPassword,
           role: 'DELIVERER',
-          admin_hotels: { connect: { id: hotelIdNumber } },
+          hotel: { connect: { id: hotelIdNumber } },
         },
       });
 
@@ -116,7 +116,7 @@ export class DelivererService {
 
       const data = await this.prisma.user.findMany({
         where: {
-          admin_hotels: { some: { id: hotelIdNumber } },
+          hotel: { id: hotelIdNumber },
           role: 'DELIVERER',
         },
       });
@@ -143,18 +143,17 @@ export class DelivererService {
   // Get all deliverers managed by a specific hotel admin
   async getDeliverersByHotelAdmin(adminId: string) {
     try {
-      const hotels = await this.prisma.hotel.findMany({
+      const admin = await this.prisma.user.findUnique({
         where: {
-          admins: { some: { id: adminId } },
+          id: adminId,
         },
-        select: { id: true },
       });
-
-      const hotelIds = hotels.map((hotel) => hotel.id);
-
+      if (!admin) {
+        throw new Error('Admin not found');
+      }
       const deliverers = await this.prisma.user.findMany({
         where: {
-          admin_hotels: { some: { id: { in: hotelIds } } },
+          hotelId: admin.hotelId,
           role: 'DELIVERER',
         },
       });
