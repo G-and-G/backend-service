@@ -38,7 +38,10 @@ export class UserService {
           password: hashedPassword,
         },
       });
-      await this.mailService.sendWelcomeEmail({ names: `${user.first_name} ${user.last_name}`, email: user.email })
+      await this.mailService.sendWelcomeEmail({
+        names: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+      });
       return ApiResponse.success('User Created successfully', user);
     } catch (error) {
       if (error.code === 'P2002') {

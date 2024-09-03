@@ -32,7 +32,7 @@ export class AuthController {
     @Body() dto: ResetPasswordDTO,
     @Param('token') token: string,
   ) {
-    return this.authService.resetPassword(token,dto.newPassword);
+    return this.authService.resetPassword(token, dto.newPassword);
   }
 
   @Post('initiate-email-verification')

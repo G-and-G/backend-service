@@ -25,8 +25,8 @@ export class CreateHotelDTO {
       latitude: 12.3,
       longitude: -20.2,
       street: 'KN 45 ST',
-      name:"Nyarugenge, Nyamirambo, Nyarufunzo",
-      country:"Rwanda"
+      name: 'Nyarugenge, Nyamirambo, Nyarufunzo',
+      country: 'Rwanda',
     },
   })
   @ValidateNested()
