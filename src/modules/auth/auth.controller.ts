@@ -12,10 +12,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() dto: LoginDTO, @Res() res: Response) {
-    console.log(dto);
-    const result = await this.authService.login(dto);
-    return res.status(result.status).json(result.response);
+  async login(@Body() dto: LoginDTO) {
+    return this.authService.login(dto);
   }
 
   @Post('AdminLogin')
@@ -34,11 +32,7 @@ export class AuthController {
     @Body() dto: ResetPasswordDTO,
     @Param('token') token: string,
   ) {
-    try {
-      await this.authService.resetPassword(token, dto.newPassword);
-    } catch (error) {
-      console.log('Error resetting password:', error);
-    }
+    return this.authService.resetPassword(token,dto.newPassword);
   }
 
   @Post('initiate-email-verification')
