@@ -6,6 +6,7 @@ import { randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
 import { UserService } from 'src/modules/user/user.service';
 import { LoginDTO } from './dto/login.dto';
+import ApiResponse from 'src/utils/ApiResponse';
 
 @Injectable()
 export class AuthService {
@@ -79,10 +80,11 @@ export class AuthService {
     }
   }
   async initiateResetPassword(email: string) {
+   try {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
-      return;
+      throw new Error("Email not found!");
     }
 
     const resetToken = randomBytes(32).toString('hex');
@@ -94,6 +96,15 @@ export class AuthService {
       token: resetToken,
       names: `${user.first_name} ${user.last_name}`,
     });
+    
+    return ApiResponse.success("Initiated reset password successfully!");
+
+   } catch (error) {
+
+    console.log(error);
+    return ApiResponse.error("Error occurred initiating password reset",error.message);
+    
+   }
   }
   async resetPassword(token: string, newPassword: string) {
     const user = await this.userService.getUserByResetToken(token);
