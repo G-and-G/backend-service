@@ -5,7 +5,10 @@ import { AuthService } from './auth.service';
 import { InitiateResetPasswordDTO } from './dto/initiate-reset-password.dto';
 import { LoginDTO } from './dto/login.dto';
 import { ResetPasswordDTO } from './dto/reset-password.dto';
-import { VerifyEmailDTO } from './dto/verify-email-dto';
+import {
+  InitiateEmailVerificationDTO,
+  VerifyEmailDTO,
+} from './dto/verify-email-dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -37,9 +40,11 @@ export class AuthController {
   }
 
   @Post('initiate-email-verification')
-  async initiateEmailVerification(@Body('email') email: string) {
+  async initiateEmailVerification(
+    @Body('email') dto: InitiateEmailVerificationDTO,
+  ) {
     try {
-      await this.authService.initiateEmailVerification(email);
+      await this.authService.initiateEmailVerification(dto.email);
       return { message: 'Email verification initiated successfully' };
     } catch (error) {
       console.log('Error initiating email verification:', error);

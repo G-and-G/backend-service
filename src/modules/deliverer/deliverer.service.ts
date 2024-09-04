@@ -24,7 +24,9 @@ export class DelivererService {
       }
 
       const hashedPassword = await bcrypt.hash(dto.password, 10);
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationCode = Math.floor(
+        100000 + Math.random() * 900000,
+      ).toString();
 
       const newVerification = await this.prisma.verification.create({
         data: {
@@ -39,21 +41,21 @@ export class DelivererService {
           password: hashedPassword,
           role: 'DELIVERER',
           hotel: { connect: { id: hotelIdNumber } },
-          verification:{
-            connect:{
-              id: newVerification.id
-            }
-          }
+          verification: {
+            connect: {
+              id: newVerification.id,
+            },
+          },
         },
       });
       await this.prisma.verification.update({
-        where:{
-          id: newVerification.id
+        where: {
+          id: newVerification.id,
         },
-        data:{
-          user_id:deliverer.id
-        }
-      })
+        data: {
+          user_id: deliverer.id,
+        },
+      });
       return ApiResponse.success('Deliverer created successfully', deliverer);
     } catch (error) {
       console.error(error);
