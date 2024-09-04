@@ -39,8 +39,15 @@ export class UserService {
           password: hashedPassword,
         },
       });
+<<<<<<< HEAD
       await this.mailService.sendWelcomeEmail({ names: `${user.first_name} ${user.last_name}`, email: user.email });
       // await this.mailService.sendInitiateEmailVerificationEmail({})
+=======
+      await this.mailService.sendWelcomeEmail({
+        names: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+      });
+>>>>>>> cf74b221f1b68ce76b4fa654824aeb010880185f
       return ApiResponse.success('User Created successfully', user);
     } catch (error) {
       if (error.code === 'P2002') {
@@ -119,9 +126,7 @@ export class UserService {
           id: adminId,
         },
         data: {
-          admin_hotels: {
-            connect: { id: hotelId }, // Connect the admin to the specific hotel
-          },
+          hotelId: hotelId,
         },
       });
 
@@ -141,7 +146,7 @@ export class UserService {
         id,
       },
       include: {
-        admin_hotels: true,
+        hotel: true,
       },
     });
     console.log('user', user);

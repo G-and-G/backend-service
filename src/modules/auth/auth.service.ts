@@ -1,13 +1,17 @@
+<<<<<<< HEAD
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+=======
+import { BadRequestException, Injectable } from '@nestjs/common';
+>>>>>>> cf74b221f1b68ce76b4fa654824aeb010880185f
 import { JwtService } from '@nestjs/jwt';
 import { Role, VerificationStatus } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';
 import { randomBytes } from 'crypto';
+import { PrismaService } from 'prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
 import { UserService } from 'src/modules/user/user.service';
-import { LoginDTO } from './dto/login.dto';
 import ApiResponse from 'src/utils/ApiResponse';
-import { PrismaService } from 'prisma/prisma.service';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +48,7 @@ export class AuthService {
       return ApiResponse.success('Logged in successfully', { token, user });
     } catch (error) {
       console.log(error);
-      return ApiResponse.error('Error signing in', error.message);
+      throw new BadRequestException(error);
     }
   }
   async adminAuth(dto: LoginDTO) {

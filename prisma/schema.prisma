@@ -38,9 +38,9 @@ model User {
   last_name         String
   email             String          @unique
   password          String
-  phone_number      String? // to be added
-  admin_hotels      Hotel[]
-  // hotel             Hotel?          @relation(fields: [hotelId], references: [id])
+  phone_number      String?
+  hotel             Hotel?          @relation(fields: [hotelId], references: [id])
+  hotelId           Int?
   role              Role            @default(NORMAL)
   verification      Verification    @relation(fields: [verification_id], references: [id])
   verification_id   String @unique
@@ -51,9 +51,9 @@ model User {
   notificationToken String?
   assigned_orders   AssignedOrder[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  // hotelId    Int?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  hotel_invites HotelInvite[]
 
   @@map("users")
 }
@@ -192,11 +192,12 @@ model Hotel {
   lastMonthOrders     Int?    @default(0)
   ThisWeekOrders      Int?    @default(0)
   startingWorkingTime String
-  closingTime   String        @default("22:00")
+  closingTime         String  @default("22:00")
   image               String
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  hotel_invites HotelInvite[]
 
   @@map("hotels")
 }
@@ -297,4 +298,23 @@ model Notification {
 model secret {
   id   String @id @default(uuid())
   data Json
+}
+
+model HotelInvite {
+  id         String       @id @default(uuid())
+  user       User         @relation(fields: [user_id], references: [id])
+  user_id    String
+  hotel      Hotel        @relation(fields: [hotel_id], references: [id])
+  hotel_id   Int
+  status     InviteStatus @default(PENDING)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  @@map("hotel_invites")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
