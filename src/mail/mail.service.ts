@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import config from 'src/config';
-import { welcome } from './templates/welcome';
+import { emailVerified } from './templates/email-verified';
 import { initiateEmailVerification } from './templates/initiate-email-verification';
 import { initiatePasswordReset } from './templates/initiate-password-reset';
 import { passwordResetSuccessful } from './templates/password-reset-successful';
-import { emailVerified } from './templates/email-verified';
+import { welcome } from './templates/welcome';
 
 @Injectable()
 export class MailService {
@@ -54,15 +54,17 @@ export class MailService {
     email,
     token,
     names,
+    platform,
   }: {
     email: string;
     token: string;
     names: string;
+    platform: string;
   }) {
     const mailOptions: nodemailer.SendMailOptions = {
       to: email,
       subject: 'Reset your password',
-      html: initiatePasswordReset({ token, names }),
+      html: initiatePasswordReset({ token, names, platform }),
     };
     console.log(
       '[APPLICATION LOG]: Sending password reset initialization to ' + email,
@@ -109,14 +111,21 @@ export class MailService {
     email,
     token,
     names,
+    platform,
   }: {
     email: string;
     token: string;
     names: string;
+    platform: string;
   }) {
     try {
       // Send the initiate password reset email
-      await this.sendInitiatePasswordResetEmail({ email, token, names });
+      await this.sendInitiatePasswordResetEmail({
+        email,
+        token,
+        names,
+        platform,
+      });
       console.log(
         '[APPLICATION LOG]: Password reset email sent successfully to ' + email,
       );

@@ -3,9 +3,11 @@ import config from 'src/config';
 export const initiatePasswordReset = ({
   token,
   names,
+  platform,
 }: {
   token: string;
   names: string;
+  platform: string;
 }) =>
   `
     <!DOCTYPE html>
@@ -62,7 +64,11 @@ export const initiatePasswordReset = ({
     <p>We received a request to reset your password. Click the link below to reset it:</p>
     <div class="reset-link">
       <a href="${
-        config().client.url + '/auth/resetPassword/?token=' + token
+        config().client.url +
+        '/auth/resetPassword/?token=' +
+        token +
+        '&platform=' +
+        platform
       }">Reset Password</a>
     </div>
   </div>

@@ -35,6 +35,7 @@ export class AuthService {
         },
       });
       if (verification.verification_status !== VerificationStatus.VERIFIED) {
+        // Please notify frontend before changing this message
         throw new BadRequestException('Email is not verified!');
       }
       const token = this.jwtService.sign(
@@ -81,7 +82,11 @@ export class AuthService {
       };
     }
   }
-  async initiateResetPassword(email: string): Promise<ApiResponse> {
+  // platform can be 'web' or 'mobile'
+  async initiateResetPassword(
+    email: string,
+    platform: string,
+  ): Promise<ApiResponse> {
     try {
       const user = await this.userService.getUserByEmail(email);
 
@@ -89,24 +94,39 @@ export class AuthService {
         throw new Error('Email not found!');
       }
 
+      let userResetToken = await this.prisma.passwordReset.findUnique({
+        where: { user_id: user.id },
+      });
       const resetToken = randomBytes(32).toString('hex');
-
-      await this.userService.updateResetToken(user.id, resetToken);
+      if (!userResetToken) {
+        userResetToken = await this.prisma.passwordReset.create({
+          data: {
+            user_id: user.id,
+            passwordResetToken: resetToken,
+            passwordResetExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          },
+        });
+      } else {
+        userResetToken = await this.prisma.passwordReset.update({
+          where: { user_id: user.id },
+          data: {
+            passwordResetToken: resetToken,
+            passwordResetExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          },
+        });
+      }
 
       await this.mailService.sendResetPasswordEmail({
         email: user.email,
         token: resetToken,
         names: `${user.first_name} ${user.last_name}`,
+        platform,
       });
 
       return ApiResponse.success('Initiated reset password successfully!');
     } catch (error) {
       console.log(error);
-      ApiResponse.error(
-        'Error occurred initiating password reset',
-        error.message,
-        error.status,
-      );
+      throw error;
     }
   }
   async resetPassword(
@@ -117,7 +137,14 @@ export class AuthService {
       const user = await this.userService.getUserByResetToken(token);
 
       if (!user) {
-        return;
+        throw new BadRequestException('Invalid token');
+      }
+
+      const isResetTokenValid =
+        new Date(user.password_reset.passwordResetExpiry).getTime() >
+        new Date().getTime();
+      if (!isResetTokenValid) {
+        throw new BadRequestException('Reset token has expired');
       }
 
       const hashedPassword = hashSync(newPassword, 10);
@@ -129,6 +156,7 @@ export class AuthService {
       return ApiResponse.success('Email reset successfully!', user);
     } catch (err) {
       console.log(err);
+      throw err;
     }
   }
 
@@ -143,7 +171,15 @@ export class AuthService {
       const verificationCode = Math.floor(
         100000 + Math.random() * 900000,
       ).toString();
-
+      await this.prisma.verification.update({
+        where: {
+          user_id: user.id,
+        },
+        data: {
+          verificationToken: verificationCode,
+          verificationTokenExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
       await this.mailService.sendInitiateEmailVerificationEmail({
         email: user.email,
         verificationCode,

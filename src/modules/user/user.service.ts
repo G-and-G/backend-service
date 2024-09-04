@@ -259,7 +259,16 @@ export class UserService {
   }
   async getUserByResetToken(resetToken: string) {
     try {
-      const user = await this.prisma.user.findFirst({});
+      const user = await this.prisma.user.findFirst({
+        where: {
+          password_reset: {
+            passwordResetToken: resetToken,
+          },
+        },
+        include: {
+          password_reset: true,
+        },
+      });
       return user;
     } catch (error) {
       console.log('Error getting user by reset token:', error);

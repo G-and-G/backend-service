@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -28,8 +28,11 @@ export class AuthController {
   }
 
   @Post('initiate-reset-password')
-  async initiateResetPassword(@Body() dto: InitiateResetPasswordDTO) {
-    return await this.authService.initiateResetPassword(dto.email);
+  async initiateResetPassword(
+    @Body() dto: InitiateResetPasswordDTO,
+    @Query('platform') platform: string,
+  ) {
+    return await this.authService.initiateResetPassword(dto.email, platform);
   }
   @Put('reset-password/:token')
   async resetPassword(
