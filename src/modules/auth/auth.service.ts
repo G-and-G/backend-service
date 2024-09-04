@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role, VerificationStatus } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';

@@ -38,11 +38,12 @@ model User {
   last_name         String
   email             String          @unique
   password          String
-  // phone_number      String? // to be added
+  phone_number      String? // to be added
   admin_hotels      Hotel[]
   // hotel             Hotel?          @relation(fields: [hotelId], references: [id])
   role              Role            @default(NORMAL)
-  verification      Verification?
+  verification      Verification    @relation(fields: [verification_id], references: [id])
+  verification_id   String @unique
   password_reset    PasswordReset?
   orders            Order[]
   reviews           Review[]
@@ -71,7 +72,7 @@ model AssignedOrder {
 
 model Verification {
   id                      String             @id @default(uuid())
-  user                    User               @relation(fields: [user_id], references: [id])
+  user                    User?             
   user_id                 String             @unique
   verification_status     VerificationStatus @default(UNVERIFIED)
   verificationToken       String

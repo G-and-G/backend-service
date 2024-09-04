@@ -40,6 +40,10 @@ export class UserController {
   async update() {
     //
   }
+  @Delete("/all")
+  async deleteAll(){
+    return this.userService.deleteAll();
+  }
 
   @Get('all')
   async all() {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { HotelController } from './hotel.controller';
 import { HotelService } from './hotel.service';
 import { UserModule } from '../user/user.module';

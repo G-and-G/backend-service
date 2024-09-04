@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,12 +9,13 @@ import { Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import ApiResponse from 'src/utils/ApiResponse';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
+ 
   constructor(
     private prisma: PrismaService,
-    private cloudinaryService: CloudinaryService,
     private mailService: MailService,
   ) {}
 
@@ -38,7 +39,8 @@ export class UserService {
           password: hashedPassword,
         },
       });
-      await this.mailService.sendWelcomeEmail({ names: `${user.first_name} ${user.last_name}`, email: user.email })
+      await this.mailService.sendWelcomeEmail({ names: `${user.first_name} ${user.last_name}`, email: user.email });
+      // await this.mailService.sendInitiateEmailVerificationEmail({})
       return ApiResponse.success('User Created successfully', user);
     } catch (error) {
       if (error.code === 'P2002') {
@@ -274,5 +276,7 @@ export class UserService {
       console.log('Error verifying email:', error);
       throw error;
     }
+  }
+  deleteAll() {
   }
 }
