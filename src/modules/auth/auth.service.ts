@@ -18,16 +18,16 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
   async login(dto: LoginDTO) {
-    try {
-      const user = await this.userService.getUserByEmail(dto.email);
+    const user = await this.userService.getUserByEmail(dto.email);
 
+    if (!user) {
+      throw new BadRequestException('Invalid email or password');
+    }
+    try {
       const match = compareSync(dto.password, user.password);
 
       if (!match || !user) {
-        return {
-          status: 400,
-          response: { message: 'Invalid email or password' },
-        };
+        throw new BadRequestException('Invalid email or password');
       }
       const verification = await this.prisma.verification.findFirst({
         where: {
@@ -35,7 +35,7 @@ export class AuthService {
         },
       });
       if (verification.verification_status !== VerificationStatus.VERIFIED) {
-        throw new Error('Email is not verified!');
+        throw new BadRequestException('Email is not verified!');
       }
       const token = this.jwtService.sign(
         { id: user.id, role: user.role },
@@ -44,7 +44,7 @@ export class AuthService {
       return ApiResponse.success('Logged in successfully', { token, user });
     } catch (error) {
       console.log(error);
-      throw new BadRequestException(error);
+      throw error;
     }
   }
   async adminAuth(dto: LoginDTO) {

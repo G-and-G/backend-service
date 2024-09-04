@@ -40,9 +40,7 @@ export class AuthController {
   }
 
   @Post('initiate-email-verification')
-  async initiateEmailVerification(
-    @Body('email') dto: InitiateEmailVerificationDTO,
-  ) {
+  async initiateEmailVerification(@Body() dto: InitiateEmailVerificationDTO) {
     return this.authService.initiateEmailVerification(dto.email);
   }
   @Post('verify-email/:token')
