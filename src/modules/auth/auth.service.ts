@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
-=======
 import { BadRequestException, Injectable } from '@nestjs/common';
->>>>>>> cf74b221f1b68ce76b4fa654824aeb010880185f
 import { JwtService } from '@nestjs/jwt';
 import { Role, VerificationStatus } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';
@@ -41,7 +37,7 @@ export class AuthService {
       if (verification.verification_status !== VerificationStatus.VERIFIED) {
         throw new Error('Email is not verified!');
       }
-      const token = this.jwtService.sign(
+      const token =  this.jwtService.sign(
         { id: user.id, role: user.role },
         { expiresIn: '1d' },
       );
@@ -106,9 +102,10 @@ export class AuthService {
       return ApiResponse.success('Initiated reset password successfully!');
     } catch (error) {
       console.log(error);
-      return ApiResponse.error(
+      ApiResponse.error(
         'Error occurred initiating password reset',
         error.message,
+        error.status
       );
     }
   }
@@ -142,7 +139,8 @@ export class AuthService {
       return;
     }
 
-    const verificationCode = randomBytes(6).toString('hex');
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
 
     await this.mailService.sendInitiateEmailVerificationEmail({
       email: user.email,
@@ -153,18 +151,7 @@ export class AuthService {
     return { message: 'Email verification initiated' };
   }
 
-  async verifyEmail(userId: string): Promise<boolean> {
-    try {
-      const user = await this.userService.verifyEmail(userId);
-
-      if (user) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.log('Error verifying email:', error);
-      throw error;
-    }
+  async verifyEmail(token: string,email:string): Promise<ApiResponse> {
+       return this.userService.verifyEmail(token,email);
   }
 }

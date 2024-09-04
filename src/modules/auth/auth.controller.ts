@@ -5,6 +5,7 @@ import { ResetPasswordDTO } from './dto/reset-password.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
+import { VerifyEmailDTO } from './dto/verify-email-dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -45,19 +46,8 @@ export class AuthController {
       return { message: 'Failed to initiate email verification', error };
     }
   }
-  @Put('verify-email/:token')
-  async verifyEmail(@Param('token') token: string) {
-    try {
-      const userId = await this.authService.verifyEmail(token);
-
-      if (userId) {
-        return { message: 'Email verification successful' };
-      } else {
-        return { message: 'Email verification failed' };
-      }
-    } catch (error) {
-      console.error('Error verifying email:', error);
-      return { message: 'An error occurred during email verification' };
-    }
+  @Post('verify-email/:token')
+  async verifyEmail(@Param('token') token: string,@Body() dto:VerifyEmailDTO) {
+   return this.authService.verifyEmail(token,dto.email);
   }
 }

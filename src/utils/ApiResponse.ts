@@ -1,3 +1,5 @@
+import { HttpException, HttpStatus } from "@nestjs/common";
+
 class ApiResponse {
   status: number;
   success: boolean;
@@ -16,8 +18,15 @@ class ApiResponse {
     return new ApiResponse(true, message, data, status);
   }
 
-  static error(message: string, data?: any | null, status = 400) {
-    return new ApiResponse(false, message, data, status);
+  static error(message: string, data?: any | null, status = HttpStatus.BAD_REQUEST) {
+    throw new HttpException(
+      {
+        success: false,
+        message: message,
+        status: status,
+      },
+      status,
+    );
   }
 }
 

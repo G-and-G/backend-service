@@ -7,6 +7,7 @@ import {
   CreateDelivererDto,
   UpdateDelivererDto,
 } from './deliverer.dto';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class DelivererService {
@@ -23,16 +24,36 @@ export class DelivererService {
       }
 
       const hashedPassword = await bcrypt.hash(dto.password, 10);
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+      const newVerification = await this.prisma.verification.create({
+        data: {
+          user_id: '',
+          verificationToken: verificationCode, // Generate a secure random token
+          verificationTokenExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
       const deliverer = await this.prisma.user.create({
         data: {
           ...dto,
           password: hashedPassword,
           role: 'DELIVERER',
           hotel: { connect: { id: hotelIdNumber } },
+          verification:{
+            connect:{
+              id: newVerification.id
+            }
+          }
         },
       });
-
+      await this.prisma.verification.update({
+        where:{
+          id: newVerification.id
+        },
+        data:{
+          user_id:deliverer.id
+        }
+      })
       return ApiResponse.success('Deliverer created successfully', deliverer);
     } catch (error) {
       console.error(error);
