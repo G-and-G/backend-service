@@ -37,7 +37,7 @@ export class AuthService {
       if (verification.verification_status !== VerificationStatus.VERIFIED) {
         throw new Error('Email is not verified!');
       }
-      const token =  this.jwtService.sign(
+      const token = this.jwtService.sign(
         { id: user.id, role: user.role },
         { expiresIn: '1d' },
       );
@@ -105,7 +105,7 @@ export class AuthService {
       ApiResponse.error(
         'Error occurred initiating password reset',
         error.message,
-        error.status
+        error.status,
       );
     }
   }
@@ -136,22 +136,28 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(email);
 
     if (!user) {
-      return;
+      throw new BadRequestException('User not found');
     }
 
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    try {
+      const verificationCode = Math.floor(
+        100000 + Math.random() * 900000,
+      ).toString();
 
+      await this.mailService.sendInitiateEmailVerificationEmail({
+        email: user.email,
+        verificationCode,
+        names: `${user.first_name} ${user.last_name}`,
+      });
 
-    await this.mailService.sendInitiateEmailVerificationEmail({
-      email: user.email,
-      verificationCode,
-      names: `${user.first_name} ${user.last_name}`,
-    });
-
-    return { message: 'Email verification initiated' };
+      return { message: 'Email verification initiated' };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Failed to initiate email verification');
+    }
   }
 
-  async verifyEmail(token: string,email:string): Promise<ApiResponse> {
-       return this.userService.verifyEmail(token,email);
+  async verifyEmail(token: string, email: string): Promise<ApiResponse> {
+    return this.userService.verifyEmail(token, email);
   }
 }

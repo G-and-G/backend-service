@@ -14,13 +14,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role, RolesGuard } from 'src/common/guards/role.guard';
 import { AuthGuard } from 'src/modules/auth/guards/auth.guard';
 import ApiResponse from 'src/utils/ApiResponse';
 import { RegisterDTO } from './dto/create-user.dto';
 import { AdminGuard } from './guards/admin.guard';
 import { UserService } from './user.service';
-import { Role, RolesGuard } from 'src/common/guards/role.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
 
 @Controller('user')
 @ApiBearerAuth('JWT-auth')
@@ -40,8 +40,8 @@ export class UserController {
   async update() {
     //
   }
-  @Delete("/all")
-  async deleteAll(){
+  @Delete('/all')
+  async deleteAll() {
     return this.userService.deleteAll();
   }
 

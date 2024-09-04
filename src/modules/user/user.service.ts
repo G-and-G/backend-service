@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaService } from 'prisma/prisma.service';
@@ -12,11 +6,9 @@ import { RegisterDTO } from './dto/create-user.dto';
 // import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Role } from '@prisma/client';
 import { hash } from 'bcrypt';
+import { log } from 'console';
 import ApiResponse from 'src/utils/ApiResponse';
 import { UpdateUserDTO } from './dto/update-user.dto';
-import { AuthService } from '../auth/auth.service';
-import { randomBytes } from 'crypto';
-import { log } from 'console';
 
 @Injectable()
 export class UserService {
@@ -36,7 +28,9 @@ export class UserService {
       if (existingUser) {
         throw new Error('Email is in use!');
       }
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationCode = Math.floor(
+        100000 + Math.random() * 900000,
+      ).toString();
       const newVerification = await this.prisma.verification.create({
         data: {
           user_id: '',
@@ -60,29 +54,33 @@ export class UserService {
         },
       });
       await this.prisma.verification.update({
-        where:{
-          id: newVerification.id
+        where: {
+          id: newVerification.id,
         },
-        data:{
-          user_id: user.id
-        }
+        data: {
+          user_id: user.id,
+        },
       });
       await this.mailService.sendWelcomeEmail({
         names: `${user.first_name} ${user.last_name}`,
         email: user.email,
       });
-      await this.mailService.sendInitiateEmailVerificationEmail({email:user.email,verificationCode,names:`${user.first_name} ${user.last_name}`})
+      await this.mailService.sendInitiateEmailVerificationEmail({
+        email: user.email,
+        verificationCode,
+        names: `${user.first_name} ${user.last_name}`,
+      });
       return ApiResponse.success('User Created successfully', user);
     } catch (error) {
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
-         ApiResponse.error(
+        ApiResponse.error(
           `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
           error,
         );
       }
       console.log(error);
-       ApiResponse.error('Internal server error', error);
+      ApiResponse.error('Internal server error', error);
     }
   }
   async makeUserAdmin(userId: string) {
@@ -283,18 +281,22 @@ export class UserService {
       throw error;
     }
   }
-  async verifyEmail(token:string,email: string): Promise<ApiResponse> {
+  async verifyEmail(token: string, email: string): Promise<ApiResponse> {
+    const user = this.getUserByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
     try {
       const verification = await this.prisma.verification.findFirst({
-        where:{
-          verificationToken:token
-        }
+        where: {
+          verificationToken: token,
+        },
       });
 
-      if(Number(verification.verificationTokenExpiry) <  Date.now()) {
-          throw new Error("Verification code has expired!")
+      if (Number(verification.verificationTokenExpiry) < Date.now()) {
+        throw new BadRequestException('Verification code has expired!');
       }
-    
+
       const user = await this.prisma.user.update({
         where: { email },
         data: {
@@ -306,20 +308,20 @@ export class UserService {
         },
       });
 
-      return ApiResponse.success("Email Verified successfully!",user);
+      return ApiResponse.success('Email Verified successfully!', user);
     } catch (error) {
       console.log('Error verifying email:', error);
-      ApiResponse.error("Error verifying email:", error);
+      throw error;
     }
   }
 
   async deleteAll() {
     try {
       await this.prisma.user.deleteMany();
-      return ApiResponse.success("Delete all users");
+      return ApiResponse.success('Delete all users');
     } catch (error) {
       log(error);
-      ApiResponse.error("Error deleting all",error.message,error.status)
+      ApiResponse.error('Error deleting all', error.message, error.status);
     }
   }
 }

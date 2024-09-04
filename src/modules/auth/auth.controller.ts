@@ -1,10 +1,10 @@
 import { Body, Controller, Param, Post, Put, Res } from '@nestjs/common';
-import { LoginDTO } from './dto/login.dto';
-import { InitiateResetPasswordDTO } from './dto/initiate-reset-password.dto';
-import { ResetPasswordDTO } from './dto/reset-password.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
 import { Response } from 'express';
+import { AuthService } from './auth.service';
+import { InitiateResetPasswordDTO } from './dto/initiate-reset-password.dto';
+import { LoginDTO } from './dto/login.dto';
+import { ResetPasswordDTO } from './dto/reset-password.dto';
 import { VerifyEmailDTO } from './dto/verify-email-dto';
 
 @Controller('auth')
@@ -47,7 +47,10 @@ export class AuthController {
     }
   }
   @Post('verify-email/:token')
-  async verifyEmail(@Param('token') token: string,@Body() dto:VerifyEmailDTO) {
-   return this.authService.verifyEmail(token,dto.email);
+  async verifyEmail(
+    @Param('token') token: string,
+    @Body() dto: VerifyEmailDTO,
+  ) {
+    return this.authService.verifyEmail(token, dto.email);
   }
 }
