@@ -150,7 +150,8 @@ export class AuthService {
         names: `${user.first_name} ${user.last_name}`,
       });
 
-      return { message: 'Email verification initiated' };
+      // return { message: 'Email verification initiated' };
+      return ApiResponse.success('Email verification initiated');
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Failed to initiate email verification');

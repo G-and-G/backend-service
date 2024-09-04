@@ -243,13 +243,15 @@ export class UserService {
       throw error;
     }
   }
-  async updateResetToken(userId: string, resetToken: string): Promise<void> {
+  async updateResetToken(userId: string, resetToken: string) {
     try {
-      const updatedUser = await this.prisma.user.updateMany({
-        where: { id: userId },
-        data: {},
+      const userResetToken = await this.prisma.passwordReset.findFirst({
+        where: {
+          user_id: userId,
+        },
       });
-      console.log(updatedUser);
+      console.log(userResetToken);
+      return userResetToken;
     } catch (error) {
       console.log('Error updating reset token:', error);
       throw error;
@@ -274,6 +276,12 @@ export class UserService {
         where: { id: userId },
         data: {
           password: newPassword,
+        },
+      });
+
+      await this.prisma.passwordReset.deleteMany({
+        where: {
+          user_id: userId,
         },
       });
     } catch (error) {

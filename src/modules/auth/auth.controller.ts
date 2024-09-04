@@ -43,13 +43,7 @@ export class AuthController {
   async initiateEmailVerification(
     @Body('email') dto: InitiateEmailVerificationDTO,
   ) {
-    try {
-      await this.authService.initiateEmailVerification(dto.email);
-      return { message: 'Email verification initiated successfully' };
-    } catch (error) {
-      console.log('Error initiating email verification:', error);
-      return { message: 'Failed to initiate email verification', error };
-    }
+    return this.authService.initiateEmailVerification(dto.email);
   }
   @Post('verify-email/:token')
   async verifyEmail(
