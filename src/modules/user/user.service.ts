@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,12 +14,14 @@ import { Role } from '@prisma/client';
 import { hash } from 'bcrypt';
 import ApiResponse from 'src/utils/ApiResponse';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { AuthService } from '../auth/auth.service';
+import { randomBytes } from 'crypto';
+import { log } from 'console';
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
-    private cloudinaryService: CloudinaryService,
     private mailService: MailService,
   ) {}
 
@@ -29,30 +36,53 @@ export class UserService {
       if (existingUser) {
         throw new Error('Email is in use!');
       }
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const newVerification = await this.prisma.verification.create({
+        data: {
+          user_id: '',
+          verificationToken: verificationCode, // Generate a secure random token
+          verificationTokenExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
+
       const user = await this.prisma.user.create({
         data: {
-          // role:dto.role,
+          // role:dto.role
+          verification: {
+            connect: {
+              id: newVerification.id,
+            },
+          },
           first_name: dto.firstName,
           last_name: dto.lastName,
           email: dto.email,
           password: hashedPassword,
         },
       });
+      await this.prisma.verification.update({
+        where:{
+          id: newVerification.id
+        },
+        data:{
+          user_id: user.id
+        }
+      });
       await this.mailService.sendWelcomeEmail({
         names: `${user.first_name} ${user.last_name}`,
         email: user.email,
       });
+      await this.mailService.sendInitiateEmailVerificationEmail({email:user.email,verificationCode,names:`${user.first_name} ${user.last_name}`})
       return ApiResponse.success('User Created successfully', user);
     } catch (error) {
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
-        return ApiResponse.error(
+         ApiResponse.error(
           `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
           error,
         );
       }
       console.log(error);
-      return ApiResponse.error('Internal server error', error);
+       ApiResponse.error('Internal server error', error);
     }
   }
   async makeUserAdmin(userId: string) {
@@ -253,10 +283,20 @@ export class UserService {
       throw error;
     }
   }
-  async verifyEmail(userId: string): Promise<boolean> {
+  async verifyEmail(token:string,email: string): Promise<ApiResponse> {
     try {
+      const verification = await this.prisma.verification.findFirst({
+        where:{
+          verificationToken:token
+        }
+      });
+
+      if(Number(verification.verificationTokenExpiry) <  Date.now()) {
+          throw new Error("Verification code has expired!")
+      }
+    
       const user = await this.prisma.user.update({
-        where: { id: userId },
+        where: { email },
         data: {
           verification: {
             update: {
@@ -266,14 +306,20 @@ export class UserService {
         },
       });
 
-      if (user) {
-        return true;
-      } else {
-        return false;
-      }
+      return ApiResponse.success("Email Verified successfully!",user);
     } catch (error) {
       console.log('Error verifying email:', error);
-      throw error;
+      ApiResponse.error("Error verifying email:", error);
+    }
+  }
+
+  async deleteAll() {
+    try {
+      await this.prisma.user.deleteMany();
+      return ApiResponse.success("Delete all users");
+    } catch (error) {
+      log(error);
+      ApiResponse.error("Error deleting all",error.message,error.status)
     }
   }
 }

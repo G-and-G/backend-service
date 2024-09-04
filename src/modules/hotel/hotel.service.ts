@@ -94,7 +94,8 @@ export class HotelService {
       }
       return ApiResponse.success('Successfully fetched admins', hotel.admins);
     } catch (error) {
-      return ApiResponse.error('Error fetching admins', error.message);
+      ApiResponse.error('Error fetching admins', error.message);
+      return;
     }
   }
 
@@ -130,7 +131,8 @@ export class HotelService {
       });
       return ApiResponse.success('Hotels fetched successfully', hotels);
     } catch (error) {
-      return ApiResponse.error('Error fetching hotels', error.message);
+      ApiResponse.error('Error fetching hotels', error.message);
+      return;
     }
   }
 

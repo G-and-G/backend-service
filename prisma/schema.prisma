@@ -41,9 +41,9 @@ model User {
   phone_number      String?
   hotel             Hotel?          @relation(fields: [hotelId], references: [id])
   hotelId           Int?
-  // admin_hotels      Hotel[]
   role              Role            @default(NORMAL)
-  verification      Verification?
+  verification      Verification    @relation(fields: [verification_id], references: [id])
+  verification_id   String @unique
   password_reset    PasswordReset?
   orders            Order[]
   reviews           Review[]
@@ -72,7 +72,7 @@ model AssignedOrder {
 
 model Verification {
   id                      String             @id @default(uuid())
-  user                    User               @relation(fields: [user_id], references: [id])
+  user                    User?             
   user_id                 String             @unique
   verification_status     VerificationStatus @default(UNVERIFIED)
   verificationToken       String
