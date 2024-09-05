@@ -32,6 +32,10 @@ class ApiResponse {
       status,
     );
   }
+
+  static sendError(message: string, data?: any, status = 400) {
+    return new ApiResponse(false, message, data, status);
+  }
 }
 
 export default ApiResponse;

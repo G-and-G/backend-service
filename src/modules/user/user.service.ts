@@ -74,16 +74,21 @@ export class UserService {
     } catch (error) {
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
-        ApiResponse.error(
-          `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
-          error,
-        );
+        throw new BadRequestException(`${key} already exists`, error);
       }
       console.log(error);
-      ApiResponse.error('Internal server error', error);
+      throw new BadRequestException('Error creating user', error);
     }
   }
-  async makeUserAdmin(userId: string) {
+  async makeUserAdmin(userId: string, hotelId: number) {
+    const hotel = await this.prisma.hotel.findUnique({
+      where: {
+        id: hotelId,
+      },
+    });
+    if (!hotel) {
+      throw new BadRequestException('Hotel not found');
+    }
     try {
       const updatedUser = await this.prisma.user.update({
         where: {
@@ -91,16 +96,17 @@ export class UserService {
         },
         data: {
           role: Role.HOTEL_ADMIN, // Set the role to 'admin'
+          hotelId: hotelId,
         },
       });
 
       return ApiResponse.success(
-        'User role updated to admin successfully',
+        'User role updated to admin of a hotel successfully',
         updatedUser,
       );
     } catch (error) {
       console.log('Error updating user role:', error);
-      return ApiResponse.error('Error updating user role', error);
+      throw new BadRequestException('Error updating user role', error);
     }
   }
   async updateUser(userId: string, updateDTO: UpdateUserDTO) {

@@ -1,62 +1,67 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import ApiResponse from 'src/utils/ApiResponse';
+import { UserService } from '../user/user.service';
 import {
   AssignOrderDto,
   CreateDelivererDto,
   UpdateDelivererDto,
 } from './deliverer.dto';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class DelivererService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UserService,
+  ) {}
 
   async createDeliverer(dto: CreateDelivererDto, hotelId: string) {
     try {
-      // Convert hotelId to a number
+      await this.userService.createUser({
+        firstName: dto.first_name,
+        lastName: dto.last_name,
+        email: dto.email,
+        password: dto.password,
+      });
+      // update role to DELIVERER
       const hotelIdNumber = parseInt(hotelId, 10);
-
-      // Ensure hotelId is a valid number
       if (isNaN(hotelIdNumber)) {
         throw new Error('Invalid hotelId provided');
       }
-
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
-      const verificationCode = Math.floor(
-        100000 + Math.random() * 900000,
-      ).toString();
-
-      const newVerification = await this.prisma.verification.create({
+      const deliverer = await this.prisma.user.update({
+        where: { email: dto.email },
         data: {
-          user_id: '',
-          verificationToken: verificationCode, // Generate a secure random token
-          verificationTokenExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        },
-      });
-      const deliverer = await this.prisma.user.create({
-        data: {
-          ...dto,
-          password: hashedPassword,
           role: 'DELIVERER',
-          hotel: { connect: { id: hotelIdNumber } },
-          verification: {
-            connect: {
-              id: newVerification.id,
-            },
-          },
-        },
-      });
-      await this.prisma.verification.update({
-        where: {
-          id: newVerification.id,
-        },
-        data: {
-          user_id: deliverer.id,
+          hotelId: hotelIdNumber,
         },
       });
       return ApiResponse.success('Deliverer created successfully', deliverer);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async addExistingDeliverer(email: string, hotelId: string) {
+    const user = await this.userService.getUserByEmail(email);
+    if (!user) throw new BadRequestException('User does not exist');
+    try {
+      const hotelIdNumber = parseInt(hotelId, 10);
+      if (isNaN(hotelIdNumber)) {
+        throw new Error('Invalid hotelId provided');
+      }
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          role: 'DELIVERER',
+          hotelId: hotelIdNumber,
+        },
+      });
+      return ApiResponse.success('Deliverer added successfully', user);
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException(error);
@@ -97,32 +102,24 @@ export class DelivererService {
           order_id: dto.orderId,
         },
       });
-      return {
-        status: 200,
-        response: {
-          message: 'Order assigned to deliverer successfully',
-          assignment,
-        },
-      };
+      return ApiResponse.success('Order assigned successfully', assignment);
     } catch (error) {
       if (error.code === 'P2002' && error.meta?.target.includes('user_id')) {
-        return {
-          status: 400,
-          response: {
-            message: `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
-          },
-        };
+        // return {
+        //   status: 400,
+        //   response: {
+        //     message: `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
+        //   },
+        // };
+        throw new BadRequestException(
+          `Failed to assign order: Deliverer with user ID ${dto.userId} is already assigned to another order.`,
+        );
       }
 
       console.error('Unexpected error occurred:', error);
-
-      return {
-        status: 500,
-        response: {
-          message:
-            'Failed to assign order to deliverer due to an internal server error.',
-        },
-      };
+      throw new InternalServerErrorException(
+        'Failed to assign order to deliverer due to an internal server error.',
+      );
     }
   }
 

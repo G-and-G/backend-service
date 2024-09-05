@@ -12,13 +12,14 @@ import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/reviews/reviews.module';
 import { UserModule } from './modules/user/user.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
+import { RolesGuard } from './common/guards/role.guard';
 import { FirebaseController } from './firebase/firebase.controller';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
-import { PaymentModule } from './modules/payment/payment.module';
-import { PaymentService } from './modules/payment/payment.service';
-import { RolesGuard } from './common/guards/role.guard';
 import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { DelivererModule } from './modules/deliverer/deliverer.module';
+import { InviteModule } from './modules/invites/invite.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { PaymentService } from './modules/payment/payment.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { DelivererModule } from './modules/deliverer/deliverer.module';
     // GoogleModule,
     AnalyticsModule,
     DelivererModule,
+    InviteModule,
   ],
   controllers: [AppController, FirebaseController],
 

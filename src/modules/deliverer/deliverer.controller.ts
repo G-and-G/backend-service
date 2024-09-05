@@ -37,6 +37,22 @@ export class DelivererController {
     return this.delivererService.createDeliverer(createDelivererDto, hotelId);
   }
 
+  @Post('/add-existing')
+  @Roles(Role.HOTEL_ADMIN)
+  @ApiOperation({
+    summary: 'Add an existing user/deliverer to a specific hotel',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The deliverer has been successfully added.',
+  })
+  async addExistingDeliverer(
+    @Query('email') email: string,
+    @Query('hotelId') hotelId: string,
+  ) {
+    return this.delivererService.addExistingDeliverer(email, hotelId);
+  }
+
   @Put('update/:id')
   @Roles(Role.HOTEL_ADMIN)
   @ApiOperation({ summary: 'Update a deliverer' })
