@@ -34,6 +34,7 @@ export class CategoryService {
         subCategory,
       );
     } catch (error) {
+      console.log('error', error);
       return ApiResponse.error('Error creating Subcategory', error);
     }
   }

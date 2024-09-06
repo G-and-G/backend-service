@@ -152,7 +152,21 @@ export class DelivererService {
       const orders = await this.prisma.assignedOrder.findMany({
         where: { user_id: delivererId },
         include: {
-          order: true,
+          order: {
+            include: {
+              deliveryAddress: {
+                include: {
+                  address: true,
+                },
+              },
+              customer: true,
+              products: {
+                include: {
+                  menu_item: true,
+                },
+              },
+            },
+          },
         },
       });
       return ApiResponse.success('Orders retrieved successfully', orders);

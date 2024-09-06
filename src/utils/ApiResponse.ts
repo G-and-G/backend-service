@@ -28,6 +28,7 @@ class ApiResponse {
         success: false,
         message: message,
         status: status,
+        data: data,
       },
       status,
     );

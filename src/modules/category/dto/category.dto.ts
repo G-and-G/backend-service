@@ -1,14 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductCategory } from '@prisma/client';
-import {
-  ArrayNotEmpty,
-  ArrayUnique,
-  IsArray,
-  IsNotEmpty,
-  IsString,
-  Length,
-  min,
-} from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateCategoryDto {
   @ApiProperty({
@@ -19,7 +11,7 @@ export class CreateCategoryDto {
   @IsNotEmpty()
   @Length(5, 100, {
     message:
-      'Description must be atleast 5 characters and not exceeding 100 characters',
+      'Description must be at least 5 characters and not exceeding 100 characters',
   })
   description: string;
 
