@@ -219,6 +219,7 @@ export class OrderService {
         include: {
           products: true, // This will include the associated items for each order
           customer: true,
+          assignment:true
         },
       });
 
