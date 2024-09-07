@@ -7,6 +7,10 @@ datasource db {
   url       = env("DB_URL")
   directUrl = env("DIRECT_URL")
 }
+enum DeviceType {
+  IOS
+  ANDROID
+}
 
 enum Role {
   NORMAL
@@ -50,12 +54,22 @@ model User {
   notifications     Notification[]
   notificationToken String?
   assigned_orders   AssignedOrder[]
-
+  devices           Device[]
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
   hotel_invites HotelInvite[]
 
   @@map("users")
+}
+model Device {
+  id                String   @id @default(uuid())       // Unique device ID
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String                                    // Foreign key to User
+  oneSignalPlayerId String   @unique                          // Unique token for each device
+  deviceType        DeviceType?                                    // e.g., 'iOS', 'Android'
+  deviceName        String?                                   // Optional device name
+  createdAt         DateTime @default(now())                  // Creation timestamp
+  updatedAt         DateTime @updatedAt                       // Automatically updates on update
 }
 
 model AssignedOrder {

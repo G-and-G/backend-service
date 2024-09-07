@@ -8,7 +8,7 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
@@ -18,9 +18,10 @@ const prisma = new PrismaClient();
 
 @ApiTags('menu')
 @Controller('menu')
+@ApiBearerAuth("JWT-auth")
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
-
+  
   @Get('/')
   async getMenu() {
     try {
