@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { MailService } from 'src/mail/mail.service';
 // import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaService } from 'prisma/prisma.service';
@@ -9,6 +14,8 @@ import { hash } from 'bcrypt';
 import { log } from 'console';
 import ApiResponse from 'src/utils/ApiResponse';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { CreateDeviceDTO } from './dto/create-device-dto';
+import { CreateAlgoliaDto } from 'src/algolia/dto/create-algolia.dto';
 
 @Injectable()
 export class UserService {
@@ -345,6 +352,68 @@ export class UserService {
     } catch (error) {
       log(error);
       ApiResponse.error('Error deleting all', error.message, error.status);
+    }
+  }
+
+  async savePlayerId(
+    createDeviceDTO: CreateDeviceDTO,
+    userId: string,
+  ): Promise<ApiResponse> {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      }
+
+      const newDevice = await this.prisma.device.create({
+        data: {
+          oneSignalPlayerId: createDeviceDTO.playerId,
+          deviceName: createDeviceDTO.deviceName,
+          deviceType: createDeviceDTO.deviceType,
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
+      });
+      await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          devices: {
+            connect: {
+              id: newDevice.id,
+            },
+          },
+        },
+      });
+
+      return ApiResponse.success('Subscribed successfully', newDevice);
+    } catch (error) {
+      console.log(error);
+      ApiResponse.error(error.message);
+    }
+  }
+
+  async unSubscribeFromNotifications(userId: string): Promise<ApiResponse> {
+    try {
+      await this.prisma.device.deleteMany({
+        where: {
+          id: userId,
+        },
+      });
+
+      return ApiResponse.success('Successfully deleted all devices');
+    } catch (error) {
+      console.log(error);
+      return ApiResponse.success('Successfully deleted all devices');
     }
   }
 }
