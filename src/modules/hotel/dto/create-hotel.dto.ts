@@ -60,5 +60,5 @@ export class CreateHotelDTO {
     type: Number,
   })
   @IsNumber()
-  rating: Number;
+  rating: number;
 }

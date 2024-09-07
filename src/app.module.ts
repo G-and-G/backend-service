@@ -12,6 +12,8 @@ import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/reviews/reviews.module';
 import { UserModule } from './modules/user/user.module';
 // import { ErrorHandlingMiddleware } from './middlewares/ErrorHandling.middleware';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AlgoliaModule } from './algolia/algolia.module';
 import { RolesGuard } from './common/guards/role.guard';
 import { FirebaseController } from './firebase/firebase.controller';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
@@ -38,6 +40,8 @@ import { PaymentService } from './modules/payment/payment.service';
     AnalyticsModule,
     DelivererModule,
     InviteModule,
+    AlgoliaModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, FirebaseController],
 

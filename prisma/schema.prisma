@@ -43,13 +43,14 @@ model User {
   hotelId           Int?
   role              Role            @default(NORMAL)
   verification      Verification    @relation(fields: [verification_id], references: [id])
-  verification_id   String @unique
+  verification_id   String          @unique
   password_reset    PasswordReset?
   orders            Order[]
   reviews           Review[]
   notifications     Notification[]
   notificationToken String?
   assigned_orders   AssignedOrder[]
+  onePushIds        String[]
 
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt
@@ -72,7 +73,7 @@ model AssignedOrder {
 
 model Verification {
   id                      String             @id @default(uuid())
-  user                    User?             
+  user                    User?
   user_id                 String             @unique
   verification_status     VerificationStatus @default(UNVERIFIED)
   verificationToken       String

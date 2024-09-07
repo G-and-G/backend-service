@@ -18,5 +18,5 @@ export class CreateMenuDTO {
   items: any[];
   @IsArray()
   @ApiProperty({ example: [1, 2] })
-  categories: Number[];
+  categories: number[];
 }

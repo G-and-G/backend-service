@@ -16,7 +16,7 @@ export class OrderService {
       const orders = await this.prisma.order.findMany({
         include: {
           products: true, // This will include th3e associated items for each order
-          assignment:true
+          assignment: true,
         },
       });
 
@@ -219,7 +219,7 @@ export class OrderService {
         include: {
           products: true, // This will include the associated items for each order
           customer: true,
-          assignment:true
+          assignment: true,
         },
       });
 

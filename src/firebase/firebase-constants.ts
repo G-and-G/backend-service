@@ -1,1 +1,1 @@
-export let firebaseToken = '';
+export const firebaseToken = '';
