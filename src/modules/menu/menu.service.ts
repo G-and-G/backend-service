@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateMenuDTO } from '../hotel/dto/create-menu.dto';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
+import { UpdateMenuItemDTO } from './dtos/updateMenuItemDto';
 
 @Injectable()
 export class MenuService {
@@ -62,6 +63,30 @@ export class MenuService {
           quantity_available: data.quantity_available,
           sub_category_id: data.category_id,
           menu_id: hotelMenu.id,
+          description: data.description,
+          image: data.image,
+          price: data.price,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return new InternalServerErrorException(error);
+    }
+  }
+
+  async updateMenuItem(id: number, data: UpdateMenuItemDTO) {
+    const item = await this.prisma.menuItem.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!item) {
+      throw new NotFoundException('Menu Item not found');
+    }
+    try {
+      return await this.prisma.menuItem.update({
+        where: { id: Number(id) },
+        data: {
+          name: data.name,
+          quantity_available: data.quantity_available,
           description: data.description,
           image: data.image,
           price: data.price,

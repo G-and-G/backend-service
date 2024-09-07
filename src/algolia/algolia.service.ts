@@ -9,10 +9,10 @@ export class AlgoliaService {
   private readonly logger = new Logger(AlgoliaService.name);
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron('5 * * * * *')
-  handleCron() {
-    this.logger.debug('Called when the current second is 45');
-  }
+  // @Cron('5 * * * * *')
+  // handleCron() {
+  //   this.logger.debug('Called when the current second is 45');
+  // }
 
   // every day at 2:00 AM
   @Cron('0 2 * * *')

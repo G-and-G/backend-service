@@ -5,12 +5,14 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { PrismaClient } from '@prisma/client';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateMenuItemDTO } from './dtos/createMenuItemDTO';
+import { UpdateMenuItemDTO } from './dtos/updateMenuItemDto';
 import { MenuService } from './menu.service';
 const prisma = new PrismaClient();
 
@@ -121,5 +123,16 @@ export class MenuController {
   })
   async getMenuByHotelId(@Param('id') id: number) {
     return this.menuService.getMenuByHotelId(id, true);
+  }
+
+  @Put('/menuItem/:id')
+  @ApiParam({
+    name: 'id',
+  })
+  async updateMenuItem(
+    @Param('id') id: number,
+    @Body() body: UpdateMenuItemDTO,
+  ) {
+    return this.menuService.updateMenuItem(id, body);
   }
 }
