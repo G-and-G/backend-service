@@ -373,8 +373,8 @@ export class UserService {
       const newDevice = await this.prisma.device.create({
         data: {
           oneSignalPlayerId: createDeviceDTO.playerId,
-          deviceName:createDeviceDTO.deviceName,
-          deviceType:createDeviceDTO.deviceType,
+          deviceName: createDeviceDTO.deviceName,
+          deviceType: createDeviceDTO.deviceType,
           user: {
             connect: {
               id: user.id,

@@ -8,18 +8,21 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('notification')
 @ApiBearerAuth('JWT-auth')
 export class NotificationController {
-    constructor(private userService: UserService){}
-    @UseGuards(AuthGuard)
-    @Post('/subscribe')
-    async subscribeToNotifications(@Body() createDeviceDTO:CreateDeviceDTO,@Request() req:any){
-     const {id} = req.user;
-     console.log(req.user);
-     return this.userService.savePlayerId(createDeviceDTO,id);
-    }
+  constructor(private userService: UserService) {}
+  @UseGuards(AuthGuard)
+  @Post('/subscribe')
+  async subscribeToNotifications(
+    @Body() createDeviceDTO: CreateDeviceDTO,
+    @Request() req: any,
+  ) {
+    const { id } = req.user;
+    console.log(req.user);
+    return this.userService.savePlayerId(createDeviceDTO, id);
+  }
 
-    @Post('/unsubscribe')
-    async unSubscribeToNotifications(@Request() req:any){
-     const {id} = req.user;
-     return this.userService.unSubscribeFromNotifications(id);
-    }
+  @Post('/unsubscribe')
+  async unSubscribeToNotifications(@Request() req: any) {
+    const { id } = req.user;
+    return this.userService.unSubscribeFromNotifications(id);
+  }
 }

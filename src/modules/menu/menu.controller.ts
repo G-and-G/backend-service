@@ -18,10 +18,10 @@ const prisma = new PrismaClient();
 
 @ApiTags('menu')
 @Controller('menu')
-@ApiBearerAuth("JWT-auth")
+@ApiBearerAuth('JWT-auth')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
-  
+
   @Get('/')
   async getMenu() {
     try {

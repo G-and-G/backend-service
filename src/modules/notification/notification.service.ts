@@ -16,17 +16,17 @@ export class NotificationService {
     title: string,
     message: string,
     userIds: string[], // OneSignal Player/User ID
-    redirect_url?:string,
-    item?:object
+    redirect_url?: string,
+    item?: object,
   ): Promise<AxiosResponse<any>> {
     const notificationData = {
       app_id: this.ONE_SIGNAL_APP_ID,
       contents: { en: message },
       headings: { en: title },
       include_player_ids: userIds, // send to specific users
-      data:{
-       redirect_url,
-       item
+      data: {
+        redirect_url,
+        item,
       },
     };
 

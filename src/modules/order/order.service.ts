@@ -155,7 +155,7 @@ export class OrderService {
           }, // This will include the associated items for each order
           deliveryAddress: true,
           customer: true,
-          assignment:true
+          assignment: true,
         },
         // Include any related data if needed
       });

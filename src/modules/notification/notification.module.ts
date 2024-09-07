@@ -7,8 +7,8 @@ import { UserService } from '../user/user.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
-  imports:[UserModule,HttpModule],
+  imports: [UserModule, HttpModule],
   controllers: [NotificationController],
-  providers: [NotificationService,UserService],
+  providers: [NotificationService, UserService],
 })
 export class NotificationModule {}
