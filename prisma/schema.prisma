@@ -75,7 +75,7 @@ model Device {
 model AssignedOrder {
   id         String   @id @default(uuid())
   user       User     @relation(fields: [user_id], references: [id])
-  user_id    String   @unique
+  user_id    String   
   order      Order    @relation(fields: [order_id], references: [id])
   order_id   String   @unique
   created_at DateTime @default(now())

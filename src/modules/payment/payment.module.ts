@@ -8,10 +8,13 @@ import { OrderService } from 'src/modules/order/order.service';
 import { UserModule } from 'src/modules/user/user.module';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
+import { NotificationModule } from '../notification/notification.module';
+import { NotificationService } from '../notification/notification.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [PrismaModule, UserModule, PaymentModule],
+  imports: [PrismaModule, UserModule, PaymentModule,HttpModule],
   controllers: [PaymentController],
-  providers: [PaymentService, PrismaService, OrderService],
+  providers: [PaymentService, PrismaService, OrderService,NotificationService],
 })
 export class PaymentModule {}

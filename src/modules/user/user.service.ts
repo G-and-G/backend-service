@@ -202,7 +202,11 @@ export class UserService {
 
   async getAllUsers() {
     try {
-      const users = await this.prisma.user.findMany();
+      const users = await this.prisma.user.findMany({
+        include:{
+          devices:true
+        }
+      });
       return users;
     } catch (error) {
       console.log('Error getting all users:', error);

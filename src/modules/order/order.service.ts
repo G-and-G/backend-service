@@ -3,12 +3,16 @@ import { Order, Role } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import ApiResponse from 'src/utils/ApiResponse';
 import { CreateOrderDTO } from './dtos/createOrderDTO';
+import { NotificationService } from '../notification/notification.service';
+import { HotelService } from '../hotel/hotel.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 // import { Address } from 'src/hotel/dto/address.dto';
 
 @Injectable()
 export class OrderService {
   constructor(
-    private readonly prisma: PrismaService, // private readonly hotelService: HotelService,
+    private readonly prisma: PrismaService,
+    private eventEmitter: EventEmitter2  // private readonly hotelService: HotelService,
   ) {}
 
   async getOrders(): Promise<Order[]> {
@@ -41,6 +45,7 @@ export class OrderService {
       const price = data.products.reduce((prev, curr) => {
         return prev + curr.product.price * curr.quantity;
       }, 0);
+
       const newOrder = await this.prisma.order.create({
         data: {
           price,
@@ -78,8 +83,19 @@ export class OrderService {
             })),
           },
         },
-        include: { products: true },
+        include: { products: true,customer:true ,hotel:true},
       });
+      let message:string = `${newOrder.customer.first_name} ${newOrder.customer.last_name} sent in a new Order, Make sure to check it out!`;
+      let hotel = await this.prisma.hotel.findFirst({
+        where:{
+          id:newOrder.hotel.id
+        },
+        include:{
+          admins:true
+        }
+      });
+      let adminsIds = hotel.admins.map(admin => admin.id);
+      await this.eventEmitter.emit("notification.send",{message,userIds:adminsIds});
       return ApiResponse.success('order placed successfully', newOrder, 201);
     } catch (error) {
       console.log('errorrrrrrrrrrr', error);
