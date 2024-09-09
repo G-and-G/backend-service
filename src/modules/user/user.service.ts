@@ -205,6 +205,7 @@ export class UserService {
       const users = await this.prisma.user.findMany({
         include: {
           devices: true,
+          notifications:true
         },
       });
       return users;
