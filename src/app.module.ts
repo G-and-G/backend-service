@@ -6,7 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CategoryModule } from './modules/category/category.module';
 import { HotelModule } from './modules/hotel/hotel.module';
 import { MenuModule } from './modules/menu/menu.module';
-import { NotificationGateway } from './modules/notification/notification.gateway';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationModule } from './modules/notification/notification.module';
 import { OrderModule } from './modules/order/order.module';
 import { ReviewModule } from './modules/reviews/reviews.module';
@@ -22,6 +22,8 @@ import { DelivererModule } from './modules/deliverer/deliverer.module';
 import { InviteModule } from './modules/invites/invite.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PaymentService } from './modules/payment/payment.service';
+import { NotificationService } from './modules/notification/notification.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -40,14 +42,16 @@ import { PaymentService } from './modules/payment/payment.service';
     AnalyticsModule,
     DelivererModule,
     InviteModule,
+    HttpModule,
     AlgoliaModule,
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController, FirebaseController],
 
   providers: [
     AppService,
-    NotificationGateway,
+    NotificationService,
     PaymentService,
     RolesGuard,
     AuthGuard,

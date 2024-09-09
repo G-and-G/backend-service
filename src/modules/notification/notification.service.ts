@@ -3,34 +3,60 @@ import { sendNotificationToClient } from './notify';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { PrismaService } from 'prisma/prisma.service';
+import { NotificationType } from '@prisma/client';
+import { RESPONSE_PASSTHROUGH_METADATA } from '@nestjs/common/constants';
+import { OnEvent } from '@nestjs/event-emitter';
+import { NotificationEvent } from 'src/events/notification.event';
 @Injectable()
 export class NotificationService {
-  private readonly ONE_SIGNAL_APP_ID = 'YOUR_ONESIGNAL_APP_ID';
-  private readonly ONE_SIGNAL_API_KEY = 'YOUR_ONESIGNAL_REST_API_KEY';
+  private readonly ONE_SIGNAL_APP_ID = process.env.ONESIGNAL_APP_ID;
+  private readonly ONE_SIGNAL_API_KEY = process.env.ONESIGNAL_API_KEY;
   private readonly ONE_SIGNAL_API_URL =
     'https://onesignal.com/api/v1/notifications';
 
-  constructor(private httpService: HttpService) {}
-
+  constructor(
+    private httpService: HttpService,
+    private prisma: PrismaService,
+  ) {}
+  @OnEvent('notification.send')
   async sendNotification(
-    title: string,
-    message: string,
-    userIds: string[], // OneSignal Player/User ID
-    redirect_url?: string,
-    item?: object,
+    event: NotificationEvent,
   ): Promise<AxiosResponse<any>> {
-    const notificationData = {
-      app_id: this.ONE_SIGNAL_APP_ID,
-      contents: { en: message },
-      headings: { en: title },
-      include_player_ids: userIds, // send to specific users
-      data: {
-        redirect_url,
-        item,
-      },
-    };
-
     try {
+      const users = await this.prisma.user.findMany({
+        where: {
+          id: {
+            in: event.userIds,
+          },
+        },
+        include: {
+          devices: true,
+        },
+      });
+      if (users.length <= 0) {
+        throw new Error('Users not found');
+      }
+      const oneSignalPlayerIds = users.reduce((acc, user) => {
+        return acc.concat(
+          user.devices.map((device) => device.oneSignalPlayerId),
+        );
+      }, []);
+
+      console.log('ids', oneSignalPlayerIds);
+
+      const notificationData = {
+        app_id: this.ONE_SIGNAL_APP_ID,
+        contents: { en: event.message },
+        headings: { en: event.title },
+        include_subscription_ids: oneSignalPlayerIds, // send to specific users
+        data: {
+          redirect_url: event.redirect_url,
+          item: event.item,
+        },
+      };
+
+      console.log('API KEY', this.ONE_SIGNAL_API_KEY);
       const response = await lastValueFrom(
         this.httpService.post(this.ONE_SIGNAL_API_URL, notificationData, {
           headers: {
@@ -39,6 +65,19 @@ export class NotificationService {
           },
         }),
       );
+
+      await this.prisma.notification.create({
+        data: {
+          title: event.title,
+          content: event.message,
+          type: NotificationType.OTHER,
+          receivers: {
+            connect: users.map((user) => ({ id: user.id })),
+          },
+        },
+      });
+
+      console.log('Notification sent!', response.data);
       return response.data;
     } catch (error) {
       throw new HttpException(
