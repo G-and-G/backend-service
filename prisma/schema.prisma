@@ -208,6 +208,7 @@ model Hotel {
   startingWorkingTime String
   closingTime         String  @default("22:00")
   image               String
+  subaccount_id       String  @default("")
 
   created_at    DateTime      @default(now())
   updated_at    DateTime      @updatedAt

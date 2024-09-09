@@ -61,4 +61,8 @@ export class CreateHotelDTO {
   })
   @IsNumber()
   rating: number;
+  
+  @ApiProperty()
+  @IsString()
+  subaccount_id:string;
 }
