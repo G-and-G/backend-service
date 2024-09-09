@@ -17,7 +17,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 export class DelivererService {
   constructor(
     private readonly prisma: PrismaService,
-    private eventEmitter:EventEmitter2,
+    private eventEmitter: EventEmitter2,
     private readonly userService: UserService,
   ) {}
 
@@ -104,7 +104,12 @@ export class DelivererService {
           order_id: dto.orderId,
         },
       });
-      this.eventEmitter.emit("notification.send",{message:"You have been assigned a new order, checkout your orders to make sure you deliver them!",title:"New order 🔔",userIds:[dto.userId]});
+      this.eventEmitter.emit('notification.send', {
+        message:
+          'You have been assigned a new order, checkout your orders to make sure you deliver them!',
+        title: 'New order 🔔',
+        userIds: [dto.userId],
+      });
       return ApiResponse.success('Order assigned successfully', assignment);
     } catch (error) {
       throw new InternalServerErrorException(

@@ -13,8 +13,8 @@ import { NotificationService } from '../notification/notification.service';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [PrismaModule, UserModule, PaymentModule,HttpModule],
+  imports: [PrismaModule, UserModule, PaymentModule, HttpModule],
   controllers: [PaymentController],
-  providers: [PaymentService, PrismaService, OrderService,NotificationService],
+  providers: [PaymentService, PrismaService, OrderService, NotificationService],
 })
 export class PaymentModule {}

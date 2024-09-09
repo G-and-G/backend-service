@@ -9,9 +9,9 @@ import { HotelModule } from '../hotel/hotel.module';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [UserModule,NotificationModule,HotelModule,HttpModule],
+  imports: [UserModule, NotificationModule, HotelModule, HttpModule],
   controllers: [OrderController],
-  providers: [OrderService, HotelService,NotificationService],
+  providers: [OrderService, HotelService, NotificationService],
   exports: [OrderService],
 })
 export class OrderModule {}

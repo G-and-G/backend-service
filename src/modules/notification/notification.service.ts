@@ -21,7 +21,7 @@ export class NotificationService {
   ) {}
   @OnEvent('notification.send')
   async sendNotification(
-    event: NotificationEvent
+    event: NotificationEvent,
   ): Promise<AxiosResponse<any>> {
     try {
       const users = await this.prisma.user.findMany({
@@ -43,7 +43,7 @@ export class NotificationService {
         );
       }, []);
 
-      console.log("ids",oneSignalPlayerIds);
+      console.log('ids', oneSignalPlayerIds);
 
       const notificationData = {
         app_id: this.ONE_SIGNAL_APP_ID,
@@ -51,12 +51,12 @@ export class NotificationService {
         headings: { en: event.title },
         include_subscription_ids: oneSignalPlayerIds, // send to specific users
         data: {
-          redirect_url:event.redirect_url,
-          item:event.item,
-        }
+          redirect_url: event.redirect_url,
+          item: event.item,
+        },
       };
-      
-      console.log("API KEY", this.ONE_SIGNAL_API_KEY);
+
+      console.log('API KEY', this.ONE_SIGNAL_API_KEY);
       const response = await lastValueFrom(
         this.httpService.post(this.ONE_SIGNAL_API_URL, notificationData, {
           headers: {
@@ -68,7 +68,7 @@ export class NotificationService {
 
       await this.prisma.notification.create({
         data: {
-          title:event.title,
+          title: event.title,
           content: event.message,
           type: NotificationType.OTHER,
           receivers: {
@@ -77,7 +77,7 @@ export class NotificationService {
         },
       });
 
-      console.log("Notification sent!",response.data)
+      console.log('Notification sent!', response.data);
       return response.data;
     } catch (error) {
       throw new HttpException(

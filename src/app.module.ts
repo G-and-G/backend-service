@@ -45,7 +45,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     AlgoliaModule,
     ScheduleModule.forRoot(),
-    EventEmitterModule.forRoot()
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController, FirebaseController],
 

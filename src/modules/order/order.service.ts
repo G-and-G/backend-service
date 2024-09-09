@@ -12,7 +12,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
-    private eventEmitter: EventEmitter2  // private readonly hotelService: HotelService,
+    private eventEmitter: EventEmitter2, // private readonly hotelService: HotelService,
   ) {}
 
   async getOrders(): Promise<Order[]> {
@@ -83,19 +83,22 @@ export class OrderService {
             })),
           },
         },
-        include: { products: true,customer:true ,hotel:true},
+        include: { products: true, customer: true, hotel: true },
       });
-      let message:string = `${newOrder.customer.first_name} ${newOrder.customer.last_name} sent in a new Order, Make sure to check it out!`;
+      let message: string = `${newOrder.customer.first_name} ${newOrder.customer.last_name} sent in a new Order, Make sure to check it out!`;
       let hotel = await this.prisma.hotel.findFirst({
-        where:{
-          id:newOrder.hotel.id
+        where: {
+          id: newOrder.hotel.id,
         },
-        include:{
-          admins:true
-        }
+        include: {
+          admins: true,
+        },
       });
-      let adminsIds = hotel.admins.map(admin => admin.id);
-      await this.eventEmitter.emit("notification.send",{message,userIds:adminsIds});
+      let adminsIds = hotel.admins.map((admin) => admin.id);
+      await this.eventEmitter.emit('notification.send', {
+        message,
+        userIds: adminsIds,
+      });
       return ApiResponse.success('order placed successfully', newOrder, 201);
     } catch (error) {
       console.log('errorrrrrrrrrrr', error);

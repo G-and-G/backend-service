@@ -47,9 +47,9 @@ export class HotelService {
           startingWorkingTime: createHotelDTO.startingWorkingTime,
           closingTime: createHotelDTO.closingTime,
         },
-        include:{
-          admins:true
-        }
+        include: {
+          admins: true,
+        },
       });
 
       return ApiResponse.success('Hotel created successfully', hotel);
