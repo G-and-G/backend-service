@@ -9,7 +9,8 @@
     "build": "nest build",
     "gen": "prisma generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+   "start": "node --max-old-space-size=4096 ./node_modules/@nestjs/cli/bin/nest.js start",
+
     "form": "prisma format",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
