@@ -25,7 +25,6 @@ export class HotelService {
   ) {}
 
   async createHotel(createHotelDTO: CreateHotelDTO): Promise<ApiResponse> {
-    
     try {
       const hotel = await this.prisma.hotel.create({
         data: {
@@ -49,11 +48,9 @@ export class HotelService {
           admins: true,
         },
       });
-  
+
       return ApiResponse.success('Hotel created successfully', hotel);
     } catch (error) {
-     
-  
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
         return ApiResponse.sendError(
@@ -62,15 +59,23 @@ export class HotelService {
           409,
         );
       }
-  
+
       if (error.code === 'P2003') {
-        return ApiResponse.sendError('Invalid relation data provided', null, 400);
+        return ApiResponse.sendError(
+          'Invalid relation data provided',
+          null,
+          400,
+        );
       }
-  
+
       if (error.name === 'PrismaClientValidationError') {
-        return ApiResponse.sendError('Invalid input data for hotel creation', null, 400);
+        return ApiResponse.sendError(
+          'Invalid input data for hotel creation',
+          null,
+          400,
+        );
       }
-  
+
       return ApiResponse.sendError('Internal server error', error, 500);
     }
   }

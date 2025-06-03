@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsUrl, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsUrl,
+  Min,
+  Max,
+} from 'class-validator';
 
 class AddressDTO {
   @IsNotEmpty()
