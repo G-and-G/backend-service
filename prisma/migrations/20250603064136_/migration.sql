@@ -1,11 +1,14 @@
 -- CreateEnum
+CREATE TYPE "DeviceType" AS ENUM ('IOS', 'ANDROID');
+
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('NORMAL', 'HOTEL_ADMIN', 'SUPER_ADMIN', 'DELIVERER');
 
 -- CreateEnum
 CREATE TYPE "ProductCategory" AS ENUM ('FOOD', 'DRINK');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'COMPLETED');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'COMPLETED', 'DELIVERED');
 
 -- CreateEnum
 CREATE TYPE "VerificationStatus" AS ENUM ('UNVERIFIED', 'PENDING', 'VERIFIED');
@@ -22,6 +25,9 @@ CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED');
 -- CreateEnum
 CREATE TYPE "NotificationType" AS ENUM ('ORDER_PLACED', 'OTHER');
 
+-- CreateEnum
+CREATE TYPE "InviteStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -29,12 +35,28 @@ CREATE TABLE "users" (
     "last_name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "phone_number" TEXT,
+    "hotelId" INTEGER,
     "role" "Role" NOT NULL DEFAULT 'NORMAL',
+    "verification_id" TEXT NOT NULL,
     "notificationToken" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Device" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "oneSignalPlayerId" TEXT NOT NULL,
+    "deviceType" "DeviceType",
+    "deviceName" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Device_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -108,8 +130,8 @@ CREATE TABLE "addresses" (
     "name" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "street" TEXT,
-    "longitude" TEXT NOT NULL,
-    "latitude" TEXT NOT NULL,
+    "longitude" DOUBLE PRECISION NOT NULL,
+    "latitude" DOUBLE PRECISION NOT NULL,
     "country" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -134,15 +156,15 @@ CREATE TABLE "payments" (
 -- CreateTable
 CREATE TABLE "hotels" (
     "id" SERIAL NOT NULL,
-    "admin_id" TEXT,
     "name" TEXT NOT NULL,
     "address_id" TEXT NOT NULL,
     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "lastMonthOrders" INTEGER DEFAULT 0,
     "ThisWeekOrders" INTEGER DEFAULT 0,
-    "startingWorkingTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "endingWorkingTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "startingWorkingTime" TEXT NOT NULL,
+    "closingTime" TEXT NOT NULL DEFAULT '22:00',
     "image" TEXT NOT NULL,
+    "subaccount_id" TEXT NOT NULL DEFAULT '',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -236,6 +258,18 @@ CREATE TABLE "secret" (
 );
 
 -- CreateTable
+CREATE TABLE "hotel_invites" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "hotel_id" INTEGER NOT NULL,
+    "status" "InviteStatus" NOT NULL DEFAULT 'PENDING',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "hotel_invites_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_MenuItemToReview" (
     "A" INTEGER NOT NULL,
     "B" TEXT NOT NULL
@@ -257,7 +291,10 @@ CREATE TABLE "_NotificationToUser" (
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "assigned_orders_user_id_key" ON "assigned_orders"("user_id");
+CREATE UNIQUE INDEX "users_verification_id_key" ON "users"("verification_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Device_oneSignalPlayerId_key" ON "Device"("oneSignalPlayerId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "assigned_orders_order_id_key" ON "assigned_orders"("order_id");
@@ -281,9 +318,6 @@ CREATE UNIQUE INDEX "delivery_infos_address_id_key" ON "delivery_infos"("address
 CREATE UNIQUE INDEX "hotels_id_key" ON "hotels"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "hotels_admin_id_key" ON "hotels"("admin_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "hotels_address_id_key" ON "hotels"("address_id");
 
 -- CreateIndex
@@ -297,6 +331,9 @@ CREATE UNIQUE INDEX "menu_items_id_key" ON "menu_items"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "sub_categories_id_key" ON "sub_categories"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sub_categories_name_key" ON "sub_categories"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "reviews_id_key" ON "reviews"("id");
@@ -326,13 +363,19 @@ CREATE UNIQUE INDEX "_NotificationToUser_AB_unique" ON "_NotificationToUser"("A"
 CREATE INDEX "_NotificationToUser_B_index" ON "_NotificationToUser"("B");
 
 -- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_hotelId_fkey" FOREIGN KEY ("hotelId") REFERENCES "hotels"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_verification_id_fkey" FOREIGN KEY ("verification_id") REFERENCES "user_verifications"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Device" ADD CONSTRAINT "Device_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "assigned_orders" ADD CONSTRAINT "assigned_orders_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "assigned_orders" ADD CONSTRAINT "assigned_orders_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_verifications" ADD CONSTRAINT "user_verifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_password_resets" ADD CONSTRAINT "user_password_resets_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -351,9 +394,6 @@ ALTER TABLE "delivery_infos" ADD CONSTRAINT "delivery_infos_address_id_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "payments" ADD CONSTRAINT "payments_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "hotels" ADD CONSTRAINT "hotels_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "hotels" ADD CONSTRAINT "hotels_address_id_fkey" FOREIGN KEY ("address_id") REFERENCES "addresses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -375,6 +415,12 @@ ALTER TABLE "reviews" ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY ("user_i
 
 -- AddForeignKey
 ALTER TABLE "reviews" ADD CONSTRAINT "reviews_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "hotel_invites" ADD CONSTRAINT "hotel_invites_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "hotel_invites" ADD CONSTRAINT "hotel_invites_hotel_id_fkey" FOREIGN KEY ("hotel_id") REFERENCES "hotels"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_MenuItemToReview" ADD CONSTRAINT "_MenuItemToReview_A_fkey" FOREIGN KEY ("A") REFERENCES "menu_items"("id") ON DELETE CASCADE ON UPDATE CASCADE;

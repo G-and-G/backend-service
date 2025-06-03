@@ -135,22 +135,34 @@ export class UserService {
   }
   async makeUserSuperAdmin(userId: string) {
     try {
-      const updateUser = await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          role: 'SUPER_ADMIN',
-        },
+      // Validate UUID format
+   
+ 
+      console.log('Making user a super admin:', userId);
+  
+      // Check if user exists
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
       });
-
+      
+  
+      if (!user) {
+        return ApiResponse.error(`User with ID ${userId} not found`, null, 404);
+      }
+  
+      // Update user role
+      const updateUser = await this.prisma.user.update({
+        where: { id: userId },
+        data: { role: 'SUPER_ADMIN' },
+      });
+  
       return ApiResponse.success(
         'User role updated to Super Admin successfully',
         updateUser,
       );
     } catch (error) {
-      console.log('Error updating user role:', error);
-      return ApiResponse.error('Error updating user role', error);
+      console.error('Error updating user role:', error);
+      return ApiResponse.error('Error updating user role', error, 400);
     }
   }
 

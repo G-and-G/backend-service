@@ -25,12 +25,8 @@ export class HotelService {
   ) {}
 
   async createHotel(createHotelDTO: CreateHotelDTO): Promise<ApiResponse> {
-    console.log('Received DTO:', createHotelDTO);
+    
     try {
-      if (!createHotelDTO || !createHotelDTO.address) {
-        throw new BadRequestException('Invalid input data');
-      }
-
       const hotel = await this.prisma.hotel.create({
         data: {
           name: createHotelDTO.name,
@@ -42,29 +38,40 @@ export class HotelService {
               street: createHotelDTO.address.street,
               name: createHotelDTO.address.name,
               city: createHotelDTO.address.city,
+              country: createHotelDTO.address.country, // Optional
             },
           },
-          startingWorkingTime: createHotelDTO.startingWorkingTime,
+          startingWorkingTime: createHotelDTO.startingWorkingTime, // Fixed
           closingTime: createHotelDTO.closingTime,
+          rating: createHotelDTO.rating || 0, // Handle rating
         },
         include: {
           admins: true,
         },
       });
-
+  
       return ApiResponse.success('Hotel created successfully', hotel);
     } catch (error) {
-      console.log(error);
-
-      // Handle specific errors, e.g., duplicate entries
+     
+  
       if (error.code === 'P2002') {
         const key = error.meta.target[0];
-        throw new ConflictException(
+        return ApiResponse.sendError(
           `${key.charAt(0).toUpperCase() + key.slice(1)} already exists`,
+          null,
+          409,
         );
       }
-      console.log(error);
-      throw new InternalServerErrorException('Internal server error', error);
+  
+      if (error.code === 'P2003') {
+        return ApiResponse.sendError('Invalid relation data provided', null, 400);
+      }
+  
+      if (error.name === 'PrismaClientValidationError') {
+        return ApiResponse.sendError('Invalid input data for hotel creation', null, 400);
+      }
+  
+      return ApiResponse.sendError('Internal server error', error, 500);
     }
   }
 
