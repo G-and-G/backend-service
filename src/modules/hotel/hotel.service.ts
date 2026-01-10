@@ -137,6 +137,7 @@ export class HotelService {
 
   async getAllHotels(): Promise<ApiResponse> {
     try {
+
       const hotels = await this.prisma.hotel.findMany({
         include: {
           menu: true,
@@ -144,6 +145,8 @@ export class HotelService {
           address: true,
         },
       });
+      console.log("hotels",hotels);
+      
       return ApiResponse.success('Hotels fetched successfully', hotels);
     } catch (error) {
       ApiResponse.error('Error fetching hotels', error.message);

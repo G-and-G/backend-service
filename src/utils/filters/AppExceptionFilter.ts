@@ -14,15 +14,16 @@ export class AppExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
     console.log(`[APPLICATION LOG]: Error with status ${status}`);
-    let responseObject = ApiResponse.error(
+    let responseObject = ApiResponse.sendError(
       'Bad Request',
       exception.getResponse(),
     );
     if (status === 400) {
       console.log('400 status code error');
       if (Object.keys(exception.getResponse()).includes('message')) {
-        responseObject = ApiResponse.error(
-          exception.getResponse()['message'][0],
+        const message = exception.getResponse()['message'];
+        responseObject = ApiResponse.sendError(
+          Array.isArray(message) ? message[0] : message,
           exception.getResponse(),
         );
       }
@@ -30,7 +31,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     } else {
       response
         .status(status)
-        .json(ApiResponse.error('Internal server error', exception));
+        .json(ApiResponse.sendError('Internal server error', exception, status));
     }
   }
 }

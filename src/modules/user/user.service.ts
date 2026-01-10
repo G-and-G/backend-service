@@ -16,13 +16,14 @@ import ApiResponse from 'src/utils/ApiResponse';
 import { UpdateUserDTO } from './dto/update-user.dto';
 import { CreateDeviceDTO } from './dto/create-device-dto';
 import { CreateAlgoliaDto } from 'src/algolia/dto/create-algolia.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   async createUser(dto: RegisterDTO) {
     try {
@@ -40,7 +41,7 @@ export class UserService {
       ).toString();
       const newVerification = await this.prisma.verification.create({
         data: {
-          user_id: '',
+          user_id: randomUUID(),
           verificationToken: verificationCode, // Generate a secure random token
           verificationTokenExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24),
         },

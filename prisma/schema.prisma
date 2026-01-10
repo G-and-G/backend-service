@@ -3,10 +3,10 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DB_URL")
-  shadowDatabaseUrl  = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DB_URL")
 }
+
 enum DeviceType {
   IOS
   ANDROID
@@ -43,41 +43,52 @@ model User {
   email             String          @unique
   password          String
   phone_number      String?
-  hotel             Hotel?          @relation(fields: [hotelId], references: [id])
-  hotelId           Int?
-  role              Role            @default(NORMAL)
-  verification      Verification    @relation(fields: [verification_id], references: [id])
-  verification_id   String          @unique
+
+  hotelId           Int?     @map("hotel_id")
+  hotel             Hotel?   @relation(fields: [hotelId], references: [id])
+
+  role              Role     @default(NORMAL)
+
+  verification_id   String   @unique
+  verification      Verification @relation(fields: [verification_id], references: [id])
+
   password_reset    PasswordReset?
-  orders            Order[]
+  orders            Order[]  @relation("CustomerOrders")
   reviews           Review[]
   notifications     Notification[]
-  notificationToken String?
+  notificationToken String? @map("notification_token")
   assigned_orders   AssignedOrder[]
   devices           Device[]
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
-  hotel_invites HotelInvite[]
+  hotel_invites     HotelInvite[]
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   @@map("users")
 }
+
 model Device {
-  id                String   @id @default(uuid())       // Unique device ID
+  id                String   @id @default(uuid())
+
+  userId            String   @map("user_id")
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String                                    // Foreign key to User
-  oneSignalPlayerId String   @unique                          // Unique token for each device
-  deviceType        DeviceType?                                    // e.g., 'iOS', 'Android'
-  deviceName        String?                                   // Optional device name
-  createdAt         DateTime @default(now())                  // Creation timestamp
-  updatedAt         DateTime @updatedAt                       // Automatically updates on update
+
+  oneSignalPlayerId String   @unique @map("one_signal_player_id")
+  deviceType        DeviceType? @map("device_type")
+  deviceName        String?  @map("device_name")
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 }
 
 model AssignedOrder {
   id         String   @id @default(uuid())
-  user       User     @relation(fields: [user_id], references: [id])
-  user_id    String   
-  order      Order    @relation(fields: [order_id], references: [id])
+  user_id    String
   order_id   String   @unique
+
+  user       User     @relation(fields: [user_id], references: [id])
+  order      Order    @relation(fields: [order_id], references: [id])
+
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -85,24 +96,28 @@ model AssignedOrder {
 }
 
 model Verification {
-  id                      String             @id @default(uuid())
+  id                      String   @id @default(uuid())
+  user_id                 String   @unique
   user                    User?
-  user_id                 String             @unique
+
   verification_status     VerificationStatus @default(UNVERIFIED)
-  verificationToken       String
-  verificationTokenExpiry DateTime
-  created_at              DateTime           @default(now())
-  updated_at              DateTime           @updatedAt
+  verificationToken       String   @map("verification_token")
+  verificationTokenExpiry DateTime @map("verification_token_expiry")
+
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
 
   @@map("user_verifications")
 }
 
 model PasswordReset {
   id                  String   @id @default(uuid())
-  user                User     @relation(fields: [user_id], references: [id])
   user_id             String   @unique
-  passwordResetToken  String
-  passwordResetExpiry DateTime
+  user                User     @relation(fields: [user_id], references: [id])
+
+  passwordResetToken  String   @map("password_reset_token")
+  passwordResetExpiry DateTime @map("password_reset_expiry")
+
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
 
@@ -110,68 +125,79 @@ model PasswordReset {
 }
 
 model Order {
-  id                 String         @id @unique @default(uuid())
-  customer           User           @relation(fields: [customer_id], references: [id])
-  customer_id        String
-  hotel              Hotel          @relation(fields: [hotel_id], references: [id])
-  hotel_id           Int
-  date               DateTime       @default(now())
-  deliveryAddress    DeliveryInfo   @relation(fields: [deliveryAddress_id], references: [id])
-  deliveryAddress_id String         @unique
-  products           CartItem[]
-  price              Float
-  review             Review?
-  status             OrderStatus?   @default(PENDING)
-  payments           Payment[]
-  isPaid             Boolean        @default(false)
-  assignment         AssignedOrder?
+  id                 String   @id @default(uuid())
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  customer_id        String
+  customer           User     @relation("CustomerOrders", fields: [customer_id], references: [id])
+
+  hotel_id           Int
+  hotel              Hotel    @relation(fields: [hotel_id], references: [id])
+
+  deliveryAddress_id String   @map("delivery_address_id")
+  deliveryAddress    DeliveryInfo @relation(fields: [deliveryAddress_id], references: [id])
+
+  assignment         AssignedOrder?
+  payments           Payment[]
+  reviews            Review[]
+  products           OrderItem[]
+
+  price              Float    @default(0.0)
+  status             OrderStatus @default(PENDING)
+  isPaid             Boolean  @default(false) @map("is_paid")
+
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 
   @@map("orders")
 }
 
 model DeliveryInfo {
-  id          String   @id @default(uuid())
-  order       Order?
-  full_name   String
-  telephone   String
-  plateNumber String?
-  address     Address  @relation(fields: [address_id], references: [id])
-  address_id  String   @unique
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id           String   @id @default(uuid())
+  plateNumber  String?  @map("plate_number")
+  full_name    String
+  telephone    String
+
+  address_id   String?
+  address      Address? @relation(fields: [address_id], references: [id])
+
+  orders       Order[]
+
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   @@map("delivery_infos")
 }
 
 model Address {
-  id            String         @id @default(uuid())
+  id            String   @id @default(uuid())
   name          String
   city          String
   street        String?
   longitude     Float
   latitude      Float
   country       String?
+
   deliveryInfos DeliveryInfo[]
   hotels        Hotel?
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@map("addresses")
 }
 
 model Payment {
   id             String        @id @default(uuid())
-  order          Order         @relation(fields: [order_id], references: [id])
   order_id       String
+  order          Order         @relation(fields: [order_id], references: [id])
+
   payment_method PaymentMathod
   amount         Float
   currency       Currency
   status         PaymentStatus @default(PENDING)
-  created_at     DateTime      @default(now())
-  updated_at     DateTime      @updatedAt
+
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   @@map("payments")
 }
@@ -195,32 +221,33 @@ enum PaymentStatus {
 }
 
 model Hotel {
-  id                  Int     @id @unique @default(autoincrement())
+  id                  Int     @id @default(autoincrement())
   admins              User[]
   name                String
   menu                Menu?
-  address             Address @relation(fields: [address_id], references: [id])
   address_id          String  @unique
+  address             Address @relation(fields: [address_id], references: [id])
   orders              Order[]
   rating              Float   @default(0)
-  lastMonthOrders     Int?    @default(0)
-  ThisWeekOrders      Int?    @default(0)
-  startingWorkingTime String
-  closingTime         String  @default("22:00")
+  lastMonthOrders     Int?    @default(0) @map("last_month_orders")
+  ThisWeekOrders      Int?    @default(0) @map("this_week_orders")
+  startingWorkingTime String  @default("08:00") @map("starting_working_time")
+  closingTime         String  @default("22:00") @map("closing_time")
   image               String
   subaccount_id       String  @default("")
 
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
-  hotel_invites HotelInvite[]
+  hotel_invites       HotelInvite[]
+
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 
   @@map("hotels")
 }
 
 model Menu {
-  id       Int        @id @unique @default(autoincrement())
-  hotel    Hotel      @relation(fields: [hotel_id], references: [id])
-  hotel_id Int        @unique
+  id       Int     @id @default(autoincrement())
+  hotel_id Int     @unique
+  hotel    Hotel   @relation(fields: [hotel_id], references: [id])
   items    MenuItem[]
 
   created_at DateTime @default(now())
@@ -230,62 +257,83 @@ model Menu {
 }
 
 model MenuItem {
-  id                 Int         @id @unique @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   name               String
-  menu               Menu        @relation(fields: [menu_id], references: [id])
   menu_id            Int
+  menu               Menu    @relation(fields: [menu_id], references: [id])
   price              Float
-  sub_category       SubCategory @relation(fields: [sub_category_id], references: [id])
   sub_category_id    Int
+  sub_category       SubCategory @relation(fields: [sub_category_id], references: [id])
   quantity_available Int
   description        String
   image              String
   reviews            Review[]
   cart_items         CartItem[]
+  order_items        OrderItem[]
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 
   @@map("menu_items")
 }
 
+model OrderItem {
+  id           String   @id @default(uuid())
+  
+  order_id     String
+  order        Order    @relation(fields: [order_id], references: [id])
+
+  menuItem_id  Int      @map("menu_item_id")
+  menu_item    MenuItem @relation(fields: [menuItem_id], references: [id])
+
+  quantity     Int
+  
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("order_items")
+}
+
 model CartItem {
-  id          String   @id @default(uuid())
-  menu_item   MenuItem @relation(fields: [menuItem_id], references: [id])
-  quantity    Int
-  createdAt   DateTime @default(now())
-  menuItem_id Int
-  orders      Order[]
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id            String   @id @default(uuid())
+  menuItem_id   Int      @map("menu_item_id")
+  menu_item     MenuItem @relation(fields: [menuItem_id], references: [id])
+  quantity      Int
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   @@map("cart_items")
 }
 
 model SubCategory {
-  id          Int             @id @unique @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   type        ProductCategory
   items       MenuItem[]
   description String
   image       String?
-  name        String          @unique
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
+  name        String  @unique
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@map("sub_categories")
 }
 
 model Review {
-  id          String     @id @unique @default(uuid())
-  user        User       @relation(fields: [user_id], references: [id])
+  id          String   @id @default(uuid())
   user_id     String
+  user        User     @relation(fields: [user_id], references: [id])
+
+  order_id    String?  @unique
+  order       Order?   @relation(fields: [order_id], references: [id])
+
   description String
   title       String
-  order       Order?     @relation(fields: [order_id], references: [id])
-  order_id    String?    @unique
   menu_items  MenuItem[]
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@map("reviews")
 }
@@ -296,16 +344,16 @@ enum NotificationType {
 }
 
 model Notification {
-  id         String           @id @unique @default(uuid())
-  title      String
-  content    String
-  type       NotificationType
-  receivers  User[]
-  createdAt  DateTime?        @default(now())
-  imageLabel String?
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  type        NotificationType @default(OTHER)
+  imageLabel  String?  @map("image_label")
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  receivers   User[]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updated_at  DateTime @updatedAt
 
   @@map("notifications")
 }
@@ -316,14 +364,15 @@ model secret {
 }
 
 model HotelInvite {
-  id         String       @id @default(uuid())
-  user       User         @relation(fields: [user_id], references: [id])
+  id         String   @id @default(uuid())
   user_id    String
-  hotel      Hotel        @relation(fields: [hotel_id], references: [id])
+  user       User    @relation(fields: [user_id], references: [id])
   hotel_id   Int
+  hotel      Hotel   @relation(fields: [hotel_id], references: [id])
   status     InviteStatus @default(PENDING)
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("hotel_invites")
 }

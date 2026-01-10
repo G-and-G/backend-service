@@ -9,8 +9,7 @@
     "build": "nest build",
     "gen": "prisma generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-   "start": "node --max-old-space-size=4096 ./node_modules/@nestjs/cli/bin/nest.js start",
-
+    "start": "node --max-old-space-size=4096 ./node_modules/@nestjs/cli/bin/nest.js start",
     "form": "prisma format",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -49,6 +48,7 @@
     "dotenv": "^16.4.5",
     "firebase-admin": "^11.10.1",
     "flutterwave-node-v3": "^1.1.10",
+    "morgan": "^1.10.1",
     "nodemailer": "^6.9.4",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",

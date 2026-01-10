@@ -5,8 +5,11 @@ import 'dotenv/config';
 import { AppModule } from './app.module';
 import { AppExceptionFilter } from './common/filters/AppExceptionFilter';
 
+import * as morgan from 'morgan';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.use(morgan('dev'));
   const config = new DocumentBuilder()
     .setTitle('Swagger Grab and Go')
     .setDescription('The Grab and Go API description')
