@@ -31,7 +31,9 @@ export class AppExceptionFilter implements ExceptionFilter {
     } else {
       response
         .status(status)
-        .json(ApiResponse.sendError('Internal server error', exception, status));
+        .json(
+          ApiResponse.sendError('Internal server error', exception, status),
+        );
     }
   }
 }
