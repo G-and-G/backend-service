@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'prisma/prisma.module';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
@@ -44,6 +45,7 @@ import { HttpModule } from '@nestjs/axios';
     InviteModule,
     HttpModule,
     AlgoliaModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
   ],
@@ -57,4 +59,4 @@ import { HttpModule } from '@nestjs/axios';
     AuthGuard,
   ],
 })
-export class AppModule {}
+export class AppModule { }

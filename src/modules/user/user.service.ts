@@ -23,7 +23,7 @@ export class UserService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
-  ) { }
+  ) {}
 
   async createUser(dto: RegisterDTO) {
     try {
